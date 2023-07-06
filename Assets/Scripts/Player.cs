@@ -10,6 +10,11 @@ public class Player : MonoBehaviour
     float _horizontal = 0;
     float _vertical = 0;
     bool _delayFlag = false;
+    Animator _animator;
+    private void Start()
+    {
+        _animator = GetComponent<Animator>();
+    }
     void Update()
     {
         _horizontal = Input.GetAxisRaw("Horizontal");
@@ -21,6 +26,7 @@ public class Player : MonoBehaviour
             RaycastHit2D hit = PointCast(start + direction);
             if (hit.collider == null)
             {
+                _animator.Play("PlayerRun");
                 transform.position += (Vector3)direction;
             }
             else
@@ -34,8 +40,15 @@ public class Player : MonoBehaviour
             Vector2 start = transform.position;
             Vector2 direction = new Vector2(0, _vertical);
             RaycastHit2D hit = PointCast(start + direction);
-            if (hit.collider == null) transform.position += (Vector3)direction;
-            else PushBlock(hit.collider, direction);
+            if (hit.collider == null)
+            {
+                _animator.Play("PlayerRun");
+                transform.position += (Vector3)direction;
+            }
+            else
+            {
+                PushBlock(hit.collider, direction);
+            }
             StartCoroutine(DelayMove(0.2f));
         }
     }
