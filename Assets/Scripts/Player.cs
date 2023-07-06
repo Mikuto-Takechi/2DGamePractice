@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
@@ -9,36 +10,32 @@ public class Player : MonoBehaviour
     float _horizontal = 0;
     float _vertical = 0;
     bool _delayFlag = false;
-    void Start()
-    {
-    }
-
     void Update()
     {
         _horizontal = Input.GetAxisRaw("Horizontal");
         _vertical = Input.GetAxisRaw("Vertical");
-        Vector2 start = transform.position;
-        Debug.DrawLine(start, start + Vector2.right);
-        Debug.DrawLine(start, start + Vector2.left);
-        Debug.DrawLine(start, start + Vector2.up);
-        Debug.DrawLine(start, start + Vector2.down);
-        
-        //RaycastHit2D hit = Physics2D.CircleCast(start, 1, Vector2.zero);
-        //if (hit.collider) Debug.Log("a");
         if (_horizontal != 0 && !_delayFlag)
         {
-            RaycastHit2D hit = new RaycastHit2D();
-            if (_horizontal > 0) hit = Physics2D.Linecast(start, start + Vector2.right);
-            if (_horizontal < 0) hit = Physics2D.Linecast(start, start + Vector2.left);
-            if(hit.collider == null) transform.position += new Vector3(_horizontal, 0, 0);
+            Vector2 start = transform.position;
+            Vector2 direction = new Vector2(_horizontal, 0);
+            RaycastHit2D hit = PointCast(start + direction);
+            if (hit.collider == null)
+            {
+                transform.position += (Vector3)direction;
+            }
+            else
+            {
+                PushBlock(hit.collider, direction);
+            }
             StartCoroutine(DelayMove(0.2f));
         }
         if (_vertical != 0 && !_delayFlag)
         {
-            RaycastHit2D hit = new RaycastHit2D();
-            if (_vertical > 0) hit = Physics2D.Linecast(start, start + Vector2.up);
-            if (_vertical < 0) hit = Physics2D.Linecast(start, start + Vector2.down);
-            if (hit.collider == null) transform.position += new Vector3(0,_vertical,0);
+            Vector2 start = transform.position;
+            Vector2 direction = new Vector2(0, _vertical);
+            RaycastHit2D hit = PointCast(start + direction);
+            if (hit.collider == null) transform.position += (Vector3)direction;
+            else PushBlock(hit.collider, direction);
             StartCoroutine(DelayMove(0.2f));
         }
     }
@@ -48,5 +45,18 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(time);
         _delayFlag = false;
         yield break;
+    }
+    void PushBlock(Collider2D col, Vector2 direction)
+    {
+        if (col.CompareTag("Moveable"))
+        {
+            Vector2 start = col.transform.position;
+            RaycastHit2D hit = PointCast(start + direction);
+            if (hit.collider == null) col.transform.position += (Vector3)direction;
+        }
+    }
+    RaycastHit2D PointCast(Vector2 pos)
+    {
+        return Physics2D.Linecast(pos, pos);
     }
 }
