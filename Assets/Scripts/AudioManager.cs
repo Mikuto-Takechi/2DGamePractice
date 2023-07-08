@@ -49,5 +49,15 @@ public class AudioManager : MonoBehaviour
     }
     void SceneLoaded(Scene nextScene, LoadSceneMode mode)
     {
+        if(nextScene.name == "Title")
+        {
+            StopBGM();
+            PlayBGM(0);
+        }
+        if(nextScene.name == "Stage1")
+        {
+            StopBGM();
+            PlayBGM(1);
+        }
     }
 }
