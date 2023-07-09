@@ -1,49 +1,74 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.Burst.CompilerServices;
-using Unity.VisualScripting;
-using UnityEditor.Tilemaps;
+using System.Collections;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
+using UnityEngine.Animations;
+using System;
 
-public class Player : MonoBehaviour
+public class Player : InputBase
 {
-    float _horizontal = 0;
-    float _vertical = 0;
-    bool _delayFlag = false;
     Animator _animator;
     GameObject[] _allObjects;
+    Transform _transform;
+    Queue<Vector2> _inputQueue = new Queue<Vector2>();
+    /// <summary>入力バッファサイズ</summary>
+    [SerializeField] int _maxQueueCount = 2;
+    PlayerState _playerState = PlayerState.PlayerIdle;
+    int _coroutineCount = 0;
+
     private void Start()
     {
         _animator = GetComponent<Animator>();
         _allObjects = GameObject.FindObjectsOfType<GameObject>();
+        _transform = GetComponent<Transform>();
     }
     void Update()
     {
-        if (GManager.instance._gameState != GManager.GameState.Play) return;
-        _horizontal = Input.GetAxisRaw("Horizontal");
-        _vertical = Input.GetAxisRaw("Vertical");
-        if (_horizontal != 0 && !_delayFlag)
+        if (GManager.instance._gameState == GManager.GameState.Clear) return;
+
+        // 入力バッファに追加する
+        if (_gameInputs.Player.Up.triggered && _inputQueue.Count < _maxQueueCount)
         {
-            Vector2 start = transform.position;
-            Vector2 direction = new Vector2(_horizontal, 0);
-            PushBlock(start, start + direction);
-            StartCoroutine(DelayMove(0.2f));
+            _inputQueue.Enqueue(Vector2.up);
         }
-        if (_vertical != 0 && !_delayFlag)
+        if (_gameInputs.Player.Down.triggered && _inputQueue.Count < _maxQueueCount)
         {
-            Vector2 start = transform.position;
-            Vector2 direction = new Vector2(0, _vertical);
-            PushBlock(start, start + direction);
-            StartCoroutine(DelayMove(0.2f));
+            _inputQueue.Enqueue(Vector2.down);
+        }
+        if (_gameInputs.Player.Right.triggered && _inputQueue.Count < _maxQueueCount)
+        {
+            _inputQueue.Enqueue(Vector2.right);
+        }
+        if (_gameInputs.Player.Left.triggered && _inputQueue.Count < _maxQueueCount)
+        {
+            _inputQueue.Enqueue(Vector2.left);
+        }
+
+        // バッファから入力を処理する
+        if (_playerState == PlayerState.PlayerIdle && _inputQueue.Count > 0)
+        {
+            PushBlock((Vector2)_transform.position, (Vector2)_transform.position + _inputQueue.Dequeue());
         }
     }
-    IEnumerator DelayMove(float time)
+    IEnumerator Move(Transform obj, Vector2 to, Action callback)
     {
-        _delayFlag = true;
-        yield return new WaitForSeconds(time);
-        _delayFlag = false;
-        yield break;
+        ++_coroutineCount;
+        while (true)
+        {
+            Vector2 direction = (to - (Vector2)obj.position).normalized;
+            float distance = (to - (Vector2)obj.position).magnitude;
+            if (distance <= 0.1f)
+            {
+                obj.position = to;
+                --_coroutineCount;
+                callback();
+                yield break;
+            }
+            else
+            {
+                obj.position += (Vector3)direction / 10;
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
     }
     bool PushBlock(Vector2 from, Vector2 to)
     {
@@ -53,28 +78,35 @@ public class Player : MonoBehaviour
         if (hit.collider && hit.collider.CompareTag("Moveable"))//判定が取れたオブジェクトがブロックなら再帰処理
         {
             bool success = PushBlock(to, to + direction);
-            if (!success)
-                return false;
+            if (!success) return false;
         }
-        GameObject targetObject = null;
+
         foreach (GameObject ob in _allObjects)//座標から移動させるオブジェクトを探し出す
         {
-            if(ob != null && (Vector2)ob.transform.position == from && (ob.CompareTag("Player") || ob.CompareTag("Moveable")))
+            if (ob !=null && (Vector2)ob.transform.position == from && (ob.CompareTag("Player") || ob.CompareTag("Moveable")))
             {
-                targetObject = ob;
+                Transform objTransform = ob.transform;
+                _playerState = PlayerState.PlayerMoving;
+                //オブジェクトを目標の地点までスムーズに動かす↓
+                StartCoroutine(Move(objTransform, to, () => 
+                {
+                    if (_coroutineCount == 0)//実行されているコルーチンの数が0の場合はプレイヤーを操作可能な状態へ戻す
+                    {
+                        _playerState = PlayerState.PlayerIdle;
+                    }
+                }));
+                if (ob.CompareTag("Player"))
+                {
+                    GManager.instance.Steps += 1;
+                    AudioManager.instance.PlaySound(1);
+                    _animator.Play("PlayerRun");
+                }
+                if (ob.CompareTag("Moveable"))
+                {
+                    AudioManager.instance.PlaySound(0);
+                }
                 break;
             }
-        }
-        targetObject.transform.position = to;//移動
-        if(targetObject.CompareTag("Player"))
-        {
-            GManager.instance.Steps += 1;
-            AudioManager.instance.PlaySound(1);
-            _animator.Play("PlayerRun");
-        }
-        if(targetObject.CompareTag("Moveable"))
-        {
-            AudioManager.instance.PlaySound(0);
         }
         return true;
     }
@@ -82,4 +114,12 @@ public class Player : MonoBehaviour
     {
         return Physics2D.Linecast(pos, pos);
     }
+}
+
+public enum PlayerState
+{
+    NotReady,
+    PlayerIdle,
+    PlayerMoving,
+    Finished,
 }

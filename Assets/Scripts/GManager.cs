@@ -15,6 +15,7 @@ public class GManager : MonoBehaviour
     {
         Title,
         Play,
+        Move,
         Pause,
         Clear,
     }
@@ -43,7 +44,7 @@ public class GManager : MonoBehaviour
     }
     private void Update()
     {
-        if(_gameState == GameState.Play) _stageTime += Time.deltaTime;
+        if(_gameState == GameState.Play || _gameState == GameState.Move) _stageTime += Time.deltaTime;
     }
     void SceneLoaded(Scene nextScene, LoadSceneMode mode)
     {

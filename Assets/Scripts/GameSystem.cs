@@ -18,9 +18,10 @@ public class GameSystem : MonoBehaviour
         int blockOnPoints = 0;
         foreach (var point in blockPoints)
         {
+            Transform pointTransform = point.transform;
             foreach (var block in blocks)
             {
-                if (point.transform.position == block.transform.position)
+                if (pointTransform.position == block.transform.position)
                 {
                     ++blockOnPoints;
                 }
