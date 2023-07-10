@@ -1,16 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GamePanel : MonoBehaviour
 {
-    void Start()
+    [SerializeField] CanvasGroup[] _panels;
+    public void ChangePanel(int index)
     {
-        
-    }
-
-    void Update()
-    {
-        
+        foreach (var panel in _panels)
+        {
+            panel.alpha = 0;
+            panel.interactable = false;
+            panel.blocksRaycasts = false;
+            if(panel == _panels[index])
+            {
+                panel.alpha = 1;
+                panel.interactable = true;
+                panel.blocksRaycasts = true;
+            }
+        }
     }
 }
