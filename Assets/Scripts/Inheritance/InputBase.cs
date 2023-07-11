@@ -5,12 +5,12 @@ using UnityEngine;
 public abstract class InputBase : MonoBehaviour
 {
     public GameInputs _gameInputs;
-    private void Awake()
+    protected void Awake()
     {
         _gameInputs = new GameInputs();
         _gameInputs.Enable();
     }
-    private void OnDestroy()
+    protected void OnDestroy()
     {
         _gameInputs?.Dispose();
     }

@@ -3,25 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class AudioManager : MonoBehaviour
+public class AudioManager : Singleton<AudioManager>
 {
-    public static AudioManager instance;
     public AudioSource _se;
     public AudioSource _loop;
     [SerializeField] List<AudioClip> _audioList;
     [SerializeField] List<AudioClip> _bgmList;
-    private void Awake()
+
+    public override void AwakeFunction()
     {
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-            SceneManager.sceneLoaded += SceneLoaded;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        SceneManager.sceneLoaded += SceneLoaded;
     }
     public void PlaySound(int num)
     {
@@ -55,6 +46,11 @@ public class AudioManager : MonoBehaviour
             PlayBGM(0);
         }
         if(nextScene.name == "Stage1")
+        {
+            StopBGM();
+            PlayBGM(1);
+        }
+        if (nextScene.name == "Stage2")
         {
             StopBGM();
             PlayBGM(1);
