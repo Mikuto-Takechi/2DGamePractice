@@ -1,4 +1,4 @@
-//ˆø—pŒ³Fhttps://gist.github.com/hand-shouta-baba/72d0e82707e5ca820c87defabe9fd9da#file-jsondictionary-cs
+//< cite >< a href = "https://gist.github.com/hand-shouta-baba/72d0e82707e5ca820c87defabe9fd9da#file-jsondictionary-cs" > ˆø—pŒ³ </ a ></ cite >
 using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
