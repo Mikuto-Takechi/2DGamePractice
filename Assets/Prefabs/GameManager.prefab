@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _gameState: 0
   _maxQueueCount: 2
-  _moveInterval: 0.01
+  _moveInterval: 0.025
 --- !u!114 &-1801926212628663191
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -447,7 +447,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 282088940662830970}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 282088940778190804}
+        m_TargetAssemblyTypeName: GamePanel, Assembly-CSharp
+        m_MethodName: ChangeScene
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &282088940753988606
 GameObject:
   m_ObjectHideFlags: 0
@@ -853,6 +865,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _texts: []
   _type: 0
+  _stageName: 
 --- !u!114 &282088940840434049
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -963,7 +976,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _texts: []
-  _type: 1
+  _type: 3
+  _stageName: 
 --- !u!114 &282088940896257032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1306,7 +1320,8 @@ MonoBehaviour:
   _texts:
   - "[ESC]\u307E\u305F\u306FSTART\u3067\u30DD\u30FC\u30BA\u753B\u9762\u3092\u958B\u304F\u3002"
   - "[R]\u307E\u305F\u306FBACK\u3067\u30B9\u30C6\u30FC\u30B8\u306E\u72B6\u614B\u3092\u623B\u3059\u3002"
-  _type: 2
+  _type: 4
+  _stageName: 
 --- !u!114 &282088941068667018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1417,7 +1432,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _texts: []
-  _type: 0
+  _type: 2
+  _stageName: 
 --- !u!114 &282088941316382099
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1877,6 +1893,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _texts: []
   _type: 1
+  _stageName: 
 --- !u!114 &282088941716247076
 MonoBehaviour:
   m_ObjectHideFlags: 0

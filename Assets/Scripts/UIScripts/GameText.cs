@@ -20,6 +20,8 @@ public class GameText : MonoBehaviour
     {
         if(_type == TextType.Steps) _text.text = $"ï‡êîÅF{GManager.instance.Steps}";
         if (_type == TextType.Time) _text.text = $"éûä‘ÅF{GManager.instance.StageTime.ToString("F2")}";
+        if (_type == TextType.ClearSteps) _text.text = GManager.instance._stepText;
+        if (_type == TextType.ClearTime) _text.text = GManager.instance._timeText;
         if (_type == TextType.Records)
         {
             if(GManager.instance._stepsRecords.ContainsKey(_stageName) && GManager.instance._timeRecords.ContainsKey(_stageName))
@@ -47,6 +49,8 @@ enum TextType
 {
     Steps,
     Time,
+    ClearSteps,
+    ClearTime,
     MoveText,
     Records,
     None,

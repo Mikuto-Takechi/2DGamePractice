@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using System;
+using Kogane;
+using System.Globalization;
 
 public class GManager : Singleton<GManager>
 {
@@ -25,6 +27,8 @@ public class GManager : Singleton<GManager>
     [SerializeField] float _moveInterval = 0.05f;
     int _coroutineCount = 0;
     PlayerInput _playerInput;
+    public string _timeText, _stepText;
+
     public enum GameState
     {
         Title,
@@ -46,6 +50,11 @@ public class GManager : Singleton<GManager>
     public override void AwakeFunction()
     {
         SceneManager.sceneLoaded += SceneLoaded;
+        _playerInput = GetComponent<PlayerInput>();
+        var buffer = Load<int>("StepRecords");
+        if(buffer != null) _stepsRecords = buffer;
+        var buffer2 = Load<float>("TimeRecords");
+        if(buffer2 != null) _timeRecords = buffer2;
     }
     void SceneLoaded(Scene nextScene, LoadSceneMode mode)//シーンが読み込まれた時の処理
     {
@@ -85,9 +94,12 @@ public class GManager : Singleton<GManager>
         IsCleard();
         if (_gameState == GameState.Clear) return;
         if (_gameState == GameState.Pause) return;
-
         if (_gameInputs.Player.Reset.triggered)
         {
+            _inputQueue.Clear();//queueの中身を消す
+            StopAllCoroutines();//コルーチンを全て止める
+            _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
+            _gameState = GameState.Idle;
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
         _stageTime += Time.deltaTime;
@@ -136,8 +148,8 @@ public class GManager : Singleton<GManager>
         if (blockOnPoints == pointCount && _gameState != GameState.Clear)//クリア後処理
         {
             _gameState = GameState.Clear;
-            _timeRecords[SceneManager.GetActiveScene().name] = _stageTime;
-            _stepsRecords[SceneManager.GetActiveScene().name] = _steps;
+            _timeText = CheckRecord(_stageTime, _timeRecords);
+            _stepText = CheckRecord(_steps, _stepsRecords);
             _panel.ChangePanel(1);
             _panel.Clear();
             AudioManager.instance.StopBGM();
@@ -233,5 +245,68 @@ public class GManager : Singleton<GManager>
     RaycastHit2D PointCast(Vector2 pos)
     {
         return Physics2D.Linecast(pos, pos);
+    }
+    /// <summary>
+    /// 値が記録を更新しているかを確認して文字列を返す
+    /// 値が記録を更新していたら記録を上書きする
+    /// </summary>
+    string CheckRecord<T>(T current, Dictionary<string, T> dic) where T : IComparable<T>, IFormattable
+    {
+        string stageName = SceneManager.GetActiveScene().name;
+        string label = "", saveLabel = "", display = "";
+
+        if (typeof(T) == typeof(int))
+        {
+            saveLabel = "StepRecords";
+            label = "歩数";
+            display = current.ToString();
+        }
+        if (typeof(T) == typeof(float))
+        {
+            saveLabel = "TimeRecords";
+            label = "時間";
+            display = current.ToString("F2", new CultureInfo("en-US"));
+        }
+
+        string text = $"{label}：{display}";
+
+        //if (dic[stageName] > current)
+        if (dic[stageName].CompareTo(current) > 0)
+        {
+            dic[stageName] = current;
+            Save(saveLabel, dic);
+            text = $"{label}：{display} 記録更新！！";
+        }
+        return text;
+    }
+    /// <summary>
+    /// Dictionaryに保持されているデータをPlayerPrefsに保存する
+    /// </summary>
+    void Save<T>(string name, Dictionary<string,T> dic)
+    {
+        //Dictionaryをシリアル化可能な型に変換
+        var jsonDictionary = new JsonDictionary<string, T>(dic);
+        // インスタンス変数を JSON にシリアル化する
+        var json = JsonUtility.ToJson(jsonDictionary, true);
+        // PlayerPrefs に保存する
+        PlayerPrefs.SetString(name, json);
+    }
+    /// <summary>
+    /// PlayerPrefsに保存されているデータをDictionaryに戻す
+    /// </summary>
+    Dictionary<string, T> Load<T>(string name)
+    {
+        // PlayerPrefs から文字列を取り出す
+        string json = PlayerPrefs.GetString(name);
+        // デシリアライズする
+        var jsonDictionary = JsonUtility.FromJson<JsonDictionary<string, T>>(json);
+        if (jsonDictionary == null)
+        {
+            Debug.Log("データが入っていません");
+            return null;
+        }
+        //Dictionary型へ戻す
+        Dictionary<string, T> dictionary = jsonDictionary.Dictionary;
+        return dictionary;
     }
 }

@@ -1605,7 +1605,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _texts: []
-  _type: 3
+  _type: 5
   _stageName: Stage1
 --- !u!114 &1253170810
 MonoBehaviour:
@@ -1774,7 +1774,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _texts: []
-  _type: 3
+  _type: 5
   _stageName: 
 --- !u!1001 &1472064799
 PrefabInstance:
@@ -2035,7 +2035,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _texts: []
-  _type: 3
+  _type: 5
   _stageName: Stage2
 --- !u!1 &1709885621
 GameObject:
