@@ -729,7 +729,7 @@ MonoBehaviour:
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
-  m_ScreenMatchMode: 2
+  m_ScreenMatchMode: 1
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
@@ -806,8 +806,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -106.52, y: -24.699997}
-  m_SizeDelta: {x: 213.05, y: 30}
+  m_AnchoredPosition: {x: -164.74844, y: -32.89926}
+  m_SizeDelta: {x: 329.5069, y: 46.3985}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &282088940840434063
 CanvasRenderer:
@@ -839,11 +839,11 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 69e711adecd74934c9eae22fe080cfce, type: 3}
-    m_FontSize: 36
+    m_FontSize: 56
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
+    m_MinSize: 0
+    m_MaxSize: 64
     m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -1260,8 +1260,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 232.4143, y: -22}
-  m_SizeDelta: {x: 455.9286, y: 30}
+  m_AnchoredPosition: {x: 284.05054, y: -22}
+  m_SizeDelta: {x: 559.201, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &282088941068667023
 CanvasRenderer:
@@ -1293,10 +1293,10 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 69e711adecd74934c9eae22fe080cfce, type: 3}
-    m_FontSize: 26
+    m_FontSize: 32
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 3
     m_MaxSize: 40
     m_Alignment: 0
     m_AlignByGeometry: 0
@@ -1834,8 +1834,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -106.52, y: -69.3}
-  m_SizeDelta: {x: 213.05, y: 30}
+  m_AnchoredPosition: {x: -164.74844, y: -101.87842}
+  m_SizeDelta: {x: 329.5069, y: 46.3985}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &282088941716247077
 CanvasRenderer:
@@ -1867,11 +1867,11 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 69e711adecd74934c9eae22fe080cfce, type: 3}
-    m_FontSize: 36
+    m_FontSize: 56
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
+    m_MinSize: 0
+    m_MaxSize: 64
     m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1

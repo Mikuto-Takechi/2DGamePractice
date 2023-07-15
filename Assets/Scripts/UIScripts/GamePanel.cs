@@ -7,7 +7,7 @@ public class GamePanel : InputBase
     [SerializeField] CanvasGroup[] _panels;
 
     private void Update()
-    { 
+    {
         if (_gameInputs.Player.Pause.triggered)
         {
             SwitchPause();
@@ -20,11 +20,13 @@ public class GamePanel : InputBase
             panel.alpha = 0;
             panel.interactable = false;
             panel.blocksRaycasts = false;
-            if(panel == _panels[index])
+            if (panel == _panels[index])
             {
                 panel.alpha = 1;
                 panel.interactable = true;
                 panel.blocksRaycasts = true;
+                Button button = _panels[index].GetComponentInChildren<Button>();
+                if (button != null) button.Select();
             }
         }
     }
@@ -51,8 +53,16 @@ public class GamePanel : InputBase
     }
     public void ChangeScene(int index)
     {
-        if(index < 0) index = 0;
-        if(index > SceneManager.sceneCountInBuildSettings - 1) index = SceneManager.sceneCountInBuildSettings - 1;
+        if (index < 0) index = 0;
+        if (index > SceneManager.sceneCountInBuildSettings - 1) index = SceneManager.sceneCountInBuildSettings - 1;
         SceneManager.LoadScene(index);
+    }
+    public void QuitGame()
+    {
+    #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;//Unityエディター上ならこっち
+    #else
+        Application.Quit();//アプリ上ならこっち
+    #endif
     }
 }

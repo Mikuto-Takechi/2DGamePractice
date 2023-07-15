@@ -9,9 +9,14 @@ public class AudioManager : Singleton<AudioManager>
     public AudioSource _loop;
     [SerializeField] List<AudioClip> _audioList;
     [SerializeField] List<AudioClip> _bgmList;
+    public bool _toggleQuitSave { get; set; } = false;
 
-    public override void AwakeFunction()
+public override void AwakeFunction()
     {
+        float bgmVol = PlayerPrefs.GetFloat("BGM", 999);
+        float seVol = PlayerPrefs.GetFloat("SE", 999);
+        if (bgmVol != 999) _loop.volume = bgmVol;
+        if(seVol != 999) _se.volume = seVol;
         SceneManager.sceneLoaded += SceneLoaded;
     }
     public void PlaySound(int num)
@@ -54,6 +59,14 @@ public class AudioManager : Singleton<AudioManager>
         {
             StopBGM();
             PlayBGM(1);
+        }
+    }
+    private void OnApplicationQuit()
+    {
+        if(!_toggleQuitSave)
+        {
+            PlayerPrefs.SetFloat("BGM", _loop.volume);
+            PlayerPrefs.SetFloat("SE", _se.volume);
         }
     }
 }

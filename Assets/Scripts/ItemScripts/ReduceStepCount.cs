@@ -9,17 +9,17 @@ public class ReduceStepCount : ItemBase
     [SerializeField] int reduceCount = 0;
     public override void ItemEffect()//‘½‘Ô«‚ğg‚Á‚½ŒÄ‚Ño‚µ‚ğ‚µ‚Ä‚¢‚éêŠ
     {
-        if(GManager.instance.Steps > 0)
+        if(GManager.instance._steps > 0)
         {
-            int count = GManager.instance.Steps;
+            int count = GManager.instance._steps;
             count += reduceCount;
             if(count <= 0)
             {
-                GManager.instance.Steps = 0;
+                GManager.instance._steps = 0;
             }
             if(count > 0)
             {
-                GManager.instance.Steps = count;
+                GManager.instance._steps = count;
             }
         }
     }

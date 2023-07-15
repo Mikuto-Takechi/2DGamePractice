@@ -9,8 +9,8 @@ using System.Globalization;
 
 public class GManager : Singleton<GManager>
 {
-    int _steps = 0;
-    float _stageTime = 0;
+    public int _steps { get; set; } = 0;
+    public float _stageTime { get; set; } = 0;
     public GameState _gameState = GameState.Title;
     public Dictionary<string, float> _timeRecords = new Dictionary<string, float>();
     public Dictionary<string, int> _stepsRecords = new Dictionary<string, int>();
@@ -28,6 +28,7 @@ public class GManager : Singleton<GManager>
     int _coroutineCount = 0;
     PlayerInput _playerInput;
     public string _timeText, _stepText;
+    public bool _toggleQuitSave { get; set; } = false;
 
     public enum GameState
     {
@@ -36,16 +37,6 @@ public class GManager : Singleton<GManager>
         Clear,
         Idle,
         Move,
-    }
-    public int Steps
-    {
-        get { return _steps; }
-        set { _steps = value; }
-    }
-    public float StageTime
-    {
-        get { return _stageTime; }
-        set { _stageTime = value; } 
     }
     public override void AwakeFunction()
     {
@@ -86,6 +77,15 @@ public class GManager : Singleton<GManager>
                     _blocks.Add(obj);
                 }
             }
+        }
+    }
+    private void OnApplicationQuit()
+    {
+        //Debug.Log("ÉAÉvÉäèIóπ");
+        if(!_toggleQuitSave)
+        {
+            Save("StepRecords", _stepsRecords);
+            Save("TimeRecords", _timeRecords);
         }
     }
     private void Update()
