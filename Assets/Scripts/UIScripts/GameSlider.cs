@@ -14,6 +14,7 @@ public class GameSlider : MonoBehaviour
         _slider = GetComponent<Slider>();
         _sliderText = transform.GetComponentInChildren<Text>();
         if (_slider == null) return;
+        _slider.onValueChanged.AddListener(SliderSound);
         if (_sliderType == SliderType.BGM)
         {
             _slider.value = AudioManager.instance._loop.volume;//スライダーにAudioSourceの値を代入
@@ -39,6 +40,10 @@ public class GameSlider : MonoBehaviour
             AudioManager.instance._se.volume = _slider.value;//AudioSourceにスライダーの値を代入
             if (_sliderText) _sliderText.text = $"SE: {_slider.value.ToString("F1")}";
         }
+    }
+    void SliderSound(float num)
+    {
+        AudioManager.instance.PlaySound(4);
     }
 }
 enum SliderType

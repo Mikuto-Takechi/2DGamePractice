@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -15,6 +16,7 @@ public class GamePanel : InputBase
     }
     public void ChangePanel(int index)
     {
+        EventSystem.current.SetSelectedGameObject(null);
         foreach (var panel in _panels)
         {
             panel.alpha = 0;
@@ -26,7 +28,7 @@ public class GamePanel : InputBase
                 panel.interactable = true;
                 panel.blocksRaycasts = true;
                 Button button = _panels[index].GetComponentInChildren<Button>();
-                if (button != null) button.Select();
+                if (button != null) EventSystem.current.SetSelectedGameObject(button.gameObject);
             }
         }
     }
@@ -42,13 +44,23 @@ public class GamePanel : InputBase
         {
             GManager.instance._gameState = GManager.GameState.Pause;
             ChangePanel(2);//É|Å[ÉYUI
-            _panels[2].transform.GetComponentInChildren<Button>().Select();
+            Ease[] ease = _panels[2].transform.GetComponentsInChildren<Ease>();
+            foreach (var e in ease)
+            {
+                if (e != null) e._timer = 0;
+            }
+            //_panels[2].transform.GetComponentInChildren<Button>().Select();
             AudioManager.instance.PauseBGM(true);
             AudioManager.instance.PlaySound(2);
         }
     }
     public void Clear()
     {
+        Ease[] ease = _panels[1].transform.GetComponentsInChildren<Ease>();
+        foreach (var e in ease)
+        {
+            if(e != null) e._timer = 0;
+        }
         _panels[1].transform.GetComponentInChildren<Button>().Select();
     }
     public void ChangeScene(int index)

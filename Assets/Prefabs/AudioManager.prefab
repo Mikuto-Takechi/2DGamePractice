@@ -50,9 +50,11 @@ MonoBehaviour:
   _loop: {fileID: 5410545384752629279}
   _audioList:
   - {fileID: 8300000, guid: 20c5710f346662247adc1855a7e68088, type: 3}
-  - {fileID: 8300000, guid: 23af1a95eda471f4aa8858b6bffc44ed, type: 3}
+  - {fileID: 8300000, guid: b009104c149b5794daa69a54d818f7db, type: 3}
   - {fileID: 8300000, guid: 695127bdf2567ff43b569e9c0856ba91, type: 3}
   - {fileID: 8300000, guid: 88ae3ea9e48ea23478f0adcd61d45910, type: 3}
+  - {fileID: 8300000, guid: 9948b4ca8012ef147b36728bcda1b526, type: 3}
+  - {fileID: 8300000, guid: bf43a88439c139f49982c1a315154e23, type: 3}
   _bgmList:
   - {fileID: 8300000, guid: 978c86f8b1530aa41b6cc26e9aeb42cc, type: 3}
   - {fileID: 8300000, guid: 40db2ec3e0a31114aab3839bb825669d, type: 3}

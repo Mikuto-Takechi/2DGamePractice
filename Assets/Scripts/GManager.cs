@@ -29,6 +29,7 @@ public class GManager : Singleton<GManager>
     PlayerInput _playerInput;
     public string _timeText, _stepText;
     public bool _toggleQuitSave { get; set; } = false;
+    bool _singleCrateSound = false;
 
     public enum GameState
     {
@@ -51,6 +52,9 @@ public class GManager : Singleton<GManager>
     {
         if (!_timeRecords.ContainsKey(nextScene.name) && nextScene.name.Contains("Stage")) _timeRecords.Add(nextScene.name, 99999.99f);
         if (!_stepsRecords.ContainsKey(nextScene.name) && nextScene.name.Contains("Stage")) _stepsRecords.Add(nextScene.name, 99999);
+        _inputQueue.Clear();//queueの中身を消す
+        StopAllCoroutines();//コルーチンを全て止める
+        _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
         _steps = 0;
         _stageTime = 0;
         _panel = FindObjectOfType<GamePanel>();
@@ -94,15 +98,42 @@ public class GManager : Singleton<GManager>
         IsCleard();
         if (_gameState == GameState.Clear) return;
         if (_gameState == GameState.Pause) return;
+        //Undo処理
+        if (_gameInputs.Player.Undo.triggered)
+        {
+            _inputQueue.Clear();//queueの中身を消す
+            StopAllCoroutines();//コルーチンを全て止める
+            _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
+            //Undo用インターフェイスの呼び出し
+            foreach (GameObject obj in _allObjects)
+            {
+                //シングルトンパターンで_allObjectsに必ず1つnullが含まれているのでnullチェック
+                if (obj != null)
+                {
+                    IPopUndo i = obj.GetComponent<IPopUndo>();
+                    if (i != null) i.PopUndo();
+                }
+            }
+            _gameState = GameState.Idle;
+        }
+        //リセット処理
         if (_gameInputs.Player.Reset.triggered)
         {
             _inputQueue.Clear();//queueの中身を消す
             StopAllCoroutines();//コルーチンを全て止める
             _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
+            //リセット用インターフェイスの呼び出し
+            foreach (GameObject obj in _allObjects)
+            {
+                //シングルトンパターンで_allObjectsに必ず1つnullが含まれているのでnullチェック
+                if (obj != null)
+                {
+                    IReload i = obj.GetComponent<IReload>();
+                    if (i != null) i.Reload();
+                }
+            }
             _gameState = GameState.Idle;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
-        _stageTime += Time.deltaTime;
         // 入力バッファに追加する
         if (_gameInputs.Player.Up.triggered && _inputQueue.Count < _maxQueueCount)
         {
@@ -124,8 +155,16 @@ public class GManager : Singleton<GManager>
         // バッファから入力を処理する
         if (_gameState == GameState.Idle && _inputQueue.Count > 0)
         {
-            PushBlock((Vector2)_player.transform.position, (Vector2)_player.transform.position + _inputQueue.Dequeue());
+            if(_inputQueue.TryDequeue(out Vector2 pos))
+            {
+                if (PushBlock((Vector2)_player.transform.position, (Vector2)_player.transform.position + pos))
+                {
+                    _singleCrateSound = false;
+                }
+            }
         }
+        //stageTimeに加算
+        _stageTime += Time.deltaTime;
     }
     /// <summary>
     /// クリア判定
@@ -163,6 +202,8 @@ public class GManager : Singleton<GManager>
     {
         ++_coroutineCount;
         var wait = new WaitForSeconds(_moveInterval);
+        //行動記録を保存するために1フレーム待つ
+        yield return null;
         while (true)
         {
             Vector2 direction = (to - (Vector2)obj.position).normalized;
@@ -213,9 +254,33 @@ public class GManager : Singleton<GManager>
         {
             if (ob != null && (Vector2)ob.transform.position == from && (ob.CompareTag("Player") || ob.CompareTag("Moveable")))
             {
-                Transform objTransform = ob.transform;
+                //プレイヤーは1体しかいないので1回だけ実行される
+                if (ob.CompareTag("Player"))
+                {
+                    //全ての行動記録インターフェイス呼び出し
+                    foreach (GameObject obj in _allObjects)
+                    {
+                        //シングルトンパターンで_allObjectsに必ず1つnullが含まれているのでnullチェック
+                        if(obj != null)
+                        {
+                            IPushUndo i = obj.GetComponent<IPushUndo>();
+                            if (i != null) i.PushUndo();
+                        }
+                    }
+                    _steps += 1;
+                    AudioManager.instance.PlaySound(1);
+                    _player.GetComponent<Player>().PlayAnimation();
+                }
+                //ブロック
+                if (ob.CompareTag("Moveable"))
+                {
+                    StartCoroutine(Vibration(0.0f, 1.0f, 0.07f));
+                    if (_singleCrateSound == false) AudioManager.instance.PlaySound(0);
+                    _singleCrateSound = true;
+                }
                 _gameState = GameState.Move;
                 //オブジェクトを目標の地点までスムーズに動かす↓
+                Transform objTransform = ob.transform;
                 StartCoroutine(Move(objTransform, to, () =>
                 {
                     if (_coroutineCount == 0 && _gameState == GameState.Move)//実行されているコルーチンの数が0の場合はプレイヤーを操作可能な状態へ戻す
@@ -223,17 +288,6 @@ public class GManager : Singleton<GManager>
                         _gameState = GameState.Idle;
                     }
                 }));
-                if (ob.CompareTag("Player"))
-                {
-                    _steps += 1;
-                    AudioManager.instance.PlaySound(1);
-                    _player.GetComponent<Player>().PlayAnimation();
-                }
-                if (ob.CompareTag("Moveable"))
-                {
-                    StartCoroutine(Vibration(0.0f, 1.0f, 0.07f));
-                    AudioManager.instance.PlaySound(0);
-                }
                 break;
             }
         }

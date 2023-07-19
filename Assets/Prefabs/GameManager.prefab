@@ -48,6 +48,8 @@ MonoBehaviour:
   _gameState: 0
   _maxQueueCount: 2
   _moveInterval: 0.025
+  _timeText: 
+  _stepText: 
 --- !u!114 &-1801926212628663191
 MonoBehaviour:
   m_ObjectHideFlags: 0
