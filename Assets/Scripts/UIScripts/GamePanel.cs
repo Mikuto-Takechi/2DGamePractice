@@ -44,22 +44,21 @@ public class GamePanel : InputBase
         {
             GManager.instance._gameState = GManager.GameState.Pause;
             ChangePanel(2);//É|Å[ÉYUI
-            Ease[] ease = _panels[2].transform.GetComponentsInChildren<Ease>();
+            EaseText[] ease = _panels[2].transform.GetComponentsInChildren<EaseText>();
             foreach (var e in ease)
             {
-                if (e != null) e._timer = 0;
+                if (e != null) e.EaseStart();
             }
-            //_panels[2].transform.GetComponentInChildren<Button>().Select();
             AudioManager.instance.PauseBGM(true);
             AudioManager.instance.PlaySound(2);
         }
     }
     public void Clear()
     {
-        Ease[] ease = _panels[1].transform.GetComponentsInChildren<Ease>();
+        EaseText[] ease = _panels[1].transform.GetComponentsInChildren<EaseText>();
         foreach (var e in ease)
         {
-            if(e != null) e._timer = 0;
+            if (e != null) e.EaseStart();
         }
         _panels[1].transform.GetComponentInChildren<Button>().Select();
     }

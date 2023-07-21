@@ -7,9 +7,19 @@ using UnityEngine;
 public class ReduceStepCount : ItemBase
 {
     [SerializeField] int reduceCount = 0;
+    GameObject _easeText;
+    private new void Start()
+    {
+        base.Start();
+        _easeText = GameObject.Find("DisplayCanvas/MainPanel/Steps");
+    }
     public override void ItemEffect()//‘½‘Ô«‚ğg‚Á‚½ŒÄ‚Ño‚µ‚ğ‚µ‚Ä‚¢‚éêŠ
     {
-        if(GManager.instance._steps > 0)
+        if (_easeText.TryGetComponent(out EaseText text))
+        {
+            text.EaseStart();
+        }
+        if (GManager.instance._steps > 0)
         {
             int count = GManager.instance._steps;
             count += reduceCount;

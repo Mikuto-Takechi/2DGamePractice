@@ -7,8 +7,18 @@ using UnityEngine;
 public class ReduceTime : ItemBase
 {
     [SerializeField] float reduceCount = 0;
+    GameObject _easeText;
+    private new void Start()
+    {
+        base.Start();
+        _easeText = GameObject.Find("DisplayCanvas/MainPanel/Time");
+    }
     public override void ItemEffect()//‘½‘Ô«‚ğg‚Á‚½ŒÄ‚Ño‚µ‚ğ‚µ‚Ä‚¢‚éêŠ
     {
+        if(_easeText.TryGetComponent(out EaseText text))
+        {
+            text.EaseStart();
+        }
         if (GManager.instance._stageTime > 0)
         {
             float count = GManager.instance._stageTime;

@@ -233,6 +233,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _size: 1
   _maxTime: 1
+  _easeType: 1
 --- !u!212 &1194066081
 SpriteRenderer:
   m_ObjectHideFlags: 0

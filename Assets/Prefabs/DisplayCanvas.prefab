@@ -108,7 +108,7 @@ GameObject:
   - component: {fileID: 282088940271868641}
   - component: {fileID: 282088940271868654}
   - component: {fileID: 282088940271868640}
-  - component: {fileID: 1383725084370873297}
+  - component: {fileID: 3972978940529619060}
   m_Layer: 5
   m_Name: ClearText
   m_TagString: Untagged
@@ -193,7 +193,7 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
   m_EffectDistance: {x: 2, y: -2}
   m_UseGraphicAlpha: 1
---- !u!114 &1383725084370873297
+--- !u!114 &3972978940529619060
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -202,11 +202,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 282088940271868652}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f3ff380bee1e9149a7493f9c611a322, type: 3}
+  m_Script: {fileID: 11500000, guid: 15172d97f0333214784bca0eee2f5b43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _size: 1
-  _maxTime: 1
+  _easeType: 0
+  _easeTime: 1
 --- !u!1 &282088940600309084
 GameObject:
   m_ObjectHideFlags: 0
@@ -825,6 +825,7 @@ GameObject:
   - component: {fileID: 282088940840434060}
   - component: {fileID: 282088940840434062}
   - component: {fileID: 282088940840434049}
+  - component: {fileID: 7534589395830840198}
   m_Layer: 5
   m_Name: Steps
   m_TagString: Untagged
@@ -924,6 +925,20 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
   m_EffectDistance: {x: 2, y: -2}
   m_UseGraphicAlpha: 1
+--- !u!114 &7534589395830840198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282088940840434058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15172d97f0333214784bca0eee2f5b43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _easeType: 1
+  _easeTime: 1
 --- !u!1 &282088940896257077
 GameObject:
   m_ObjectHideFlags: 0
@@ -937,7 +952,7 @@ GameObject:
   - component: {fileID: 282088940896257079}
   - component: {fileID: 282088940896257033}
   - component: {fileID: 282088940896257032}
-  - component: {fileID: 6304485928260206370}
+  - component: {fileID: 4270875977815155837}
   m_Layer: 5
   m_Name: TimeText
   m_TagString: Untagged
@@ -1037,7 +1052,7 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
   m_EffectDistance: {x: 2, y: -2}
   m_UseGraphicAlpha: 1
---- !u!114 &6304485928260206370
+--- !u!114 &4270875977815155837
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1046,11 +1061,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 282088940896257077}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f3ff380bee1e9149a7493f9c611a322, type: 3}
+  m_Script: {fileID: 11500000, guid: 15172d97f0333214784bca0eee2f5b43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _size: 1
-  _maxTime: 1
+  _easeType: 0
+  _easeTime: 1
 --- !u!1 &282088940934068179
 GameObject:
   m_ObjectHideFlags: 0
@@ -1422,7 +1437,7 @@ GameObject:
   - component: {fileID: 282088941316382110}
   - component: {fileID: 282088941316382096}
   - component: {fileID: 282088941316382099}
-  - component: {fileID: 1210933721343537276}
+  - component: {fileID: 7693628436223376380}
   m_Layer: 5
   m_Name: StepsText
   m_TagString: Untagged
@@ -1522,7 +1537,7 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
   m_EffectDistance: {x: 2, y: -2}
   m_UseGraphicAlpha: 1
---- !u!114 &1210933721343537276
+--- !u!114 &7693628436223376380
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1531,11 +1546,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 282088941316382108}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f3ff380bee1e9149a7493f9c611a322, type: 3}
+  m_Script: {fileID: 11500000, guid: 15172d97f0333214784bca0eee2f5b43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _size: 1
-  _maxTime: 1
+  _easeType: 0
+  _easeTime: 1
 --- !u!1 &282088941571436892
 GameObject:
   m_ObjectHideFlags: 0
@@ -1937,6 +1952,7 @@ GameObject:
   - component: {fileID: 282088941716247074}
   - component: {fileID: 282088941716247075}
   - component: {fileID: 282088941716247076}
+  - component: {fileID: 1537889784026850213}
   m_Layer: 5
   m_Name: Time
   m_TagString: Untagged
@@ -2036,6 +2052,20 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
   m_EffectDistance: {x: 2, y: -2}
   m_UseGraphicAlpha: 1
+--- !u!114 &1537889784026850213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282088941716247073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15172d97f0333214784bca0eee2f5b43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _easeType: 1
+  _easeTime: 1
 --- !u!1 &282088941811330121
 GameObject:
   m_ObjectHideFlags: 0
@@ -2237,7 +2267,7 @@ GameObject:
   - component: {fileID: 282088942023231270}
   - component: {fileID: 282088942023231271}
   - component: {fileID: 282088942023231289}
-  - component: {fileID: 5401730019950713508}
+  - component: {fileID: 7640040946004317915}
   m_Layer: 5
   m_Name: PauseText
   m_TagString: Untagged
@@ -2322,7 +2352,7 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
   m_EffectDistance: {x: 2, y: -2}
   m_UseGraphicAlpha: 1
---- !u!114 &5401730019950713508
+--- !u!114 &7640040946004317915
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2331,11 +2361,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 282088942023231269}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f3ff380bee1e9149a7493f9c611a322, type: 3}
+  m_Script: {fileID: 11500000, guid: 15172d97f0333214784bca0eee2f5b43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _size: 1
-  _maxTime: 1
+  _easeType: 0
+  _easeTime: 1
 --- !u!1 &282088942127262401
 GameObject:
   m_ObjectHideFlags: 0

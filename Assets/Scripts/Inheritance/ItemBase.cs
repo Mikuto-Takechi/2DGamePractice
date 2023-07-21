@@ -10,7 +10,7 @@ public abstract class ItemBase : MonoBehaviour, IReload, IPushUndo, IPopUndo
     bool _active = true;
     SpriteRenderer _spriteRenderer;
     Stack<bool> _activeStack = new Stack<bool>();
-    private void Start()
+    protected void Start()
     {
         _player = GameObject.FindGameObjectWithTag("Player");
         _spriteRenderer = GetComponent<SpriteRenderer>();
