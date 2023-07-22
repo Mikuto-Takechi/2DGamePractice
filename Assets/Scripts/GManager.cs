@@ -23,8 +23,9 @@ public class GManager : Singleton<GManager>
     Queue<Vector2> _inputQueue = new Queue<Vector2>();
     /// <summary>入力バッファサイズ</summary>
     [SerializeField] int _maxQueueCount = 2;
-    /// <summary>移動処理の間隔</summary>
-    [SerializeField] float _moveInterval = 0.05f;
+    ///// <summary>移動処理の間隔</summary>
+    //[SerializeField] float _moveInterval = 0.05f;
+    [SerializeField] float _moveSpeed = 1.0f;
     int _coroutineCount = 0;
     PlayerInput _playerInput;
     public string _timeText, _stepText;
@@ -195,33 +196,52 @@ public class GManager : Singleton<GManager>
             AudioManager.instance.PlaySound(3);
         }
     }
-    /// <summary>
-    /// 指定した座標まで段階的に移動させる
-    /// </summary>
-    IEnumerator Move(Transform obj, Vector2 to, Action callback)
+    IEnumerator MoveSecond(Transform obj, Vector2 to, float endTime, Action callback)
     {
         ++_coroutineCount;
-        var wait = new WaitForSeconds(_moveInterval);
+        float timer = 0;
+        Vector2 from = obj.position;
         //行動記録を保存するために1フレーム待つ
         yield return null;
         while (true)
         {
-            Vector2 direction = (to - (Vector2)obj.position).normalized;
-            float distance = (to - (Vector2)obj.position).sqrMagnitude;
-            if (distance <= 0.1f * 0.1f)
+            timer += Time.deltaTime;
+            float x = timer / endTime;
+            obj.transform.position = Vector2.Lerp(from, to, x);
+            if (timer > endTime)
             {
-                obj.position = to;
                 --_coroutineCount;
                 callback();
                 yield break;
             }
-            else
-            {
-                obj.position += (Vector3)direction / 10;
-                yield return wait;
-            }
+            //処理速度が速すぎるのでUpdateと同じく1f待つ
+            yield return null;
         }
     }
+    //IEnumerator Move(Transform obj, Vector2 to, Action callback)
+    //{
+    //    ++_coroutineCount;
+    //    var wait = new WaitForSeconds(_moveInterval);
+    //    //行動記録を保存するために1フレーム待つ
+    //    yield return null;
+    //    while (true)
+    //    {
+    //        Vector2 direction = (to - (Vector2)obj.position).normalized;
+    //        float distance = (to - (Vector2)obj.position).sqrMagnitude;
+    //        if (distance <= 0.1f * 0.1f)
+    //        {
+    //            obj.position = to;
+    //            --_coroutineCount;
+    //            callback();
+    //            yield break;
+    //        }
+    //        else
+    //        {
+    //            obj.position += (Vector3)direction / 10;
+    //            yield return wait;
+    //        }
+    //    }
+    //}
     IEnumerator Vibration(float left, float right, float waitTime)
     {
         Gamepad gamepad = Gamepad.current;//ゲームパッド接続確認
@@ -281,7 +301,7 @@ public class GManager : Singleton<GManager>
                 _gameState = GameState.Move;
                 //オブジェクトを目標の地点までスムーズに動かす↓
                 Transform objTransform = ob.transform;
-                StartCoroutine(Move(objTransform, to, () =>
+                StartCoroutine(MoveSecond(objTransform, to, _moveSpeed,() =>
                 {
                     if (_coroutineCount == 0 && _gameState == GameState.Move)//実行されているコルーチンの数が0の場合はプレイヤーを操作可能な状態へ戻す
                     {

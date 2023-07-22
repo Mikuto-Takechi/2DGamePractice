@@ -868,3 +868,4 @@ MonoBehaviour:
   _easeType: 0
   _startTrans: {fileID: 1104124095}
   _endTrans: {fileID: 1422827042}
+  _easeTime: 1
