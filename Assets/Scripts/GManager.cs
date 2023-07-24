@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using System;
 using Kogane;
 using System.Globalization;
+using static UnityEditor.PlayerSettings;
 
 public class GManager : Singleton<GManager>
 {
@@ -26,11 +27,12 @@ public class GManager : Singleton<GManager>
     ///// <summary>移動処理の間隔</summary>
     //[SerializeField] float _moveInterval = 0.05f;
     [SerializeField] float _moveSpeed = 1.0f;
-    int _coroutineCount = 0;
+    public int _coroutineCount /*{ get; set; }*/ = 0;
     PlayerInput _playerInput;
     public string _timeText, _stepText;
     public bool _toggleQuitSave { get; set; } = false;
     bool _singleCrateSound = false;
+    [SerializeField] GameObject _shadow;
 
     public enum GameState
     {
@@ -100,11 +102,11 @@ public class GManager : Singleton<GManager>
         if (_gameState == GameState.Clear) return;
         if (_gameState == GameState.Pause) return;
         //Undo処理
-        if (_gameInputs.Player.Undo.triggered)
+        if (_gameInputs.Player.Undo.triggered && _coroutineCount == 0 && _gameState == GameState.Idle)
         {
             _inputQueue.Clear();//queueの中身を消す
-            StopAllCoroutines();//コルーチンを全て止める
-            _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
+            //StopAllCoroutines();//コルーチンを全て止める
+            //_coroutineCount = 0;//実行中のコルーチンのカウントをリセット
             //Undo用インターフェイスの呼び出し
             foreach (GameObject obj in _allObjects)
             {
@@ -115,7 +117,7 @@ public class GManager : Singleton<GManager>
                     if (i != null) i.PopUndo();
                 }
             }
-            _gameState = GameState.Idle;
+            //_gameState = GameState.Idle;
         }
         //リセット処理
         if (_gameInputs.Player.Reset.triggered)
@@ -154,7 +156,7 @@ public class GManager : Singleton<GManager>
         }
 
         // バッファから入力を処理する
-        if (_gameState == GameState.Idle && _inputQueue.Count > 0)
+        if (_gameState == GameState.Idle && _inputQueue.Count > 0 && _coroutineCount == 0)
         {
             if(_inputQueue.TryDequeue(out Vector2 pos))
             {
@@ -196,18 +198,24 @@ public class GManager : Singleton<GManager>
             AudioManager.instance.PlaySound(3);
         }
     }
-    IEnumerator MoveSecond(Transform obj, Vector2 to, float endTime, Action callback)
+    IEnumerator Move(Transform obj, Vector2 to, float endTime, float shadowInterval, Action callback)
     {
         ++_coroutineCount;
-        float timer = 0;
+        float timer = 0, shadowTimer = 0;
         Vector2 from = obj.position;
-        //行動記録を保存するために1フレーム待つ
-        yield return null;
         while (true)
         {
             timer += Time.deltaTime;
+            shadowTimer += Time.deltaTime;
             float x = timer / endTime;
-            obj.transform.position = Vector2.Lerp(from, to, x);
+            //一定間隔で残像を生成
+            if (shadowTimer > shadowInterval)
+            {
+                GameObject shadow = Instantiate(_shadow, obj.position, Quaternion.identity);
+                shadow.GetComponent<SpriteRenderer>().sprite = obj.GetComponent<SpriteRenderer>().sprite;
+                shadowTimer = 0;
+            }
+            obj.position = Vector2.Lerp(from, to, x);
             if (timer > endTime)
             {
                 --_coroutineCount;
@@ -218,30 +226,27 @@ public class GManager : Singleton<GManager>
             yield return null;
         }
     }
-    //IEnumerator Move(Transform obj, Vector2 to, Action callback)
-    //{
-    //    ++_coroutineCount;
-    //    var wait = new WaitForSeconds(_moveInterval);
-    //    //行動記録を保存するために1フレーム待つ
-    //    yield return null;
-    //    while (true)
-    //    {
-    //        Vector2 direction = (to - (Vector2)obj.position).normalized;
-    //        float distance = (to - (Vector2)obj.position).sqrMagnitude;
-    //        if (distance <= 0.1f * 0.1f)
-    //        {
-    //            obj.position = to;
-    //            --_coroutineCount;
-    //            callback();
-    //            yield break;
-    //        }
-    //        else
-    //        {
-    //            obj.position += (Vector3)direction / 10;
-    //            yield return wait;
-    //        }
-    //    }
-    //}
+    public void MoveFunction(Transform main, Vector2 to, float endTime, float shadowInterval)
+    {
+        _gameState = GameState.Move;
+        //表示用の子オブジェクトを取得する。
+        Transform sprite = main.GetChild(0);
+        //表示用のオブジェクトだけ滑らかに移動させる。
+        StartCoroutine(Move(sprite, to, endTime, shadowInterval, () =>
+        {
+            //移動処理終了後
+            //実行されているコルーチンの数が0の場合はプレイヤーを操作可能な状態へ戻す
+            if (_coroutineCount == 0 && _gameState == GameState.Move)
+            {
+                _gameState = GameState.Idle;
+            }
+            //親オブジェクトの座標を変えると子オブジェクトもついてくるので親子関係を解いてから、
+            //親オブジェクトを終点に飛ばす。
+            sprite.SetParent(null);
+            main.position = to;
+            sprite.SetParent(main);
+        }));
+    }
     IEnumerator Vibration(float left, float right, float waitTime)
     {
         Gamepad gamepad = Gamepad.current;//ゲームパッド接続確認
@@ -298,16 +303,7 @@ public class GManager : Singleton<GManager>
                     if (_singleCrateSound == false) AudioManager.instance.PlaySound(0);
                     _singleCrateSound = true;
                 }
-                _gameState = GameState.Move;
-                //オブジェクトを目標の地点までスムーズに動かす↓
-                Transform objTransform = ob.transform;
-                StartCoroutine(MoveSecond(objTransform, to, _moveSpeed,() =>
-                {
-                    if (_coroutineCount == 0 && _gameState == GameState.Move)//実行されているコルーチンの数が0の場合はプレイヤーを操作可能な状態へ戻す
-                    {
-                        _gameState = GameState.Idle;
-                    }
-                }));
+                MoveFunction(ob.transform, to, _moveSpeed, 999);
                 break;
             }
         }

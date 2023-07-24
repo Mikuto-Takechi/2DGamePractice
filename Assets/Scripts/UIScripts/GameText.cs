@@ -18,8 +18,8 @@ public class GameText : MonoBehaviour
 
     void Update()
     {
-        if(_type == TextType.Steps) _text.text = $"ï‡êîÅF{GManager.instance._steps}";
-        if (_type == TextType.Time) _text.text = $"éûä‘ÅF{GManager.instance._stageTime.ToString("F2")}";
+        if(_type == TextType.Steps) _text.text = $"ï‡êî {GManager.instance._steps}";
+        if (_type == TextType.Time) _text.text = $"éûä‘ {GManager.instance._stageTime.ToString("F2")}";
         if (_type == TextType.ClearSteps) _text.text = GManager.instance._stepText;
         if (_type == TextType.ClearTime) _text.text = GManager.instance._timeText;
         if (_type == TextType.Records)

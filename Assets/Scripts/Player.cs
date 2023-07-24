@@ -34,7 +34,9 @@ public class Player : MonoBehaviour, IReload, IPushUndo, IPopUndo
     {
         if (_moveStack.TryPop(out Vector2 pos))
         {
-            transform.position = pos;
+            if ((Vector2)transform.position == pos) return;
+            AudioManager.instance.PlaySound(6);
+            GManager.instance.MoveFunction(transform, pos, 0.1f, 0.015f);
         }
     }
 }
