@@ -155,17 +155,9 @@ public class GManager : Singleton<GManager>
             _inputQueue.Enqueue(Vector2.left);
         }
 
-        // バッファから入力を処理する
-        if (_gameState == GameState.Idle && _inputQueue.Count > 0 && _coroutineCount == 0)
-        {
-            if(_inputQueue.TryDequeue(out Vector2 pos))
-            {
-                if (PushBlock((Vector2)_player.transform.position, (Vector2)_player.transform.position + pos))
-                {
-                    _singleCrateSound = false;
-                }
-            }
-        }
+        //1f待ってバッファから入力を処理する
+        StartCoroutine(InputProcessing());
+ 
         //stageTimeに加算
         _stageTime += Time.deltaTime;
     }
@@ -196,6 +188,20 @@ public class GManager : Singleton<GManager>
             _panel.Clear();
             AudioManager.instance.StopBGM();
             AudioManager.instance.PlaySound(3);
+        }
+    }
+    IEnumerator InputProcessing()
+    {
+        yield return null;
+        if (_gameState == GameState.Idle && _inputQueue.Count > 0 && _coroutineCount == 0)
+        {
+            if (_inputQueue.TryDequeue(out Vector2 pos))
+            {
+                if (PushBlock((Vector2)_player.transform.position, (Vector2)_player.transform.position + pos))
+                {
+                    _singleCrateSound = false;
+                }
+            }
         }
     }
     IEnumerator Move(Transform obj, Vector2 to, float endTime, float shadowInterval, Action callback)
