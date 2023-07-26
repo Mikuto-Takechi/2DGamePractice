@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dd7bcb5817d07148a778de249dd0939, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  reduceCount: -5
+  reduceCount: -20
 --- !u!212 &5584243791924015260
 SpriteRenderer:
   m_ObjectHideFlags: 0
