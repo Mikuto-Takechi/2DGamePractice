@@ -32,6 +32,7 @@ public abstract class ItemBase : MonoBehaviour, IReload, IPushUndo, IPopUndo
     {
         _active = true;
         if (_spriteRenderer != null) _spriteRenderer.enabled = _active;
+        _activeStack.Clear();
     }
     public void PushUndo()
     {

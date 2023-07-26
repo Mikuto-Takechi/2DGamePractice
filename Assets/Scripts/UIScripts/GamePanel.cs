@@ -3,17 +3,9 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class GamePanel : InputBase
+public class GamePanel : MonoBehaviour
 {
     [SerializeField] CanvasGroup[] _panels;
-
-    private void Update()
-    {
-        if (_gameInputs.Player.Pause.triggered)
-        {
-            SwitchPause();
-        }
-    }
     public void ChangePanel(int index)
     {
         EventSystem.current.SetSelectedGameObject(null);

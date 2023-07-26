@@ -16,7 +16,6 @@ public class GManager : Singleton<GManager>
     public Dictionary<string, float> _timeRecords = new Dictionary<string, float>();
     public Dictionary<string, int> _stepsRecords = new Dictionary<string, int>();
     GamePanel _panel;
-
     GameObject[] _allObjects;
     GameObject _player;
     List<GameObject> _blockPoints = new List<GameObject>();
@@ -24,10 +23,9 @@ public class GManager : Singleton<GManager>
     Queue<Vector2> _inputQueue = new Queue<Vector2>();
     /// <summary>入力バッファサイズ</summary>
     [SerializeField] int _maxQueueCount = 2;
-    ///// <summary>移動処理の間隔</summary>
-    //[SerializeField] float _moveInterval = 0.05f;
+    /// <summary>移動速度</summary>
     [SerializeField] float _moveSpeed = 1.0f;
-    public int _coroutineCount /*{ get; set; }*/ = 0;
+    public int _coroutineCount { get; set; } = 0;
     PlayerInput _playerInput;
     public string _timeText, _stepText;
     public bool _toggleQuitSave { get; set; } = false;
@@ -47,9 +45,9 @@ public class GManager : Singleton<GManager>
         SceneManager.sceneLoaded += SceneLoaded;
         _playerInput = GetComponent<PlayerInput>();
         var buffer = Load<int>("StepRecords");
-        if(buffer != null) _stepsRecords = buffer;
+        if (buffer != null) _stepsRecords = buffer;
         var buffer2 = Load<float>("TimeRecords");
-        if(buffer2 != null) _timeRecords = buffer2;
+        if (buffer2 != null) _timeRecords = buffer2;
     }
     void SceneLoaded(Scene nextScene, LoadSceneMode mode)//シーンが読み込まれた時の処理
     {
@@ -62,7 +60,7 @@ public class GManager : Singleton<GManager>
         _stageTime = 0;
         _panel = FindObjectOfType<GamePanel>();
         _panel?.ChangePanel(0);
-        if(nextScene.name.Contains("Title"))
+        if (nextScene.name.Contains("Title"))
         {
             _gameState = GameState.Title;
         }
@@ -89,7 +87,7 @@ public class GManager : Singleton<GManager>
     private void OnApplicationQuit()
     {
         //Debug.Log("アプリ終了");
-        if(!_toggleQuitSave)
+        if (!_toggleQuitSave)
         {
             Save("StepRecords", _stepsRecords);
             Save("TimeRecords", _timeRecords);
@@ -100,13 +98,15 @@ public class GManager : Singleton<GManager>
         if (_gameState == GameState.Title) return;
         IsCleard();
         if (_gameState == GameState.Clear) return;
+        if (_gameInputs.Player.Pause.triggered)
+        {
+            _panel?.SwitchPause();
+        }
         if (_gameState == GameState.Pause) return;
         //Undo処理
         if (_gameInputs.Player.Undo.triggered && _coroutineCount == 0 && _gameState == GameState.Idle)
         {
             _inputQueue.Clear();//queueの中身を消す
-            //StopAllCoroutines();//コルーチンを全て止める
-            //_coroutineCount = 0;//実行中のコルーチンのカウントをリセット
             //Undo用インターフェイスの呼び出し
             foreach (GameObject obj in _allObjects)
             {
@@ -117,25 +117,34 @@ public class GManager : Singleton<GManager>
                     if (i != null) i.PopUndo();
                 }
             }
-            //_gameState = GameState.Idle;
         }
         //リセット処理
         if (_gameInputs.Player.Reset.triggered)
         {
-            _inputQueue.Clear();//queueの中身を消す
-            StopAllCoroutines();//コルーチンを全て止める
-            _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
-            //リセット用インターフェイスの呼び出し
-            foreach (GameObject obj in _allObjects)
+            //操作出来なくする
+            _gameState = GameState.Title;
+            //画面を徐々に暗くする
+            AudioManager.instance.PlaySound(7);
+            Fade fade = _panel.transform.GetComponentInChildren<Fade>();
+            fade?.CallFadeIn(() =>
             {
-                //シングルトンパターンで_allObjectsに必ず1つnullが含まれているのでnullチェック
-                if (obj != null)
+                _inputQueue.Clear();//queueの中身を消す
+                StopAllCoroutines();//コルーチンを全て止める
+                _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
+                //リセット用インターフェイスの呼び出し
+                foreach (GameObject obj in _allObjects)
                 {
-                    IReload i = obj.GetComponent<IReload>();
-                    if (i != null) i.Reload();
+                    //シングルトンパターンで_allObjectsに必ず1つnullが含まれているのでnullチェック
+                    if (obj != null)
+                    {
+                        IReload i = obj.GetComponent<IReload>();
+                        if (i != null) i.Reload();
+                    }
                 }
-            }
-            _gameState = GameState.Idle;
+                AudioManager.instance.PlaySound(8);
+                AudioManager.instance.PlaySound(9);
+                fade?.CallFadeOut(() => _gameState = GameState.Idle);
+            });
         }
         // 入力バッファに追加する
         if (_gameInputs.Player.Up.triggered && _inputQueue.Count < _maxQueueCount)
@@ -157,7 +166,7 @@ public class GManager : Singleton<GManager>
 
         //1f待ってバッファから入力を処理する
         StartCoroutine(InputProcessing());
- 
+
         //stageTimeに加算
         _stageTime += Time.deltaTime;
     }
@@ -292,7 +301,7 @@ public class GManager : Singleton<GManager>
                     foreach (GameObject obj in _allObjects)
                     {
                         //シングルトンパターンで_allObjectsに必ず1つnullが含まれているのでnullチェック
-                        if(obj != null)
+                        if (obj != null)
                         {
                             IPushUndo i = obj.GetComponent<IPushUndo>();
                             if (i != null) i.PushUndo();
@@ -358,7 +367,7 @@ public class GManager : Singleton<GManager>
     /// <summary>
     /// Dictionaryに保持されているデータをPlayerPrefsに保存する
     /// </summary>
-    void Save<T>(string name, Dictionary<string,T> dic)
+    void Save<T>(string name, Dictionary<string, T> dic)
     {
         //Dictionaryをシリアル化可能な型に変換
         var jsonDictionary = new JsonDictionary<string, T>(dic);
