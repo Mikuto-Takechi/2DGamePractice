@@ -48,7 +48,7 @@ public override void AwakeFunction()
         if(nextScene.name == "Title")
         {
             StopBGM();
-            PlayBGM(0);
+            PlayBGM(3);
         }
         if(nextScene.name == "Stage1")
         {
@@ -59,6 +59,11 @@ public override void AwakeFunction()
         {
             StopBGM();
             PlayBGM(1);
+        }
+        if (nextScene.name == "Stage3")
+        {
+            StopBGM();
+            PlayBGM(2);
         }
     }
     private void OnApplicationQuit()

@@ -62,6 +62,9 @@ MonoBehaviour:
   _bgmList:
   - {fileID: 8300000, guid: 978c86f8b1530aa41b6cc26e9aeb42cc, type: 3}
   - {fileID: 8300000, guid: 40db2ec3e0a31114aab3839bb825669d, type: 3}
+  - {fileID: 8300000, guid: 1e14e7ae867a1476fb521f5a66e723da, type: 3}
+  - {fileID: 8300000, guid: 39e7f0e93964f4f24a0d7e89a90454e7, type: 3}
+  - {fileID: 8300000, guid: b31d1222ed70f4868a427d4f685a5429, type: 3}
 --- !u!82 &5410545384752629264
 AudioSource:
   m_ObjectHideFlags: 0

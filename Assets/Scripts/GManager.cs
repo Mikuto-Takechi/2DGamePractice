@@ -199,6 +199,10 @@ public class GManager : Singleton<GManager>
             AudioManager.instance.PlaySound(3);
         }
     }
+    /// <summary>
+    /// 1f待ってから入力を受け付ける
+    /// </summary>
+    /// <returns></returns>
     IEnumerator InputProcessing()
     {
         yield return null;
@@ -218,6 +222,7 @@ public class GManager : Singleton<GManager>
         ++_coroutineCount;
         float timer = 0, shadowTimer = 0;
         Vector2 from = obj.position;
+        SpriteRenderer objSR = obj.GetComponent<SpriteRenderer>();
         while (true)
         {
             timer += Time.deltaTime;
@@ -227,7 +232,9 @@ public class GManager : Singleton<GManager>
             if (shadowTimer > shadowInterval)
             {
                 GameObject shadow = Instantiate(_shadow, obj.position, Quaternion.identity);
-                shadow.GetComponent<SpriteRenderer>().sprite = obj.GetComponent<SpriteRenderer>().sprite;
+                SpriteRenderer shadowSR = shadow.GetComponent<SpriteRenderer>();
+                shadowSR.sprite = objSR.sprite;
+                shadowSR.flipX = objSR.flipX;
                 shadowTimer = 0;
             }
             obj.position = Vector2.Lerp(from, to, x);
@@ -244,6 +251,13 @@ public class GManager : Singleton<GManager>
     public void MoveFunction(Transform main, Vector2 to, float endTime, float shadowInterval)
     {
         _gameState = GameState.Move;
+        //対象がプレイヤーの時 && 残像を表示する時(戻る時)
+        if(main.CompareTag("Player") && shadowInterval < 100)
+        {
+            //プレイヤーのアニメーションを逆向きで再生
+            Vector2 dir = to - (Vector2)main.position;
+            _player.GetComponent<Player>().PlayAnimation(dir*-1);
+        }
         //表示用の子オブジェクトを取得する。
         Transform sprite = main.GetChild(0);
         //表示用のオブジェクトだけ滑らかに移動させる。
@@ -309,7 +323,8 @@ public class GManager : Singleton<GManager>
                     }
                     _steps += 1;
                     AudioManager.instance.PlaySound(1);
-                    _player.GetComponent<Player>().PlayAnimation();
+                    Vector2 dir = to - (Vector2)_player.transform.position;
+                    _player.GetComponent<Player>().PlayAnimation(dir);
                 }
                 //ブロック
                 if (ob.CompareTag("Moveable"))
