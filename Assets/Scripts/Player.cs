@@ -14,7 +14,7 @@ public class Player : MonoBehaviour, IReload, IPushUndo, IPopUndo
     /// <summary>
     /// アニメーションを再生
     /// </summary>
-    public void PlayAnimation(Vector2 dir)
+    public void PlayAnimation(Vector2Int dir)
     {
         if(dir.y < 0)
             _animator.Play("PlayerRun");

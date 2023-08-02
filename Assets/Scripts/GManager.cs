@@ -6,8 +6,8 @@ using UnityEngine.SceneManagement;
 using System;
 using Kogane;
 using System.Globalization;
-using static UnityEditor.PlayerSettings;
-
+using UnityEngine.Tilemaps;
+[RequireComponent(typeof(MapEditor))]
 public class GManager : Singleton<GManager>
 {
     public int _steps { get; set; } = 0;
@@ -16,11 +16,7 @@ public class GManager : Singleton<GManager>
     public Dictionary<string, float> _timeRecords = new Dictionary<string, float>();
     public Dictionary<string, int> _stepsRecords = new Dictionary<string, int>();
     GamePanel _panel;
-    GameObject[] _allObjects;
-    GameObject _player;
-    List<GameObject> _blockPoints = new List<GameObject>();
-    List<GameObject> _blocks = new List<GameObject>();
-    Queue<Vector2> _inputQueue = new Queue<Vector2>();
+    Queue<Vector2Int> _inputQueue = new Queue<Vector2Int>();
     /// <summary>入力バッファサイズ</summary>
     [SerializeField] int _maxQueueCount = 2;
     /// <summary>移動速度</summary>
@@ -30,7 +26,9 @@ public class GManager : Singleton<GManager>
     public string _timeText, _stepText;
     public bool _toggleQuitSave { get; set; } = false;
     bool _singleCrateSound = false;
+    bool _pushField = false;
     [SerializeField] GameObject _shadow;
+    MapEditor _mapEditor;
 
     public enum GameState
     {
@@ -43,6 +41,7 @@ public class GManager : Singleton<GManager>
     public override void AwakeFunction()
     {
         SceneManager.sceneLoaded += SceneLoaded;
+        _mapEditor = GetComponent<MapEditor>();
         _playerInput = GetComponent<PlayerInput>();
         var buffer = Load<int>("StepRecords");
         if (buffer != null) _stepsRecords = buffer;
@@ -51,8 +50,6 @@ public class GManager : Singleton<GManager>
     }
     void SceneLoaded(Scene nextScene, LoadSceneMode mode)//シーンが読み込まれた時の処理
     {
-        if (!_timeRecords.ContainsKey(nextScene.name) && nextScene.name.Contains("Stage")) _timeRecords.Add(nextScene.name, 99999.99f);
-        if (!_stepsRecords.ContainsKey(nextScene.name) && nextScene.name.Contains("Stage")) _stepsRecords.Add(nextScene.name, 99999);
         _inputQueue.Clear();//queueの中身を消す
         StopAllCoroutines();//コルーチンを全て止める
         _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
@@ -64,24 +61,12 @@ public class GManager : Singleton<GManager>
         {
             _gameState = GameState.Title;
         }
-        if (nextScene.name.Contains("Stage"))
+        else
         {
+            _mapEditor.InitializeGame();
+            if (!_timeRecords.ContainsKey(_mapEditor._mapName)) _timeRecords.Add(_mapEditor._mapName, 99999.99f);
+            if (!_stepsRecords.ContainsKey(_mapEditor._mapName)) _stepsRecords.Add(_mapEditor._mapName, 99999);
             _gameState = GameState.Idle;
-            _allObjects = FindObjectsOfType<GameObject>();
-            _player = GameObject.Find("Player");
-            _blockPoints = new List<GameObject>();
-            _blocks = new List<GameObject>();
-            foreach (GameObject obj in _allObjects)
-            {
-                if (obj.CompareTag("BlockPoint"))
-                {
-                    _blockPoints.Add(obj);
-                }
-                if (obj.CompareTag("Moveable"))
-                {
-                    _blocks.Add(obj);
-                }
-            }
         }
     }
     private void OnApplicationQuit()
@@ -96,8 +81,21 @@ public class GManager : Singleton<GManager>
     private void Update()
     {
         if (_gameState == GameState.Title) return;
-        IsCleard();
         if (_gameState == GameState.Clear) return;
+        if(_mapEditor.IsCleared())
+        {
+            if (_gameState != GameState.Clear && _gameState != GameState.Move)//クリア後処理
+            {
+                _gameState = GameState.Clear;
+                _timeText = CheckRecord(_stageTime, _timeRecords);
+                _stepText = CheckRecord(_steps, _stepsRecords);
+                _panel.ChangePanel(1);
+                _panel.Clear();
+                AudioManager.instance.StopBGM();
+                AudioManager.instance.PlaySound(3);
+            }
+            return;
+        }
         if (_gameInputs.Player.Pause.triggered)
         {
             _panel?.SwitchPause();
@@ -107,10 +105,10 @@ public class GManager : Singleton<GManager>
         if (_gameInputs.Player.Undo.triggered && _coroutineCount == 0 && _gameState == GameState.Idle)
         {
             _inputQueue.Clear();//queueの中身を消す
+            _mapEditor.PopField();
             //Undo用インターフェイスの呼び出し
-            foreach (GameObject obj in _allObjects)
+            foreach (GameObject obj in _mapEditor._items)
             {
-                //シングルトンパターンで_allObjectsに必ず1つnullが含まれているのでnullチェック
                 if (obj != null)
                 {
                     IPopUndo i = obj.GetComponent<IPopUndo>();
@@ -131,10 +129,10 @@ public class GManager : Singleton<GManager>
                 _inputQueue.Clear();//queueの中身を消す
                 StopAllCoroutines();//コルーチンを全て止める
                 _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
+                _mapEditor.InitializeField();
                 //リセット用インターフェイスの呼び出し
-                foreach (GameObject obj in _allObjects)
+                foreach (GameObject obj in _mapEditor._items)
                 {
-                    //シングルトンパターンで_allObjectsに必ず1つnullが含まれているのでnullチェック
                     if (obj != null)
                     {
                         IReload i = obj.GetComponent<IReload>();
@@ -149,19 +147,19 @@ public class GManager : Singleton<GManager>
         // 入力バッファに追加する
         if (_gameInputs.Player.Up.triggered && _inputQueue.Count < _maxQueueCount)
         {
-            _inputQueue.Enqueue(Vector2.up);
+            _inputQueue.Enqueue(Vector2Int.down);
         }
         if (_gameInputs.Player.Down.triggered && _inputQueue.Count < _maxQueueCount)
         {
-            _inputQueue.Enqueue(Vector2.down);
+            _inputQueue.Enqueue(Vector2Int.up);
         }
         if (_gameInputs.Player.Right.triggered && _inputQueue.Count < _maxQueueCount)
         {
-            _inputQueue.Enqueue(Vector2.right);
+            _inputQueue.Enqueue(Vector2Int.right);
         }
         if (_gameInputs.Player.Left.triggered && _inputQueue.Count < _maxQueueCount)
         {
-            _inputQueue.Enqueue(Vector2.left);
+            _inputQueue.Enqueue(Vector2Int.left);
         }
 
         //1f待ってバッファから入力を処理する
@@ -169,35 +167,6 @@ public class GManager : Singleton<GManager>
 
         //stageTimeに加算
         _stageTime += Time.deltaTime;
-    }
-    /// <summary>
-    /// クリア判定
-    /// </summary>
-    void IsCleard()
-    {
-        int pointCount = _blockPoints.Count;
-        int blockOnPoints = 0;
-        foreach (GameObject obj in _blockPoints)
-        {
-            Transform pointTransform = obj.transform;
-            foreach (GameObject block in _blocks)
-            {
-                if (pointTransform.position == block.transform.position)
-                {
-                    ++blockOnPoints;
-                }
-            }
-        }
-        if (blockOnPoints == pointCount && _gameState != GameState.Clear)//クリア後処理
-        {
-            _gameState = GameState.Clear;
-            _timeText = CheckRecord(_stageTime, _timeRecords);
-            _stepText = CheckRecord(_steps, _stepsRecords);
-            _panel.ChangePanel(1);
-            _panel.Clear();
-            AudioManager.instance.StopBGM();
-            AudioManager.instance.PlaySound(3);
-        }
     }
     /// <summary>
     /// 1f待ってから入力を受け付ける
@@ -208,11 +177,13 @@ public class GManager : Singleton<GManager>
         yield return null;
         if (_gameState == GameState.Idle && _inputQueue.Count > 0 && _coroutineCount == 0)
         {
-            if (_inputQueue.TryDequeue(out Vector2 pos))
+            if (_inputQueue.TryDequeue(out Vector2Int pos))
             {
-                if (PushBlock((Vector2)_player.transform.position, (Vector2)_player.transform.position + pos))
+                var playerIndex = _mapEditor.GetPlayerIndex();
+                if (PushBlock(playerIndex, playerIndex + pos))
                 {
                     _singleCrateSound = false;
+                    _pushField = false;
                 }
             }
         }
@@ -252,12 +223,12 @@ public class GManager : Singleton<GManager>
     {
         _gameState = GameState.Move;
         //対象がプレイヤーの時 && 残像を表示する時(戻る時)
-        if(main.CompareTag("Player") && shadowInterval < 100)
-        {
-            //プレイヤーのアニメーションを逆向きで再生
-            Vector2 dir = to - (Vector2)main.position;
-            _player.GetComponent<Player>().PlayAnimation(dir*-1);
-        }
+        //if(main.CompareTag("Player") && shadowInterval < 100)
+        //{
+        //    //プレイヤーのアニメーションを逆向きで再生
+        //    Vector2Int dir = to - (Vector2)main.position;
+        //    _player.GetComponent<Player>().PlayAnimation(dir*-1);
+        //}
         //表示用の子オブジェクトを取得する。
         Transform sprite = main.GetChild(0);
         //表示用のオブジェクトだけ滑らかに移動させる。
@@ -293,66 +264,72 @@ public class GManager : Singleton<GManager>
     /// <summary>
     /// 移動の判定を取って処理につなげる
     /// </summary>
-    bool PushBlock(Vector2 from, Vector2 to)
+    bool PushBlock(Vector2Int from, Vector2Int to)
     {
-        RaycastHit2D hit = PointCast(to);
-        if (hit.collider && !hit.collider.CompareTag("Moveable")) return false;//移動先が壁なら処理を抜ける
-        Vector2 direction = to - from;
-        if (hit.collider && hit.collider.CompareTag("Moveable"))//判定が取れたオブジェクトがブロックなら再帰処理
+        // 縦軸横軸の配列外参照をしていないか
+        if (to.y < 0 || to.y >= _mapEditor.map.GetLength(0))
+            return false;
+        if (to.x < 0 || to.x >= _mapEditor.map.GetLength(1))
+            return false;
+        if (_mapEditor.map[to.y, to.x].Contains("w"))
+            return false;   // 移動先が壁なら動かせない
+        Vector2Int direction = to - from;
+        if (_mapEditor._field[to.y, to.x] != null && _mapEditor._field[to.y, to.x].tag == "Moveable")
         {
             bool success = PushBlock(to, to + direction);
-            if (!success) return false;
+
+            if (!success)
+                return false;
         }
 
-        foreach (GameObject ob in _allObjects)//座標から移動させるオブジェクトを探し出す
+        // GameObjectの座標(position)を移動させてからインデックスの入れ替え
+        var targetObject = _mapEditor._field[from.y, from.x];
+        var targetPosition = new Vector2(to.x, _mapEditor.map.GetLength(0) - to.y);
+        var player = targetObject.GetComponent<Player>();
+
+        if (player)
         {
-            if (ob != null && (Vector2)ob.transform.position == from && (ob.CompareTag("Player") || ob.CompareTag("Moveable")))
-            {
-                //プレイヤーは1体しかいないので1回だけ実行される
-                if (ob.CompareTag("Player"))
-                {
-                    //全ての行動記録インターフェイス呼び出し
-                    foreach (GameObject obj in _allObjects)
-                    {
-                        //シングルトンパターンで_allObjectsに必ず1つnullが含まれているのでnullチェック
-                        if (obj != null)
-                        {
-                            IPushUndo i = obj.GetComponent<IPushUndo>();
-                            if (i != null) i.PushUndo();
-                        }
-                    }
-                    _steps += 1;
-                    AudioManager.instance.PlaySound(1);
-                    Vector2 dir = to - (Vector2)_player.transform.position;
-                    _player.GetComponent<Player>().PlayAnimation(dir);
-                }
-                //ブロック
-                if (ob.CompareTag("Moveable"))
-                {
-                    StartCoroutine(Vibration(0.0f, 1.0f, 0.07f));
-                    if (_singleCrateSound == false) AudioManager.instance.PlaySound(0);
-                    _singleCrateSound = true;
-                }
-                MoveFunction(ob.transform, to, _moveSpeed, 999);
-                break;
-            }
+            _steps += 1;
+            AudioManager.instance.PlaySound(1);
+            player.PlayAnimation(direction);
         }
+        if(targetObject.CompareTag("Moveable"))
+        {
+            StartCoroutine(Vibration(0.0f, 1.0f, 0.07f));
+            if (_singleCrateSound == false)
+            {
+                //箱を元に呼び出された時、最初の1回だけ音を鳴らす。
+                AudioManager.instance.PlaySound(0);
+            } 
+            _singleCrateSound = true;
+        }
+        if(_pushField == false)
+        {
+            _mapEditor.PushField();
+            //インターフェイスの呼び出し
+            foreach (GameObject obj in _mapEditor._items)
+            {
+                if (obj != null)
+                {
+                    IPushUndo i = obj.GetComponent<IPushUndo>();
+                    if (i != null) i.PushUndo();
+                }
+            }
+            _pushField = true;
+        }
+        MoveFunction(targetObject.transform, targetPosition, _moveSpeed, 999);
+        _mapEditor._field[to.y, to.x] = _mapEditor._field[from.y, from.x];
+        _mapEditor._field[from.y, from.x] = null;
         return true;
     }
-    /// <summary>
-    /// Linecastを1点に絞る
-    /// </summary>
-    RaycastHit2D PointCast(Vector2 pos)
-    {
-        return Physics2D.Linecast(pos, pos);
-    }
+
     /// <summary>
     /// 値が記録を更新しているかを確認して文字列を返す
     /// 値が記録を更新していたら記録を上書きする
     /// </summary>
     string CheckRecord<T>(T current, Dictionary<string, T> dic) where T : IComparable<T>, IFormattable
     {
-        string stageName = SceneManager.GetActiveScene().name;
+        string stageName = _mapEditor._mapName;
         string label = "", saveLabel = "", display = "";
 
         if (typeof(T) == typeof(int))

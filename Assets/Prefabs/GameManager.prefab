@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 185269273831189667}
   - component: {fileID: 185269273831189666}
   - component: {fileID: -1801926212628663191}
+  - component: {fileID: 3594268987651630426}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -48,7 +49,6 @@ MonoBehaviour:
   _gameState: 0
   _maxQueueCount: 2
   _moveSpeed: 0.3
-  _coroutineCount: 0
   _timeText: 
   _stepText: 
   _shadow: {fileID: 2216680461163846205, guid: 570f0cfe8d00f014786973323f9afac6, type: 3}
@@ -82,3 +82,23 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &3594268987651630426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 185269273831189677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d7268bfa2481134eb711a99840a3e90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mapData: {fileID: 4900000, guid: 18551e15433686f41872eabde2ede487, type: 3}
+  _wallPrefabs:
+  - {fileID: 5870338377683659470, guid: 13f4b0a97acf7764187e65a64a546335, type: 3}
+  _groundPrefabs:
+  - {fileID: 5870338377683659470, guid: 3e246e67ccaf51d4b9f6f7fff639dc94, type: 3}
+  _playerPrefab: {fileID: 486475863234424499, guid: 1d91bc688150daf48a1f50d2c750e62f, type: 3}
+  _boxPrefab: {fileID: 2269101993774152916, guid: 81ced9c93bff0804cb3e086fa32be263, type: 3}
+  _goalPrefab: {fileID: 5870338377683659470, guid: 1b5173c5d4f665448b3a0cbc62ea5a47, type: 3}
