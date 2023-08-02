@@ -82,7 +82,7 @@ public class GManager : Singleton<GManager>
     {
         if (_gameState == GameState.Title) return;
         if (_gameState == GameState.Clear) return;
-        if(_mapEditor.IsCleared())
+        if (_mapEditor.IsCleared())
         {
             if (_gameState != GameState.Clear && _gameState != GameState.Move)//クリア後処理
             {
@@ -223,12 +223,13 @@ public class GManager : Singleton<GManager>
     {
         _gameState = GameState.Move;
         //対象がプレイヤーの時 && 残像を表示する時(戻る時)
-        //if(main.CompareTag("Player") && shadowInterval < 100)
-        //{
-        //    //プレイヤーのアニメーションを逆向きで再生
-        //    Vector2Int dir = to - (Vector2)main.position;
-        //    _player.GetComponent<Player>().PlayAnimation(dir*-1);
-        //}
+        Player hasPlayerComponent = main.GetComponent<Player>();
+        if (hasPlayerComponent && shadowInterval < 100)
+        {
+            //プレイヤーのアニメーションを逆向きで再生
+            Vector2 dir = to - (Vector2)main.position;
+            hasPlayerComponent.PlayAnimation(Vector2Int.RoundToInt(-dir));
+        }
         //表示用の子オブジェクトを取得する。
         Transform sprite = main.GetChild(0);
         //表示用のオブジェクトだけ滑らかに移動させる。
@@ -291,19 +292,20 @@ public class GManager : Singleton<GManager>
         {
             _steps += 1;
             AudioManager.instance.PlaySound(1);
-            player.PlayAnimation(direction);
+            //yは反転しているのでy方向の移動アニメーションは反転させる
+            player.PlayAnimation(direction.y == 0 ? direction : -direction);
         }
-        if(targetObject.CompareTag("Moveable"))
+        if (targetObject.CompareTag("Moveable"))
         {
             StartCoroutine(Vibration(0.0f, 1.0f, 0.07f));
             if (_singleCrateSound == false)
             {
                 //箱を元に呼び出された時、最初の1回だけ音を鳴らす。
                 AudioManager.instance.PlaySound(0);
-            } 
+            }
             _singleCrateSound = true;
         }
-        if(_pushField == false)
+        if (_pushField == false)
         {
             _mapEditor.PushField();
             //インターフェイスの呼び出し
