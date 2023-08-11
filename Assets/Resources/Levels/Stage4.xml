@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map name="Stage4" next="Stage5" version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="16" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="1">
+ <layer id="1" name="Terrain" width="16" height="16">
+  <data encoding="csv">
+w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,
+w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,
+w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,
+w,w,g,w,w,g,g,g,g,g,g,g,g,g,g,g,
+g,g,g,w,w,w,w,w,w,w,w,w,w,w,g,g,
+g,g,g,w,g,g,g,g,g,g,g,g,g,w,g,w,
+w,g,w,w,g,g,g,w,w,g,w,w,g,w,g,w,
+w,g,w,w,w,g,g,g,g,g,g,w,g,w,g,w,
+w,g,w,w,w,g,w,g,w,g,g,w,g,w,g,w,
+w,g,w,w,w,g,w,g,w,w,w,w,g,w,g,w,
+w,g,w,w,w,g,w,g,g,g,g,g,g,w,g,w,
+w,g,w,w,w,g,w,w,w,w,w,w,w,w,g,w,
+w,g,g,g,g,g,g,g,g,g,g,g,g,g,g,w,
+w,g,g,g,g,g,g,g,g,g,g,g,g,g,g,w,
+w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,
+w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w
+</data>
+ </layer>
+ <layer id="2" name="Field" width="16" height="16">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,t,0,0,t,0,0,0,0,0,0,0,0,0,0,
+t,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,t,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,t,0,0,0,0,0,0,
+0,0,0,0,0,0,0,b,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,b,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,p,b,0,0,0,0,0,b,b,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+</map>
