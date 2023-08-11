@@ -6,8 +6,8 @@ using UnityEngine.SceneManagement;
 using System;
 using Kogane;
 using System.Globalization;
-using UnityEngine.Tilemaps;
 [RequireComponent(typeof(MapEditor))]
+[RequireComponent(typeof(TimeAndStepStack))]
 public class GManager : Singleton<GManager>
 {
     public int _steps { get; set; } = 0;
@@ -29,7 +29,6 @@ public class GManager : Singleton<GManager>
     bool _pushField = false;
     [SerializeField] GameObject _shadow;
     MapEditor _mapEditor;
-
     public enum GameState
     {
         Title,
@@ -57,6 +56,9 @@ public class GManager : Singleton<GManager>
         _stageTime = 0;
         _panel = FindObjectOfType<GamePanel>();
         _panel?.ChangePanel(0);
+        _mapEditor._fieldStack.Clear();//フィールドのスタックを削除
+        if (TryGetComponent(out IReload timeAndStep))//時間と歩数をリセットする
+            timeAndStep.Reload();
         if (nextScene.name.Contains("Title"))
         {
             _gameState = GameState.Title;
@@ -106,6 +108,8 @@ public class GManager : Singleton<GManager>
         {
             _inputQueue.Clear();//queueの中身を消す
             _mapEditor.PopField();
+            if(TryGetComponent(out IPopUndo timeAndStep))//時間と歩数を取り出す
+                timeAndStep.PopUndo();
             //Undo用インターフェイスの呼び出し
             foreach (GameObject obj in _mapEditor._items)
             {
@@ -129,7 +133,11 @@ public class GManager : Singleton<GManager>
                 _inputQueue.Clear();//queueの中身を消す
                 StopAllCoroutines();//コルーチンを全て止める
                 _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
+                //フィールドを初期化してスタックのデータを削除
                 _mapEditor.InitializeField();
+                _mapEditor._fieldStack.Clear();
+                if (TryGetComponent(out IReload timeAndStep))//時間と歩数をリセットする
+                    timeAndStep.Reload();
                 //リセット用インターフェイスの呼び出し
                 foreach (GameObject obj in _mapEditor._items)
                 {
@@ -180,7 +188,7 @@ public class GManager : Singleton<GManager>
             if (_inputQueue.TryDequeue(out Vector2Int pos))
             {
                 var playerIndex = _mapEditor.GetPlayerIndex();
-                if (PushBlock(playerIndex, playerIndex + pos))
+                if (IsMovable(playerIndex, playerIndex + pos))
                 {
                     _singleCrateSound = false;
                     _pushField = false;
@@ -265,32 +273,33 @@ public class GManager : Singleton<GManager>
     /// <summary>
     /// 移動の判定を取って処理につなげる
     /// </summary>
-    bool PushBlock(Vector2Int from, Vector2Int to)
+    bool IsMovable(Vector2Int from, Vector2Int to)
     {
         // 縦軸横軸の配列外参照をしていないか
-        if (to.y < 0 || to.y >= _mapEditor.map.GetLength(0))
+        if (to.y < 0 || to.y >= _mapEditor._field.GetLength(0))
             return false;
-        if (to.x < 0 || to.x >= _mapEditor.map.GetLength(1))
+        if (to.x < 0 || to.x >= _mapEditor._field.GetLength(1))
             return false;
-        if (_mapEditor.map[to.y, to.x].Contains("w"))
+        if (_mapEditor._terrain[to.y, to.x].Contains("w"))
             return false;   // 移動先が壁なら動かせない
+        if (_mapEditor._terrain[to.y, to.x].Contains("r"))
+            return false;   // 移動先が川なら動かせない
         Vector2Int direction = to - from;
-        if (_mapEditor._field[to.y, to.x] != null && _mapEditor._field[to.y, to.x].tag == "Moveable")
+        if (_mapEditor._currentField[to.y, to.x] != null && _mapEditor._currentField[to.y, to.x].tag == "Moveable")
         {
-            bool success = PushBlock(to, to + direction);
+            bool success = IsMovable(to, to + direction);
 
             if (!success)
                 return false;
         }
 
         // GameObjectの座標(position)を移動させてからインデックスの入れ替え
-        var targetObject = _mapEditor._field[from.y, from.x];
-        var targetPosition = new Vector2(to.x, _mapEditor.map.GetLength(0) - to.y);
+        var targetObject = _mapEditor._currentField[from.y, from.x];
+        var targetPosition = new Vector2(to.x, _mapEditor._field.GetLength(0) - to.y);
         var player = targetObject.GetComponent<Player>();
 
         if (player)
         {
-            _steps += 1;
             AudioManager.instance.PlaySound(1);
             //yは反転しているのでy方向の移動アニメーションは反転させる
             player.PlayAnimation(direction.y == 0 ? direction : -direction);
@@ -308,6 +317,8 @@ public class GManager : Singleton<GManager>
         if (_pushField == false)
         {
             _mapEditor.PushField();
+            if (TryGetComponent(out IPushUndo timeAndStep))//時間と歩数をスタックする
+                timeAndStep.PushUndo();
             //インターフェイスの呼び出し
             foreach (GameObject obj in _mapEditor._items)
             {
@@ -317,11 +328,12 @@ public class GManager : Singleton<GManager>
                     if (i != null) i.PushUndo();
                 }
             }
+            _steps += 1;
             _pushField = true;
         }
         MoveFunction(targetObject.transform, targetPosition, _moveSpeed, 999);
-        _mapEditor._field[to.y, to.x] = _mapEditor._field[from.y, from.x];
-        _mapEditor._field[from.y, from.x] = null;
+        _mapEditor._currentField[to.y, to.x] = _mapEditor._currentField[from.y, from.x];
+        _mapEditor._currentField[from.y, from.x] = null;
         return true;
     }
 

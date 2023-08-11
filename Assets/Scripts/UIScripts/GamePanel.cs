@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -59,6 +60,31 @@ public class GamePanel : MonoBehaviour
         if (index < 0) index = 0;
         if (index > SceneManager.sceneCountInBuildSettings - 1) index = SceneManager.sceneCountInBuildSettings - 1;
         SceneManager.LoadScene(index);
+    }
+    /// <summary>
+    /// ゲーム開始
+    /// </summary>
+    public void StartGame(string stageName)
+    {
+        MapEditor mapEditor = FindObjectOfType<MapEditor>();
+        if(mapEditor.BuildMapData(stageName))
+            SceneManager.LoadScene("CSVTest");
+    }
+    /// <summary>
+    /// 次のステージへ移動させる
+    /// </summary>
+    public void NextGame()
+    {
+        MapEditor mapEditor = FindObjectOfType<MapEditor>();
+        if(mapEditor._nextMapName != null)
+        {
+            if (mapEditor.BuildMapData(mapEditor._nextMapName))
+                SceneManager.LoadScene("CSVTest");
+        }
+        else
+        {
+            Debug.Log("次のマップの読み込みに失敗しました");
+        }
     }
     public void QuitGame()
     {

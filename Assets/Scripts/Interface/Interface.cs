@@ -20,3 +20,10 @@ interface IPopUndo
 {
     void PopUndo();
 }
+public enum ObjectState
+{
+    /// <summary>’Êí</summary>
+    Default,
+    /// <summary>…’†</summary>
+    UnderWater,
+}

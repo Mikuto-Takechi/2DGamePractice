@@ -9,13 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Title.unity
     guid: 99983cec641491940877e6fb2a40760b
   - enabled: 1
-    path: Assets/Scenes/Stage1.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
-  - enabled: 1
-    path: Assets/Scenes/Stage2.unity
-    guid: 8ff7601557833ac4ba0ec980aa41e1ab
-  - enabled: 1
-    path: Assets/Scenes/Stage3.unity
-    guid: f2392002309c8af499135b74d638d2e3
+    path: Assets/Scenes/CSVTest.unity
+    guid: 5194f8e75a58b1c478a041c071be9fde
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 371bc3001c00c3141adb6200ea3e3d4b, type: 2}

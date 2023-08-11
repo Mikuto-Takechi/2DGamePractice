@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,10 +7,14 @@ public class Player : MonoBehaviour, IReload, IPushUndo, IPopUndo
     Animator _animator;
     Vector2 _initPos = Vector2.zero;
     Stack<Vector2> _moveStack = new Stack<Vector2>();
+    CinemachineVirtualCamera _vcam;
     private void Start()
     {
         _animator = GetComponent<Animator>();
         _initPos = transform.position;
+        _vcam = FindObjectOfType<CinemachineVirtualCamera>();
+        if (_vcam != null)
+            _vcam.Follow = transform.GetChild(0);//プレイヤーの子オブジェクト(表示用)を追従対象に指定する
     }
     /// <summary>
     /// アニメーションを再生

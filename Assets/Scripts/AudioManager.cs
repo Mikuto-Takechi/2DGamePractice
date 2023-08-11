@@ -50,17 +50,7 @@ public override void AwakeFunction()
             StopBGM();
             PlayBGM(3);
         }
-        if(nextScene.name == "Stage1")
-        {
-            StopBGM();
-            PlayBGM(1);
-        }
-        if (nextScene.name == "Stage2")
-        {
-            StopBGM();
-            PlayBGM(1);
-        }
-        if (nextScene.name == "Stage3")
+        if(nextScene.name == "CSVTest")
         {
             StopBGM();
             PlayBGM(2);
