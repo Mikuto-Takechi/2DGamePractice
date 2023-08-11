@@ -156,7 +156,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "\u8A2D\u5B9A & \u64CD\u4F5C\u8AAC\u660E"
+  m_Text: "\u8A2D\u5B9A"
 --- !u!114 &1098266023166234727
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1355,8 +1355,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _texts:
-  - "[ESC]\u307E\u305F\u306FSTART\u3067\u30DD\u30FC\u30BA\u753B\u9762\u3092\u958B\u304F\u3002"
-  - "[R]\u307E\u305F\u306FBACK\u3067\u30B9\u30C6\u30FC\u30B8\u306E\u72B6\u614B\u3092\u623B\u3059\u3002"
+  - "[ESC\u304BB\u30DC\u30BF\u30F3]\u3067\u30DD\u30FC\u30BA\u753B\u9762\u3092\u958B\u304F\u3002"
+  - "[R\u304BRB\u30C8\u30EA\u30AC\u30FC]\u3067\u30B9\u30C6\u30FC\u30B8\u3092\u6700\u521D\u306E\u72B6\u614B\u306B\u623B\u3059\u3002"
+  - "[U\u304BLB\u30C8\u30EA\u30AC\u30FC]\u3067\u4E00\u6B69\u623B\u308B\u3002"
   _type: 4
   _stageName: 
 --- !u!114 &282088941068667018
