@@ -19,17 +19,17 @@ public class ReduceStepCount : ItemBase
         {
             text.EaseStart();
         }
-        if (GManager.instance._steps > 0)
+        if (GameManager.instance._steps > 0)
         {
-            int count = GManager.instance._steps;
+            int count = GameManager.instance._steps;
             count += reduceCount;
             if(count <= 0)
             {
-                GManager.instance._steps = 0;
+                GameManager.instance._steps = 0;
             }
             if(count > 0)
             {
-                GManager.instance._steps = count;
+                GameManager.instance._steps = count;
             }
         }
     }

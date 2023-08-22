@@ -20,7 +20,7 @@ public abstract class ItemBase : MonoBehaviour, IReload, IPushUndo, IPopUndo
     {
         if (_player == null) return;
         if (!_active) return;
-        if(transform.position == _player.transform.position && GManager.instance._gameState == GManager.GameState.Idle)
+        if(transform.position == _player.transform.position && GameManager.instance._gameState == GameManager.GameState.Idle)
         {
             ItemEffect();
             _active = false;

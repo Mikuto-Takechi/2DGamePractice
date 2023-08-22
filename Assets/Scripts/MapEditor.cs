@@ -2,9 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static GManager;
+using static GameManager;
 using System.Linq;
 using System.Xml.Linq;
+using UnityEngine.InputSystem;
 /// <summary>
 /// マップを管理するクラス
 /// </summary>
@@ -144,7 +145,7 @@ public class MapEditor : MonoBehaviour
         _initialField = new GameObject[_field.GetLength(0), _field.GetLength(1)];
         Array.Copy(_currentField, _initialField, _field.Length);
 
-        GManager.instance._gameState = GameState.Idle;
+        GameManager.instance._gameState = GameState.Idle;
     }
     /// <summary>
     /// プレイヤーの座標を取得する
@@ -189,7 +190,7 @@ public class MapEditor : MonoBehaviour
                         if (obj.position != to)
                         {
                             //y, x番目にあるGameobjectをx, 配列の縦の長さ-yへ移動させる
-                            GManager.instance.MoveFunction(obj, to, 0.1f, 0.015f);
+                            GameManager.instance.MoveFunction(obj, to, 0.2f, 0.015f);
                         }
                     }
                 }

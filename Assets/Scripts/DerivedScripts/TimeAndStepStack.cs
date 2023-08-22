@@ -10,26 +10,26 @@ public class TimeAndStepStack : MonoBehaviour, IReload, IPushUndo, IPopUndo
     Stack<float> _timeStack = new Stack<float>();
     public void Reload()
     {
-        GManager.instance._steps = 0;
-        GManager.instance._stageTime = 0;
+        GameManager.instance._steps = 0;
+        GameManager.instance._stageTime = 0;
         _stepStack.Clear();
         _timeStack.Clear();
     }
     public void PushUndo()
     {
-        _stepStack.Push(GManager.instance._steps);
-        _timeStack.Push(GManager.instance._stageTime);
+        _stepStack.Push(GameManager.instance._steps);
+        _timeStack.Push(GameManager.instance._stageTime);
     }
 
     public void PopUndo()
     {
         if (_stepStack.TryPop(out int step))
         {
-            GManager.instance._steps = step;
+            GameManager.instance._steps = step;
         }
         if (_timeStack.TryPop(out float time))
         {
-            GManager.instance._stageTime = time;
+            GameManager.instance._stageTime = time;
         }
     }
 }

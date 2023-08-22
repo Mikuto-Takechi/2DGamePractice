@@ -18,15 +18,15 @@ public class GameText : MonoBehaviour
 
     void Update()
     {
-        if(_type == TextType.Steps) _text.text = $"歩数 {GManager.instance._steps}";
-        if (_type == TextType.Time) _text.text = $"時間 {GManager.instance._stageTime.ToString("F2")}";
-        if (_type == TextType.ClearSteps) _text.text = GManager.instance._stepText;
-        if (_type == TextType.ClearTime) _text.text = GManager.instance._timeText;
+        if(_type == TextType.Steps) _text.text = $"歩数 {GameManager.instance._steps}";
+        if (_type == TextType.Time) _text.text = $"時間 {GameManager.instance._stageTime.ToString("F2")}";
+        if (_type == TextType.ClearSteps) _text.text = GameManager.instance._stepText;
+        if (_type == TextType.ClearTime) _text.text = GameManager.instance._timeText;
         if (_type == TextType.Records)
         {
-            if(GManager.instance._stepsRecords.ContainsKey(_stageName) && GManager.instance._timeRecords.ContainsKey(_stageName))
+            if(GameManager.instance._stepsRecords.ContainsKey(_stageName) && GameManager.instance._timeRecords.ContainsKey(_stageName))
             {
-                _text.text = $"歩数：{GManager.instance._stepsRecords[_stageName]}\n時間：{GManager.instance._timeRecords[_stageName].ToString("F2")}";
+                _text.text = $"歩数：{GameManager.instance._stepsRecords[_stageName]}\n時間：{GameManager.instance._timeRecords[_stageName].ToString("F2")}";
             }
             else
             {

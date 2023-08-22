@@ -27,15 +27,15 @@ public class GamePanel : MonoBehaviour
     }
     public void SwitchPause()
     {
-        if (GManager.instance._gameState == GManager.GameState.Pause)
+        if (GameManager.instance._gameState == GameManager.GameState.Pause)
         {
-            GManager.instance._gameState = GManager.GameState.Idle;
+            GameManager.instance._gameState = GameManager.GameState.Idle;
             ChangePanel(0);//メインUI
             AudioManager.instance.PauseBGM(false);
         }
         else
         {
-            GManager.instance._gameState = GManager.GameState.Pause;
+            GameManager.instance._gameState = GameManager.GameState.Pause;
             ChangePanel(2);//ポーズUI
             EaseText[] ease = _panels[2].transform.GetComponentsInChildren<EaseText>();
             foreach (var e in ease)

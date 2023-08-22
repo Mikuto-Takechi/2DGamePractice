@@ -6,9 +6,10 @@ using UnityEngine.SceneManagement;
 using System;
 using Kogane;
 using System.Globalization;
+using System.Threading.Tasks;
 [RequireComponent(typeof(MapEditor))]
 [RequireComponent(typeof(TimeAndStepStack))]
-public class GManager : Singleton<GManager>
+public class GameManager : Singleton<GameManager>
 {
     public int _steps { get; set; } = 0;
     public float _stageTime { get; set; } = 0;
@@ -29,6 +30,8 @@ public class GManager : Singleton<GManager>
     bool _pushField = false;
     [SerializeField] GameObject _shadow;
     MapEditor _mapEditor;
+    List<Func<int>> processes;
+    int _initProcess = 0;
     public enum GameState
     {
         Title,
@@ -46,6 +49,49 @@ public class GManager : Singleton<GManager>
         if (buffer != null) _stepsRecords = buffer;
         var buffer2 = Load<float>("TimeRecords");
         if (buffer2 != null) _timeRecords = buffer2;
+        processes = new List<Func<int>>
+        {
+           () =>
+           {
+                if (_gameInputs.Player.Up.IsPressed() && _inputQueue.Count < _maxQueueCount)
+                {
+                    _inputQueue.Enqueue(Vector2Int.down);
+                   if(!(_inputQueue.Count < _maxQueueCount))
+                       return 1;
+                }
+                return _initProcess;
+           },
+           () =>
+           {
+                if (_gameInputs.Player.Right.IsPressed() && _inputQueue.Count < _maxQueueCount)
+                {
+                    _inputQueue.Enqueue(Vector2Int.right);
+                    if(!(_inputQueue.Count < _maxQueueCount))
+                       return 2;
+                }
+                return _initProcess;
+           },
+           () =>
+           {
+                if (_gameInputs.Player.Down.IsPressed() && _inputQueue.Count < _maxQueueCount)
+                {
+                    _inputQueue.Enqueue(Vector2Int.up);
+                    if(!(_inputQueue.Count < _maxQueueCount))
+                       return 3;
+                }
+                return _initProcess;
+           },
+           () =>
+           {
+                if (_gameInputs.Player.Left.IsPressed() && _inputQueue.Count < _maxQueueCount)
+                {
+                    _inputQueue.Enqueue(Vector2Int.left);
+                    if(!(_inputQueue.Count < _maxQueueCount))
+                       return 0;
+                }
+                return _initProcess;
+           }
+        };
     }
     void SceneLoaded(Scene nextScene, LoadSceneMode mode)//シーンが読み込まれた時の処理
     {
@@ -104,11 +150,11 @@ public class GManager : Singleton<GManager>
         }
         if (_gameState == GameState.Pause) return;
         //Undo処理
-        if (_gameInputs.Player.Undo.triggered && _coroutineCount == 0 && _gameState == GameState.Idle)
+        if (_gameInputs.Player.Undo.IsPressed() && _coroutineCount == 0 && _gameState == GameState.Idle)
         {
             _inputQueue.Clear();//queueの中身を消す
             _mapEditor.PopField();
-            if(TryGetComponent(out IPopUndo timeAndStep))//時間と歩数を取り出す
+            if (TryGetComponent(out IPopUndo timeAndStep))//時間と歩数を取り出す
                 timeAndStep.PopUndo();
             //Undo用インターフェイスの呼び出し
             foreach (GameObject obj in _mapEditor._items)
@@ -153,36 +199,17 @@ public class GManager : Singleton<GManager>
             });
         }
         // 入力バッファに追加する
-        if (_gameInputs.Player.Up.triggered && _inputQueue.Count < _maxQueueCount)
+        if (_gameState == GameState.Idle)
         {
-            _inputQueue.Enqueue(Vector2Int.down);
+            int count = _initProcess;
+            for(int i = 0; i < 4; i++)
+            {
+                count %= 4;
+                _initProcess = processes[count]();
+                count++;
+            }
         }
-        if (_gameInputs.Player.Down.triggered && _inputQueue.Count < _maxQueueCount)
-        {
-            _inputQueue.Enqueue(Vector2Int.up);
-        }
-        if (_gameInputs.Player.Right.triggered && _inputQueue.Count < _maxQueueCount)
-        {
-            _inputQueue.Enqueue(Vector2Int.right);
-        }
-        if (_gameInputs.Player.Left.triggered && _inputQueue.Count < _maxQueueCount)
-        {
-            _inputQueue.Enqueue(Vector2Int.left);
-        }
-
-        //1f待ってバッファから入力を処理する
-        StartCoroutine(InputProcessing());
-
-        //stageTimeに加算
-        _stageTime += Time.deltaTime;
-    }
-    /// <summary>
-    /// 1f待ってから入力を受け付ける
-    /// </summary>
-    /// <returns></returns>
-    IEnumerator InputProcessing()
-    {
-        yield return null;
+        // バッファから入力を処理する
         if (_gameState == GameState.Idle && _inputQueue.Count > 0 && _coroutineCount == 0)
         {
             if (_inputQueue.TryDequeue(out Vector2Int pos))
@@ -195,6 +222,8 @@ public class GManager : Singleton<GManager>
                 }
             }
         }
+        //stageTimeに加算
+        _stageTime += Time.deltaTime;
     }
     IEnumerator Move(Transform obj, Vector2 to, float endTime, float shadowInterval, Action callback)
     {

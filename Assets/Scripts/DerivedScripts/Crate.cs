@@ -25,7 +25,7 @@ public class Crate : MonoBehaviour, IReload, IPushUndo, IPopUndo
         if (_moveStack.TryPop(out Vector2 pos))
         {
             if ((Vector2)transform.position == pos) return;
-            GManager.instance.MoveFunction(transform, pos, 0.1f, 0.015f);
+            GameManager.instance.MoveFunction(transform, pos, 0.1f, 0.015f);
         }
     }
 }

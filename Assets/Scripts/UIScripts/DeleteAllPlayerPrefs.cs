@@ -6,7 +6,7 @@ public class DeleteAllPlayerPrefs : MonoBehaviour
 {
     public void Delete()
     {
-        GManager.instance._toggleQuitSave = true;
+        GameManager.instance._toggleQuitSave = true;
         AudioManager.instance._toggleQuitSave = true;
         PlayerPrefs.DeleteAll();
         Debug.Log("PlayerPrefs‚Ìƒf[ƒ^‚ğ‚·‚×‚Äíœ‚µ‚½");
