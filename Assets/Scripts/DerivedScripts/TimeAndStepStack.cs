@@ -4,10 +4,22 @@ using UnityEngine;
 /// <summary>
 /// ŠÔ‚Æ•à”‚ğStack‚Å•Û‘¶‚µ‚Ä‚¨‚­
 /// </summary>
-public class TimeAndStepStack : MonoBehaviour, IReload, IPushUndo, IPopUndo
+public class TimeAndStepStack : MonoBehaviour/*, IReload, IPushUndo, IPopUndo*/
 {
     Stack<int> _stepStack = new Stack<int>();
     Stack<float> _timeStack = new Stack<float>();
+    void OnEnable()
+    {
+        GameManager.instance.PushData += PushUndo;
+        GameManager.instance.PopData += PopUndo;
+        GameManager.instance.ReloadData += Reload;
+    }
+    void OnDisable()
+    {
+        GameManager.instance.PushData -= PushUndo;
+        GameManager.instance.PopData -= PopUndo;
+        GameManager.instance.ReloadData -= Reload;
+    }
     public void Reload()
     {
         GameManager.instance._steps = 0;

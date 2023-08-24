@@ -4,12 +4,24 @@ using UnityEngine;
 /// <summary>
 /// Šî’êƒNƒ‰ƒX
 /// </summary>
-public abstract class ItemBase : MonoBehaviour, IReload, IPushUndo, IPopUndo
+public abstract class ItemBase : MonoBehaviour/*, IReload, IPushUndo, IPopUndo*/
 {
     GameObject _player;
     bool _active = true;
     SpriteRenderer _spriteRenderer;
     Stack<bool> _activeStack = new Stack<bool>();
+    void OnEnable()
+    {
+        GameManager.instance.PushData += PushUndo;
+        GameManager.instance.PopData += PopUndo;
+        GameManager.instance.ReloadData += Reload;
+    }
+    void OnDisable()
+    {
+        GameManager.instance.PushData -= PushUndo;
+        GameManager.instance.PopData -= PopUndo;
+        GameManager.instance.ReloadData -= Reload;
+    }
     protected void Start()
     {
         _player = GameObject.FindGameObjectWithTag("Player");

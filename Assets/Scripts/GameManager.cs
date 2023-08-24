@@ -6,9 +6,9 @@ using UnityEngine.SceneManagement;
 using System;
 using Kogane;
 using System.Globalization;
-using System.Threading.Tasks;
+using Unity.VisualScripting;
+
 [RequireComponent(typeof(MapEditor))]
-[RequireComponent(typeof(TimeAndStepStack))]
 public class GameManager : Singleton<GameManager>
 {
     public int _steps { get; set; } = 0;
@@ -29,9 +29,15 @@ public class GameManager : Singleton<GameManager>
     bool _singleCrateSound = false;
     bool _pushField = false;
     [SerializeField] GameObject _shadow;
-    MapEditor _mapEditor;
+    public MapEditor _mapEditor { get; set; }
     List<Func<int>> processes;
     int _initProcess = 0;
+    /// <summary>データをスタックにプッシュする際に呼ばれるメソッド</summary>
+    public event Action PushData;
+    /// <summary>データをスタックからポップする際に呼ばれるメソッド</summary>
+    public event Action PopData;
+    /// <summary>スタックに溜まっているデータをリセットする際に呼ばれるメソッド</summary>
+    public event Action ReloadData;
     public enum GameState
     {
         Title,
@@ -102,9 +108,8 @@ public class GameManager : Singleton<GameManager>
         _stageTime = 0;
         _panel = FindObjectOfType<GamePanel>();
         _panel?.ChangePanel(0);
-        _mapEditor._fieldStack.Clear();//フィールドのスタックを削除
-        if (TryGetComponent(out IReload timeAndStep))//時間と歩数をリセットする
-            timeAndStep.Reload();
+        _mapEditor._fieldStack.Clear();//フィールドのスタックを削除する
+        _mapEditor._gimmickStack.Clear();//ギミックのスタックを削除する
         if (nextScene.name.Contains("Title"))
         {
             _gameState = GameState.Title;
@@ -153,18 +158,7 @@ public class GameManager : Singleton<GameManager>
         if (_gameInputs.Player.Undo.IsPressed() && _coroutineCount == 0 && _gameState == GameState.Idle)
         {
             _inputQueue.Clear();//queueの中身を消す
-            _mapEditor.PopField();
-            if (TryGetComponent(out IPopUndo timeAndStep))//時間と歩数を取り出す
-                timeAndStep.PopUndo();
-            //Undo用インターフェイスの呼び出し
-            foreach (GameObject obj in _mapEditor._items)
-            {
-                if (obj != null)
-                {
-                    IPopUndo i = obj.GetComponent<IPopUndo>();
-                    if (i != null) i.PopUndo();
-                }
-            }
+            PopData();//登録されているステージ巻き戻しメソッドの呼び出し
         }
         //リセット処理
         if (_gameInputs.Player.Reset.triggered)
@@ -179,20 +173,7 @@ public class GameManager : Singleton<GameManager>
                 _inputQueue.Clear();//queueの中身を消す
                 StopAllCoroutines();//コルーチンを全て止める
                 _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
-                //フィールドを初期化してスタックのデータを削除
-                _mapEditor.InitializeField();
-                _mapEditor._fieldStack.Clear();
-                if (TryGetComponent(out IReload timeAndStep))//時間と歩数をリセットする
-                    timeAndStep.Reload();
-                //リセット用インターフェイスの呼び出し
-                foreach (GameObject obj in _mapEditor._items)
-                {
-                    if (obj != null)
-                    {
-                        IReload i = obj.GetComponent<IReload>();
-                        if (i != null) i.Reload();
-                    }
-                }
+                ReloadData();//登録されているステージ初期化メソッドの呼び出し
                 AudioManager.instance.PlaySound(8);
                 AudioManager.instance.PlaySound(9);
                 fade?.CallFadeOut(() => _gameState = GameState.Idle);
@@ -311,28 +292,30 @@ public class GameManager : Singleton<GameManager>
             return false;
         if (_mapEditor._terrain[to.y, to.x].Contains("w"))
             return false;   // 移動先が壁なら動かせない
-        if (_mapEditor._terrain[to.y, to.x].Contains("r"))
-            return false;   // 移動先が川なら動かせない
+
         Vector2Int direction = to - from;
-        if (_mapEditor._currentField[to.y, to.x] != null && _mapEditor._currentField[to.y, to.x].tag == "Moveable")
+        var destinationObject = _mapEditor._currentField[to.y, to.x];
+        if (destinationObject && destinationObject.CompareTag("Moveable"))
         {
-            bool success = IsMovable(to, to + direction);
+            bool success = IsMovable(to, to + direction);//再帰呼び出し
 
             if (!success)
                 return false;
         }
-
         // GameObjectの座標(position)を移動させてからインデックスの入れ替え
+        var gimmickObject = _mapEditor._currentGimmick[to.y, to.x];
         var targetObject = _mapEditor._currentField[from.y, from.x];
         var targetPosition = new Vector2(to.x, _mapEditor._field.GetLength(0) - to.y);
         var player = targetObject.GetComponent<Player>();
 
+        //移動させるオブジェクトがプレイヤーコンポーネントを持っていた場合の処理
         if (player)
         {
             AudioManager.instance.PlaySound(1);
             //yは反転しているのでy方向の移動アニメーションは反転させる
             player.PlayAnimation(direction.y == 0 ? direction : -direction);
         }
+        //Movableタグが付いていた時の処理
         if (targetObject.CompareTag("Moveable"))
         {
             StartCoroutine(Vibration(0.0f, 1.0f, 0.07f));
@@ -345,24 +328,28 @@ public class GameManager : Singleton<GameManager>
         }
         if (_pushField == false)
         {
-            _mapEditor.PushField();
-            if (TryGetComponent(out IPushUndo timeAndStep))//時間と歩数をスタックする
-                timeAndStep.PushUndo();
-            //インターフェイスの呼び出し
-            foreach (GameObject obj in _mapEditor._items)
-            {
-                if (obj != null)
-                {
-                    IPushUndo i = obj.GetComponent<IPushUndo>();
-                    if (i != null) i.PushUndo();
-                }
-            }
+            PushData();//登録されているステージ状態一時保存メソッドの呼び出し
             _steps += 1;
             _pushField = true;
         }
         MoveFunction(targetObject.transform, targetPosition, _moveSpeed, 999);
-        _mapEditor._currentField[to.y, to.x] = _mapEditor._currentField[from.y, from.x];
-        _mapEditor._currentField[from.y, from.x] = null;
+        //移動先が川で何もオブジェクトが無いのなら
+        if (_mapEditor._terrain[to.y, to.x].Contains("r") && gimmickObject == null && targetObject.TryGetComponent(out IObjectState targetState))
+        {
+            targetState.ChangeState(ObjectState.UnderWater);//水に沈む
+        }
+        //オブジェクトが水中に居るのなら_currentGimmickのtoの要素へ移動し、fromの要素はnullで上書きする
+        if (targetObject.TryGetComponent(out IObjectState targetState2) && targetState2.objectState == ObjectState.UnderWater)
+        {
+            AudioManager.instance.PlaySound(10);
+            _mapEditor._currentGimmick[to.y, to.x] = _mapEditor._currentField[from.y, from.x];
+            _mapEditor._currentField[from.y, from.x] = null;
+        }
+        else// 居なければ通常通りtoの要素へ移動し、fromの要素はnullで上書きする
+        {
+            _mapEditor._currentField[to.y, to.x] = _mapEditor._currentField[from.y, from.x];
+            _mapEditor._currentField[from.y, from.x] = null;
+        }
         return true;
     }
 

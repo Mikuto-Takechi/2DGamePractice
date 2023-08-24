@@ -5,7 +5,6 @@ using UnityEngine;
 using static GameManager;
 using System.Linq;
 using System.Xml.Linq;
-using UnityEngine.InputSystem;
 /// <summary>
 /// マップを管理するクラス
 /// </summary>
@@ -14,12 +13,14 @@ public class MapEditor : MonoBehaviour
     public string[,] _field { get; set; }  // アイテムの初期配置やゴールの場所の配列(layer1)
     public string[,] _terrain { get; set; }  // 地形データ用の配列(layer0)
     public GameObject[,] _currentField { get; set; } // ゲーム管理用の配列
+    public GameObject[,] _currentGimmick { get; set; }// ステージギミック用の配列
     public GameObject[,] _initialField { get; set; } // ゲーム管理用の配列の初期配置
-    public List<GameObject> _items { get; set; } = new List<GameObject>();// アイテムを格納するためのリスト
+    public GameObject[,] _initialGimmick { get; set; }// ステージギミック用の配列の初期配置
     public string _mapName { get; set; } = "";//読み込んでいるマップの名前
     public string _nextMapName { get; set; } = "";//次のマップの名前
     TextAsset[] _allMap;
     public Stack<GameObject[,]> _fieldStack { get; set; } = new Stack<GameObject[,]>();
+    public Stack<GameObject[,]> _gimmickStack { get; set; } = new Stack<GameObject[,]>();
     [SerializeField] GameObject[] _wallPrefabs = default;
     [SerializeField] GameObject[] _groundPrefabs = default;
     [SerializeField] GameObject[] _itemPrefabs = default;
@@ -29,6 +30,18 @@ public class MapEditor : MonoBehaviour
     private void Awake()
     {
         _allMap = Resources.LoadAll<TextAsset>("Levels");
+    }
+    void OnEnable()
+    {
+        GameManager.instance.PushData += PushField;
+        GameManager.instance.PopData += PopField;
+        GameManager.instance.ReloadData += InitializeField;
+    }
+    void OnDisable()
+    {
+        GameManager.instance.PushData -= PushField;
+        GameManager.instance.PopData -= PopField;
+        GameManager.instance.ReloadData -= InitializeField;
     }
     public bool BuildMapData(string stageName)
     {
@@ -94,6 +107,7 @@ public class MapEditor : MonoBehaviour
     {
         //フィールド用配列の領域を確保
         _currentField = new GameObject[_field.GetLength(0), _field.GetLength(1)];
+        _currentGimmick = new GameObject[_field.GetLength(0), _field.GetLength(1)];
         //string debugText = "";
         for (int y = 0; y < _field.GetLength(0); y++)
         {
@@ -132,8 +146,6 @@ public class MapEditor : MonoBehaviour
                 if (prefab)
                 {
                     _currentField[y, x] = Instantiate(prefab, position, Quaternion.identity);
-                    if (fieldId.Contains("i"))
-                        _items.Add(_currentField[y, x]);
                 }
                 //debugText += _field[y, x] + ", ";
             }
@@ -144,6 +156,8 @@ public class MapEditor : MonoBehaviour
         //初期状態の物の位置を保存する
         _initialField = new GameObject[_field.GetLength(0), _field.GetLength(1)];
         Array.Copy(_currentField, _initialField, _field.Length);
+        _initialGimmick = new GameObject[_field.GetLength(0), _field.GetLength(1)];
+        Array.Copy(_currentGimmick, _initialGimmick, _field.Length);
 
         GameManager.instance._gameState = GameState.Idle;
     }
@@ -168,9 +182,12 @@ public class MapEditor : MonoBehaviour
     public void PushField()
     {
         //この関数は再帰呼び出しで何回か繰り返されるので、最初の1回だけ盤面を保存させる。
-        GameObject[,] copyArray = new GameObject[_field.GetLength(0), _field.GetLength(1)];
-        Array.Copy(_currentField, copyArray, _field.Length);
-        _fieldStack.Push(copyArray);
+        GameObject[,] copyField = new GameObject[_field.GetLength(0), _field.GetLength(1)];
+        Array.Copy(_currentField, copyField, _field.Length);
+        _fieldStack.Push(copyField);
+        GameObject[,] copyGimmick = new GameObject[_field.GetLength(0), _field.GetLength(1)];
+        Array.Copy(_currentGimmick, copyGimmick, _field.Length);
+        _gimmickStack.Push(copyGimmick);
     }
     public void PopField()
     {
@@ -196,15 +213,27 @@ public class MapEditor : MonoBehaviour
                 }
             }
         }
+        if(_gimmickStack.TryPop(out var undoGimmick))
+        {
+            _currentGimmick = undoGimmick;
+        }
     }
     /// <summary>
     /// フィールド上の物の位置を初期化する
     /// </summary>
     public void InitializeField()
     {
-        GameObject[,] copyArray = new GameObject[_field.GetLength(0), _field.GetLength(1)];
-        Array.Copy(_initialField, copyArray, _initialField.Length);
-        _currentField = copyArray;
+        //初期のフィールドをコピーして現在のフィールドを上書きする
+        GameObject[,] copyField = new GameObject[_field.GetLength(0), _field.GetLength(1)];
+        Array.Copy(_initialField, copyField, _initialField.Length);
+        _currentField = copyField;
+        GameObject[,] copyGimmick = new GameObject[_field.GetLength(0), _field.GetLength(1)];
+        Array.Copy(_initialGimmick, copyGimmick, _initialGimmick.Length);
+        _currentGimmick = copyGimmick;
+        //スタックに溜まっているデータを削除する
+        _fieldStack.Clear();
+        _gimmickStack.Clear();
+        //物の位置を戻す
         for (int y = 0; y < _field.GetLength(0); y++)
         {
             for (int x = 0; x < _field.GetLength(1); x++)

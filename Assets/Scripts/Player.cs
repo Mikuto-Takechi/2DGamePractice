@@ -2,19 +2,43 @@ using Cinemachine;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour, IReload, IPushUndo, IPopUndo
+public class Player : MonoBehaviour, /*IReload, IPushUndo, IPopUndo,*/ IObjectState
 {
     Animator _animator;
-    Vector2 _initPos = Vector2.zero;
-    Stack<Vector2> _moveStack = new Stack<Vector2>();
     CinemachineVirtualCamera _vcam;
+    public ObjectState objectState { get; set; } = ObjectState.Default;
+    Stack<ObjectState> _stateStack = new Stack<ObjectState>();
+    ObjectState _initState;
+    void OnEnable()
+    {
+        GameManager.instance.PushData += PushUndo;
+        GameManager.instance.PopData += PopUndo;
+        GameManager.instance.ReloadData += Reload;
+    }
+    void OnDisable()
+    {
+        GameManager.instance.PushData -= PushUndo;
+        GameManager.instance.PopData -= PopUndo;
+        GameManager.instance.ReloadData -= Reload;
+    }
     private void Start()
     {
         _animator = GetComponent<Animator>();
-        _initPos = transform.position;
         _vcam = FindObjectOfType<CinemachineVirtualCamera>();
         if (_vcam != null)
             _vcam.Follow = transform.GetChild(0);//プレイヤーの子オブジェクト(表示用)を追従対象に指定する
+        _initState = objectState;
+    }
+    private void Update()
+    {
+        if (objectState == ObjectState.UnderWater)
+        {
+            _animator.SetBool("UnderWater", true);
+        }
+        else
+        {
+            _animator.SetBool("UnderWater", false);
+        }
     }
     /// <summary>
     /// アニメーションを再生
@@ -33,22 +57,25 @@ public class Player : MonoBehaviour, IReload, IPushUndo, IPopUndo
 
     public void Reload()
     {
-        transform.position = _initPos;
-        _moveStack.Clear();
+        objectState = _initState;
+        _stateStack.Clear();
     }
 
     public void PushUndo()
     {
-        _moveStack.Push(transform.position);
+        _stateStack.Push(objectState);
     }
 
     public void PopUndo()
     {
-        if (_moveStack.TryPop(out Vector2 pos))
+        if (_stateStack.TryPop(out ObjectState state))
         {
-            if ((Vector2)transform.position == pos) return;
-            AudioManager.instance.PlaySound(6);
-            GameManager.instance.MoveFunction(transform, pos, 0.1f, 0.015f);
+            objectState = state;
         }
+    }
+
+    public void ChangeState(ObjectState state)
+    {
+        objectState = state;
     }
 }

@@ -1,31 +1,62 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class Crate : MonoBehaviour, IReload, IPushUndo, IPopUndo
+[RequireComponent(typeof(Animator))]
+public class Crate : MonoBehaviour, /*IReload, IPushUndo, IPopUndo,*/ IObjectState
 {
-    Vector2 _initPos = Vector2.zero;
-    Stack<Vector2> _moveStack = new Stack<Vector2>();
-    void Start()
+    public ObjectState objectState { get; set; } = ObjectState.Default;
+    Stack<ObjectState> _stateStack = new Stack<ObjectState>();
+    ObjectState _initState;
+    Animator _animator;
+
+    void Awake()
     {
-        _initPos = transform.position;
+        _initState = objectState;
+        _animator = GetComponent<Animator>();
+    }
+    void OnEnable()
+    {
+        GameManager.instance.PushData += PushUndo;
+        GameManager.instance.PopData += PopUndo;
+        GameManager.instance.ReloadData += Reload;
+    }
+    void OnDisable()
+    {
+        GameManager.instance.PushData -= PushUndo;
+        GameManager.instance.PopData -= PopUndo;
+        GameManager.instance.ReloadData -= Reload;
+    }
+    private void Update()
+    {
+        if(objectState == ObjectState.UnderWater)
+        {
+            _animator.SetBool("UnderWater", true);
+        }
+        else
+        {
+            _animator.SetBool("UnderWater", false);
+        }
     }
     public void Reload()
     {
-        transform.position = _initPos;
-        _moveStack.Clear();
+        objectState = _initState;
+        _stateStack.Clear();
     }
     public void PushUndo()
     {
-        _moveStack.Push(transform.position);
+        _stateStack.Push(objectState);
     }
 
     public void PopUndo()
     {
-        if (_moveStack.TryPop(out Vector2 pos))
+        if (_stateStack.TryPop(out ObjectState state))
         {
-            if ((Vector2)transform.position == pos) return;
-            GameManager.instance.MoveFunction(transform, pos, 0.1f, 0.015f);
+            objectState = state;
         }
+    }
+
+    public void ChangeState(ObjectState state)
+    {
+        objectState = state;
     }
 }
