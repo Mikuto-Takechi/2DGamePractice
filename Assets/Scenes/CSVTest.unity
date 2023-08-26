@@ -169,10 +169,10 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
+    x: 0.02
+    y: 0.04
+    width: 0.7
+    height: 0.7
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
@@ -683,6 +683,10 @@ PrefabInstance:
     - target: {fileID: 282088940778190801, guid: 10e59292a22a1584fb714d3af52dd9fe, type: 3}
       propertyPath: m_Name
       value: DisplayCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 282088940778190802, guid: 10e59292a22a1584fb714d3af52dd9fe, type: 3}
+      propertyPath: m_TargetDisplay
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 282088940778190805, guid: 10e59292a22a1584fb714d3af52dd9fe, type: 3}
       propertyPath: m_Pivot.x

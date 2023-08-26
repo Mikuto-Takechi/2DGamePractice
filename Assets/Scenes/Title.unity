@@ -344,6 +344,7 @@ GameObject:
   - component: {fileID: 34620130}
   - component: {fileID: 34620129}
   - component: {fileID: 34620132}
+  - component: {fileID: 34620133}
   m_Layer: 5
   m_Name: Stage3
   m_TagString: Untagged
@@ -406,7 +407,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 6517943354750595676, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
     m_PressedSprite: {fileID: -6811698044768618517, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
     m_SelectedSprite: {fileID: 6517943354750595676, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
-    m_DisabledSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 21300000, guid: afb40943882eba542ba63b8deb12abbb, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -480,6 +481,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42e84d82120ff5145af9d2a62dea7ac6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &34620133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 34620127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1a9c3ba555be92408d4cc96108bc528, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stageName: Stage3
 --- !u!1 &77831753
 GameObject:
   m_ObjectHideFlags: 0
@@ -1048,7 +1062,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 6517943354750595676, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
     m_PressedSprite: {fileID: -6811698044768618517, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
     m_SelectedSprite: {fileID: 6517943354750595676, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
-    m_DisabledSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 21300000, guid: afb40943882eba542ba63b8deb12abbb, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -1777,6 +1791,7 @@ GameObject:
   - component: {fileID: 361236785}
   - component: {fileID: 361236784}
   - component: {fileID: 361236787}
+  - component: {fileID: 361236788}
   m_Layer: 5
   m_Name: Stage2
   m_TagString: Untagged
@@ -1839,7 +1854,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 6517943354750595676, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
     m_PressedSprite: {fileID: -6811698044768618517, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
     m_SelectedSprite: {fileID: 6517943354750595676, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
-    m_DisabledSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 21300000, guid: afb40943882eba542ba63b8deb12abbb, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -1913,6 +1928,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42e84d82120ff5145af9d2a62dea7ac6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &361236788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361236782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1a9c3ba555be92408d4cc96108bc528, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stageName: Stage2
 --- !u!224 &376696061
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4154,6 +4182,7 @@ GameObject:
   - component: {fileID: 995948522}
   - component: {fileID: 995948521}
   - component: {fileID: 995948525}
+  - component: {fileID: 995948526}
   m_Layer: 5
   m_Name: Stage4
   m_TagString: Untagged
@@ -4193,7 +4222,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 6517943354750595676, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
     m_PressedSprite: {fileID: -6811698044768618517, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
     m_SelectedSprite: {fileID: 6517943354750595676, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
-    m_DisabledSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 21300000, guid: afb40943882eba542ba63b8deb12abbb, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -4290,6 +4319,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42e84d82120ff5145af9d2a62dea7ac6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &995948526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 995948520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1a9c3ba555be92408d4cc96108bc528, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stageName: Stage4
 --- !u!1 &1030264906
 GameObject:
   m_ObjectHideFlags: 0
@@ -4399,6 +4441,7 @@ GameObject:
   - component: {fileID: 1152094074}
   - component: {fileID: 1152094073}
   - component: {fileID: 1152094076}
+  - component: {fileID: 1152094077}
   m_Layer: 5
   m_Name: Stage6
   m_TagString: Untagged
@@ -4461,7 +4504,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 6517943354750595676, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
     m_PressedSprite: {fileID: -6811698044768618517, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
     m_SelectedSprite: {fileID: 6517943354750595676, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
-    m_DisabledSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 21300000, guid: afb40943882eba542ba63b8deb12abbb, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -4535,6 +4578,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42e84d82120ff5145af9d2a62dea7ac6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1152094077
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1152094071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1a9c3ba555be92408d4cc96108bc528, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stageName: Stage6
 --- !u!1 &1159989464
 GameObject:
   m_ObjectHideFlags: 0
@@ -7068,6 +7124,7 @@ GameObject:
   - component: {fileID: 1740547521}
   - component: {fileID: 1740547520}
   - component: {fileID: 1740547523}
+  - component: {fileID: 1740547524}
   m_Layer: 5
   m_Name: Stage7
   m_TagString: Untagged
@@ -7130,7 +7187,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 6517943354750595676, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
     m_PressedSprite: {fileID: -6811698044768618517, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
     m_SelectedSprite: {fileID: 6517943354750595676, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
-    m_DisabledSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 21300000, guid: afb40943882eba542ba63b8deb12abbb, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -7204,6 +7261,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42e84d82120ff5145af9d2a62dea7ac6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1740547524
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1740547518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1a9c3ba555be92408d4cc96108bc528, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stageName: Stage7
 --- !u!1 &1755441935
 GameObject:
   m_ObjectHideFlags: 0
@@ -8514,6 +8584,7 @@ GameObject:
   - component: {fileID: 2042906442}
   - component: {fileID: 2042906441}
   - component: {fileID: 2042906444}
+  - component: {fileID: 2042906445}
   m_Layer: 5
   m_Name: Stage5
   m_TagString: Untagged
@@ -8576,7 +8647,7 @@ MonoBehaviour:
     m_HighlightedSprite: {fileID: 6517943354750595676, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
     m_PressedSprite: {fileID: -6811698044768618517, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
     m_SelectedSprite: {fileID: 6517943354750595676, guid: a61f0367b5da4bf4c8f52c21a2f4d0eb, type: 3}
-    m_DisabledSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 21300000, guid: afb40943882eba542ba63b8deb12abbb, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -8650,6 +8721,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42e84d82120ff5145af9d2a62dea7ac6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2042906445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2042906439}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1a9c3ba555be92408d4cc96108bc528, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stageName: Stage5
 --- !u!1 &2043794187
 GameObject:
   m_ObjectHideFlags: 0

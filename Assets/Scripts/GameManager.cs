@@ -4,9 +4,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using System;
-using Kogane;
 using System.Globalization;
-using Unity.VisualScripting;
+using MessagePack;
 
 [RequireComponent(typeof(MapEditor))]
 public class GameManager : Singleton<GameManager>
@@ -16,6 +15,7 @@ public class GameManager : Singleton<GameManager>
     public GameState _gameState = GameState.Title;
     public Dictionary<string, float> _timeRecords = new Dictionary<string, float>();
     public Dictionary<string, int> _stepsRecords = new Dictionary<string, int>();
+    public HashSet<string> _unlockStages = new HashSet<string>();
     GamePanel _panel;
     Queue<Vector2Int> _inputQueue = new Queue<Vector2Int>();
     /// <summary>入力バッファサイズ</summary>
@@ -51,10 +51,12 @@ public class GameManager : Singleton<GameManager>
         SceneManager.sceneLoaded += SceneLoaded;
         _mapEditor = GetComponent<MapEditor>();
         _playerInput = GetComponent<PlayerInput>();
-        var buffer = Load<int>("StepRecords");
-        if (buffer != null) _stepsRecords = buffer;
-        var buffer2 = Load<float>("TimeRecords");
-        if (buffer2 != null) _timeRecords = buffer2;
+        if (MessagePackLoad("StepRecords", out Dictionary<string, int> stepData))
+            _stepsRecords = stepData;
+        if (MessagePackLoad("TimeRecords", out Dictionary<string, float> timeData))
+            _timeRecords = timeData;
+        if (MessagePackLoad("UnlockStages", out HashSet<string> unlockData))
+            _unlockStages = unlockData;
         processes = new List<Func<int>>
         {
            () =>
@@ -127,8 +129,9 @@ public class GameManager : Singleton<GameManager>
         //Debug.Log("アプリ終了");
         if (!_toggleQuitSave)
         {
-            Save("StepRecords", _stepsRecords);
-            Save("TimeRecords", _timeRecords);
+            MessagePackSave("StepRecords", _stepsRecords);
+            MessagePackSave("TimeRecords", _timeRecords);
+            MessagePackSave("UnlockStages", _unlockStages);
         }
     }
     private void Update()
@@ -142,6 +145,10 @@ public class GameManager : Singleton<GameManager>
                 _gameState = GameState.Clear;
                 _timeText = CheckRecord(_stageTime, _timeRecords);
                 _stepText = CheckRecord(_steps, _stepsRecords);
+                //マップエディタースクリプトを読み込み
+                MapEditor mapEditor = FindObjectOfType<MapEditor>();
+                _unlockStages.Add(mapEditor._nextMapName);
+                MessagePackSave("UnlockStages", _unlockStages);
                 _panel.ChangePanel(1);
                 _panel.Clear();
                 AudioManager.instance.StopBGM();
@@ -377,43 +384,48 @@ public class GameManager : Singleton<GameManager>
 
         string text = $"{label}：{display}";
 
-        //if (dic[stageName] > current)
         if (dic[stageName].CompareTo(current) > 0)
         {
             dic[stageName] = current;
-            Save(saveLabel, dic);
+            MessagePackSave(saveLabel, dic);
             text = $"{label}：{display} 記録更新！！";
         }
         return text;
     }
+    //以下のライブラリを使用しデータをシリアライズしてPlayerPrefsに保存、読み込みを行う
+    //https://github.com/MessagePack-CSharp/MessagePack-CSharp/releases
     /// <summary>
-    /// Dictionaryに保持されているデータをPlayerPrefsに保存する
+    /// PlayerPrefsにデータを保存する
     /// </summary>
-    void Save<T>(string name, Dictionary<string, T> dic)
+    /// <typeparam name="T">データの型</typeparam>
+    /// <param name="label">セーブ名</param>
+    /// <param name="data">保存するデータ</param>
+    void MessagePackSave<T>(string label,T data)
     {
-        //Dictionaryをシリアル化可能な型に変換
-        var jsonDictionary = new JsonDictionary<string, T>(dic);
-        // インスタンス変数を JSON にシリアル化する
-        var json = JsonUtility.ToJson(jsonDictionary, true);
-        // PlayerPrefs に保存する
-        PlayerPrefs.SetString(name, json);
+        byte[] bytes = MessagePackSerializer.Serialize(data);
+        var json = MessagePackSerializer.ConvertToJson(bytes);
+        PlayerPrefs.SetString(label,json);
     }
     /// <summary>
-    /// PlayerPrefsに保存されているデータをDictionaryに戻す
+    /// PlayerPrefsからデータを読み込む
     /// </summary>
-    Dictionary<string, T> Load<T>(string name)
+    /// <typeparam name="T">データの型</typeparam>
+    /// <param name="label">セーブ名</param>
+    /// <param name="data">読み込んだデータ</param>
+    /// <returns>読み込みが成功しているかをbool型で戻す</returns>
+    bool MessagePackLoad<T>(string label, out T data)
     {
-        // PlayerPrefs から文字列を取り出す
-        string json = PlayerPrefs.GetString(name);
-        // デシリアライズする
-        var jsonDictionary = JsonUtility.FromJson<JsonDictionary<string, T>>(json);
-        if (jsonDictionary == null)
+        string json = PlayerPrefs.GetString(label,"");
+        if(json != null && json != "")
         {
-            Debug.Log("データが入っていません");
-            return null;
+            byte[] bytes = MessagePackSerializer.ConvertFromJson(json);
+            data = MessagePackSerializer.Deserialize<T>(bytes);
+            return true;
         }
-        //Dictionary型へ戻す
-        Dictionary<string, T> dictionary = jsonDictionary.Dictionary;
-        return dictionary;
+        else
+        {
+            data = default;
+            return false;
+        }
     }
 }

@@ -24,6 +24,7 @@ public class GameText : MonoBehaviour
         if (_type == TextType.ClearTime) _text.text = GameManager.instance._timeText;
         if (_type == TextType.Records)
         {
+            if (GameManager.instance._stepsRecords == null || GameManager.instance._timeRecords == null) return;
             if(GameManager.instance._stepsRecords.ContainsKey(_stageName) && GameManager.instance._timeRecords.ContainsKey(_stageName))
             {
                 _text.text = $"ï‡êîÅF{GameManager.instance._stepsRecords[_stageName]}\néûä‘ÅF{GameManager.instance._timeRecords[_stageName].ToString("F2")}";
