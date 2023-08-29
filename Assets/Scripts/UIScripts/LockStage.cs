@@ -8,9 +8,14 @@ public class LockStage : MonoBehaviour
 {
     [SerializeField] string _stageName = string.Empty;
     Button _button;
+    Image _lockImage;
+    Text _stageText;
     private void Start()
     {
         _button = GetComponent<Button>();
+        _lockImage = transform.Find("StageLock")?.GetComponent<Image>();
+        _stageText = transform.Find("StageText")?.GetComponent<Text>();
+        if(_lockImage) _lockImage.enabled = false;
     }
     void Update()
     {
@@ -23,6 +28,11 @@ public class LockStage : MonoBehaviour
             else
             {
                 _button.interactable = false;
+            }
+            if(_stageText && _lockImage)
+            {
+                _stageText.enabled = _button.IsInteractable();
+                _lockImage.enabled = !_button.IsInteractable();
             }
         }
     }

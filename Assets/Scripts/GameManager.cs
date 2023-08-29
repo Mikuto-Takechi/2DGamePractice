@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using System;
 using System.Globalization;
 using MessagePack;
+using System.Linq;
 
 [RequireComponent(typeof(MapEditor))]
 public class GameManager : Singleton<GameManager>
@@ -21,7 +22,8 @@ public class GameManager : Singleton<GameManager>
     /// <summary>入力バッファサイズ</summary>
     [SerializeField] int _maxQueueCount = 2;
     /// <summary>移動速度</summary>
-    [SerializeField] float _moveSpeed = 1.0f;
+    public float _moveSpeed = 1.0f;
+    float _defaultSpeed;//デフォルトの移動速度
     public int _coroutineCount { get; set; } = 0;
     PlayerInput _playerInput;
     public string _timeText, _stepText;
@@ -48,6 +50,7 @@ public class GameManager : Singleton<GameManager>
     }
     public override void AwakeFunction()
     {
+        _defaultSpeed = _moveSpeed;
         SceneManager.sceneLoaded += SceneLoaded;
         _mapEditor = GetComponent<MapEditor>();
         _playerInput = GetComponent<PlayerInput>();
@@ -57,49 +60,23 @@ public class GameManager : Singleton<GameManager>
             _timeRecords = timeData;
         if (MessagePackLoad("UnlockStages", out HashSet<string> unlockData))
             _unlockStages = unlockData;
+        //引数無し戻り値intの型のリスト
         processes = new List<Func<int>>
         {
-           () =>
-           {
-                if (_gameInputs.Player.Up.IsPressed() && _inputQueue.Count < _maxQueueCount)
-                {
-                    _inputQueue.Enqueue(Vector2Int.down);
-                   if(!(_inputQueue.Count < _maxQueueCount))
-                       return 1;
-                }
-                return _initProcess;
-           },
-           () =>
-           {
-                if (_gameInputs.Player.Right.IsPressed() && _inputQueue.Count < _maxQueueCount)
-                {
-                    _inputQueue.Enqueue(Vector2Int.right);
-                    if(!(_inputQueue.Count < _maxQueueCount))
-                       return 2;
-                }
-                return _initProcess;
-           },
-           () =>
-           {
-                if (_gameInputs.Player.Down.IsPressed() && _inputQueue.Count < _maxQueueCount)
-                {
-                    _inputQueue.Enqueue(Vector2Int.up);
-                    if(!(_inputQueue.Count < _maxQueueCount))
-                       return 3;
-                }
-                return _initProcess;
-           },
-           () =>
-           {
-                if (_gameInputs.Player.Left.IsPressed() && _inputQueue.Count < _maxQueueCount)
-                {
-                    _inputQueue.Enqueue(Vector2Int.left);
-                    if(!(_inputQueue.Count < _maxQueueCount))
-                       return 0;
-                }
-                return _initProcess;
-           }
+            () => InputProcess(_gameInputs.Player.Up.IsPressed(), Vector2Int.down, 1),
+            () => InputProcess(_gameInputs.Player.Right.IsPressed(), Vector2Int.right, 2),
+            () => InputProcess(_gameInputs.Player.Down.IsPressed(), Vector2Int.up, 3),
+            () => InputProcess(_gameInputs.Player.Left.IsPressed(), Vector2Int.left, 0)
         };
+    }
+    int InputProcess(bool flag, Vector2Int dir, int next)
+    {
+        if (flag && _inputQueue.Count < _maxQueueCount)
+        {
+            _inputQueue.Enqueue(dir);
+            if (!(_inputQueue.Count < _maxQueueCount)) return next;
+        }
+        return _initProcess;
     }
     void SceneLoaded(Scene nextScene, LoadSceneMode mode)//シーンが読み込まれた時の処理
     {
@@ -119,7 +96,7 @@ public class GameManager : Singleton<GameManager>
         else
         {
             _mapEditor.InitializeGame();
-            if (!_timeRecords.ContainsKey(_mapEditor._mapName)) _timeRecords.Add(_mapEditor._mapName, 99999.99f);
+            if (!_timeRecords.ContainsKey(_mapEditor._mapName)) _timeRecords.Add(_mapEditor._mapName, 99999);
             if (!_stepsRecords.ContainsKey(_mapEditor._mapName)) _stepsRecords.Add(_mapEditor._mapName, 99999);
             _gameState = GameState.Idle;
         }
@@ -190,7 +167,7 @@ public class GameManager : Singleton<GameManager>
         if (_gameState == GameState.Idle)
         {
             int count = _initProcess;
-            for(int i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++)
             {
                 count %= 4;
                 _initProcess = processes[count]();
@@ -305,9 +282,7 @@ public class GameManager : Singleton<GameManager>
         if (destinationObject && destinationObject.CompareTag("Moveable"))
         {
             bool success = IsMovable(to, to + direction);//再帰呼び出し
-
-            if (!success)
-                return false;
+            if (!success) return false;
         }
         // GameObjectの座標(position)を移動させてからインデックスの入れ替え
         var gimmickObject = _mapEditor._currentGimmick[to.y, to.x];
@@ -400,11 +375,11 @@ public class GameManager : Singleton<GameManager>
     /// <typeparam name="T">データの型</typeparam>
     /// <param name="label">セーブ名</param>
     /// <param name="data">保存するデータ</param>
-    void MessagePackSave<T>(string label,T data)
+    void MessagePackSave<T>(string label, T data)
     {
         byte[] bytes = MessagePackSerializer.Serialize(data);
         var json = MessagePackSerializer.ConvertToJson(bytes);
-        PlayerPrefs.SetString(label,json);
+        PlayerPrefs.SetString(label, json);
     }
     /// <summary>
     /// PlayerPrefsからデータを読み込む
@@ -415,8 +390,8 @@ public class GameManager : Singleton<GameManager>
     /// <returns>読み込みが成功しているかをbool型で戻す</returns>
     bool MessagePackLoad<T>(string label, out T data)
     {
-        string json = PlayerPrefs.GetString(label,"");
-        if(json != null && json != "")
+        string json = PlayerPrefs.GetString(label, "");
+        if (json != null && json != "")
         {
             byte[] bytes = MessagePackSerializer.ConvertFromJson(json);
             data = MessagePackSerializer.Deserialize<T>(bytes);

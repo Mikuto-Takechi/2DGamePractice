@@ -1,44 +1,45 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-
+/// <summary>
+/// ボタンを一定の数で分割して切り替えれるようにするスクリプト
+/// </summary>
 public class StageButtonSet : MonoBehaviour
 {
     [SerializeField] GameObject[] _allButton;
-    [SerializeField] GameObject _group;
-    [SerializeField] GameObject _parent;
-    List<GameObject[]> _buttonGroup = new List<GameObject[]>();
+    /// <summary>アクティブ時の親オブジェクト</summary>
+    [SerializeField] GameObject _activeParent;
+    /// <summary>非アクティブ時の親オブジェクト</summary>
+    [SerializeField] GameObject _inactiveParent;
+    /// <summary>1グループに含まれるボタンの数</summary>
+    [SerializeField] int _buttonCount = 3;
+    List<List<GameObject>> _buttonGroup = new List<List<GameObject>>();
     int _switchGroup = -1;
-    GameObject[] _unsetGroup = new GameObject[3];
+    GameObject[] _unsetGroup = new GameObject[0];
     private void Start()
     {
-        GameObject[] buttons = new GameObject[3];
-        int groupCount = 0;
-        for (int i = 0; i < _allButton.Length; ++i)
+        for(int i = 0; i < _allButton.Length; i += _buttonCount)
         {
-            if (_allButton[i] != null) _allButton[i].GetComponent<Button>().interactable = false;
-            buttons[groupCount] = _allButton[i];
-            if (groupCount == buttons.Length - 1)
-            {
-                _buttonGroup.Add(buttons);
-                buttons = new GameObject[3];
-            }
-            ++groupCount;
-            groupCount %= buttons.Length;
+            var buttons = _allButton.Skip(i).Take(_buttonCount).ToList();//i番目の要素から_buttonCountだけ取り出してリスト化する
+            buttons.Where(obj => obj).Select(obj => obj.GetComponent<Button>().interactable = false);//ボタンを接触不可にする
+            _buttonGroup.Add(buttons);//取り出したボタンのリストをまとめる
         }
-        SwitchButtonGroup(false);
+        SwitchButtonGroup(false);//初期化のため1回だけこのメソッドを呼ぶ
     }
+    /// <summary>
+    /// アクティブなボタンのグループを切り替える
+    /// </summary>
+    /// <param name="decrease">falseでプラス、trueでマイナス</param>
     public void SwitchButtonGroup(bool decrease)
     {
-        foreach(GameObject button in _unsetGroup)
+        //_unsetGroupにnullチェックとGetComponentを行う
+        foreach(Button button in _unsetGroup.Where(btn => btn).Select(btn => btn.GetComponent<Button>()))
         {
-            if(button != null)
-            {
-                button.transform.SetParent(_parent.transform);
-                button.transform.SetAsFirstSibling();
-                button.GetComponent<Button>().interactable = false;
-            }
+            button.transform.SetParent(_inactiveParent.transform);
+            button.transform.SetAsFirstSibling();
+            button.interactable = false;
         }
         if(!decrease)
         {
@@ -50,23 +51,22 @@ public class StageButtonSet : MonoBehaviour
             --_switchGroup;
             if (_switchGroup < 0) _switchGroup = _buttonGroup.Count - 1;
         }
-        for (int i = 0; i < _buttonGroup[_switchGroup].Length; ++i)
+        _unsetGroup = _buttonGroup[_switchGroup].ToArray();
+        foreach (Selectable sel in _buttonGroup[_switchGroup].Where(obj => obj).Select(sel => sel.GetComponent<Selectable>()))
         {
-            if(_buttonGroup[_switchGroup][i] != null)
-            {
-                _buttonGroup[_switchGroup][i].transform.SetParent(_group.transform);
-                _unsetGroup[i] = _buttonGroup[_switchGroup][i];
-                Selectable select = _buttonGroup[_switchGroup][i].GetComponent<Selectable>();
-                select.interactable = true;
-                GameObject upButton = _buttonGroup[_switchGroup][i == 0 ? _buttonGroup[_switchGroup].Length - 1 : i - 1];
-                GameObject downButton = _buttonGroup[_switchGroup][(i + 1) % _buttonGroup[_switchGroup].Length];
-                Navigation nav = select.navigation;
-                nav.mode = Navigation.Mode.Explicit;
-                if(upButton != null) nav.selectOnUp = upButton.GetComponent<Selectable>();
-                if(downButton != null) nav.selectOnDown = downButton.GetComponent<Selectable>();
-                select.navigation = nav;
-            }
+            sel.transform.SetParent(_activeParent.transform);
+            sel.interactable = true;
+            //現在処理しているオブジェクトの要素番号を取得する
+            int index = _buttonGroup[_switchGroup].FindIndex(v => v == sel.gameObject);
+            GameObject upButton = _buttonGroup[_switchGroup][index == 0 ? _buttonGroup[_switchGroup].Count - 1 : index - 1];//上のボタン
+            GameObject downButton = _buttonGroup[_switchGroup][(index + 1) % _buttonGroup[_switchGroup].Count];//下のボタン
+            //ナビゲーションを設定する
+            Navigation nav = sel.navigation;
+            nav.mode = Navigation.Mode.Explicit;
+            if (upButton != null) nav.selectOnUp = upButton.GetComponent<Selectable>();
+            if (downButton != null) nav.selectOnDown = downButton.GetComponent<Selectable>();
+            sel.navigation = nav;
         }
-        transform.GetComponentInChildren<Text>().text = $"{_switchGroup+1}/{_buttonGroup.Count} ページ";
+        transform.Find("PagePanel").Find("Number").GetComponent<Text>().text = $"{_switchGroup+1}/{_buttonGroup.Count} ページ";
     }
 }

@@ -24,10 +24,12 @@ public class GameText : MonoBehaviour
         if (_type == TextType.ClearTime) _text.text = GameManager.instance._timeText;
         if (_type == TextType.Records)
         {
-            if (GameManager.instance._stepsRecords == null || GameManager.instance._timeRecords == null) return;
-            if(GameManager.instance._stepsRecords.ContainsKey(_stageName) && GameManager.instance._timeRecords.ContainsKey(_stageName))
+            var steps = GameManager.instance._stepsRecords;
+            var times = GameManager.instance._timeRecords;
+            if (steps == null || times == null) return;
+            if(steps.ContainsKey(_stageName) && times.ContainsKey(_stageName))
             {
-                _text.text = $"歩数：{GameManager.instance._stepsRecords[_stageName]}\n時間：{GameManager.instance._timeRecords[_stageName].ToString("F2")}";
+                _text.text = $"歩数：{steps[_stageName]}\n時間：{times[_stageName].ToString("F2")}";
             }
             else
             {
