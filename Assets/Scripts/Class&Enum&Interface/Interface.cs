@@ -28,10 +28,3 @@ interface IObjectState
     ObjectState objectState { get; set; }
     void ChangeState(ObjectState state);
 }
-public enum ObjectState
-{
-    /// <summary>’Êí</summary>
-    Default,
-    /// <summary>…’†</summary>
-    UnderWater,
-}

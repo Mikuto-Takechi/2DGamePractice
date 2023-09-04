@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 5870338377683659469}
   - component: {fileID: 1158461481808036875}
   m_Layer: 0
-  m_Name: Floor
-  m_TagString: Untagged
+  m_Name: Wall4
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -72,8 +72,8 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -1
-  m_Sprite: {fileID: 357343933, guid: f15472e0666d044db9bfb88bc170ad9b, type: 3}
+  m_SortingOrder: 0
+  m_Sprite: {fileID: -992526965, guid: f15472e0666d044db9bfb88bc170ad9b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

@@ -56,16 +56,6 @@ public class StageButtonSet : MonoBehaviour
         {
             sel.transform.SetParent(_activeParent.transform);
             sel.interactable = true;
-            //現在処理しているオブジェクトの要素番号を取得する
-            int index = _buttonGroup[_switchGroup].FindIndex(v => v == sel.gameObject);
-            GameObject upButton = _buttonGroup[_switchGroup][index == 0 ? _buttonGroup[_switchGroup].Count - 1 : index - 1];//上のボタン
-            GameObject downButton = _buttonGroup[_switchGroup][(index + 1) % _buttonGroup[_switchGroup].Count];//下のボタン
-            //ナビゲーションを設定する
-            Navigation nav = sel.navigation;
-            nav.mode = Navigation.Mode.Explicit;
-            if (upButton != null) nav.selectOnUp = upButton.GetComponent<Selectable>();
-            if (downButton != null) nav.selectOnDown = downButton.GetComponent<Selectable>();
-            sel.navigation = nav;
         }
         transform.Find("PagePanel").Find("Number").GetComponent<Text>().text = $"{_switchGroup+1}/{_buttonGroup.Count} ページ";
     }

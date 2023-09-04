@@ -7,6 +7,7 @@ using System;
 using System.Globalization;
 using MessagePack;
 using System.Linq;
+using static UnityEngine.EventSystems.EventTrigger;
 
 [RequireComponent(typeof(MapEditor))]
 public class GameManager : Singleton<GameManager>
@@ -32,7 +33,7 @@ public class GameManager : Singleton<GameManager>
     bool _pushField = false;
     [SerializeField] GameObject _shadow;
     public MapEditor _mapEditor { get; set; }
-    List<Func<int>> processes;
+    List<Func<int>> _processes;
     int _initProcess = 0;
     /// <summary>データをスタックにプッシュする際に呼ばれるメソッド</summary>
     public event Action PushData;
@@ -61,7 +62,7 @@ public class GameManager : Singleton<GameManager>
         if (MessagePackLoad("UnlockStages", out HashSet<string> unlockData))
             _unlockStages = unlockData;
         //引数無し戻り値intの型のリスト
-        processes = new List<Func<int>>
+        _processes = new List<Func<int>>
         {
             () => InputProcess(_gameInputs.Player.Up.IsPressed(), Vector2Int.down, 1),
             () => InputProcess(_gameInputs.Player.Right.IsPressed(), Vector2Int.right, 2),
@@ -96,14 +97,14 @@ public class GameManager : Singleton<GameManager>
         else
         {
             _mapEditor.InitializeGame();
-            if (!_timeRecords.ContainsKey(_mapEditor._mapName)) _timeRecords.Add(_mapEditor._mapName, 99999);
-            if (!_stepsRecords.ContainsKey(_mapEditor._mapName)) _stepsRecords.Add(_mapEditor._mapName, 99999);
+            //記録が追加されていないステージ名ならば新しくDictionaryに追加する
+            _timeRecords.TryAdd(_mapEditor._mapName, 99999);
+            _stepsRecords.TryAdd(_mapEditor._mapName, 99999);
             _gameState = GameState.Idle;
         }
     }
     private void OnApplicationQuit()
     {
-        //Debug.Log("アプリ終了");
         if (!_toggleQuitSave)
         {
             MessagePackSave("StepRecords", _stepsRecords);
@@ -167,12 +168,12 @@ public class GameManager : Singleton<GameManager>
         if (_gameState == GameState.Idle)
         {
             int count = _initProcess;
-            for (int i = 0; i < 4; i++)
+            Enumerable.Range(0, 4).ToList().ForEach(i =>
             {
                 count %= 4;
-                _initProcess = processes[count]();
+                _initProcess = _processes[count]();
                 count++;
-            }
+            });
         }
         // バッファから入力を処理する
         if (_gameState == GameState.Idle && _inputQueue.Count > 0 && _coroutineCount == 0)
@@ -274,12 +275,16 @@ public class GameManager : Singleton<GameManager>
             return false;
         if (to.x < 0 || to.x >= _mapEditor._field.GetLength(1))
             return false;
-        if (_mapEditor._terrain[to.y, to.x].Contains("w"))
+        //if (_mapEditor._terrain[to.y, to.x].Contains("w"))
+        //    return false;   // 移動先が壁なら動かせない
+        var name = _mapEditor._prefabsDictionary.Where(pair => pair.Key == _mapEditor._terrain[to.y, to.x])
+                                                .Select(pair => pair.Value.Item2).FirstOrDefault();
+        if (name == PrefabType.Wall)
             return false;   // 移動先が壁なら動かせない
 
         Vector2Int direction = to - from;
         var destinationObject = _mapEditor._currentField[to.y, to.x];
-        if (destinationObject && destinationObject.CompareTag("Moveable"))
+        if (destinationObject && destinationObject.CompareTag("Movable"))
         {
             bool success = IsMovable(to, to + direction);//再帰呼び出し
             if (!success) return false;
@@ -298,7 +303,7 @@ public class GameManager : Singleton<GameManager>
             player.PlayAnimation(direction.y == 0 ? direction : -direction);
         }
         //Movableタグが付いていた時の処理
-        if (targetObject.CompareTag("Moveable"))
+        if (targetObject.CompareTag("Movable"))
         {
             StartCoroutine(Vibration(0.0f, 1.0f, 0.07f));
             if (_singleCrateSound == false)
@@ -316,7 +321,7 @@ public class GameManager : Singleton<GameManager>
         }
         MoveFunction(targetObject.transform, targetPosition, _moveSpeed, 999);
         //移動先が川で何もオブジェクトが無いのなら
-        if (_mapEditor._terrain[to.y, to.x].Contains("r") && gimmickObject == null && targetObject.TryGetComponent(out IObjectState targetState))
+        if (name == PrefabType.Water && gimmickObject == null && targetObject.TryGetComponent(out IObjectState targetState))
         {
             targetState.ChangeState(ObjectState.UnderWater);//水に沈む
         }

@@ -76,17 +76,59 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d7268bfa2481134eb711a99840a3e90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _wallPrefabs:
-  - {fileID: 5870338377683659470, guid: 13f4b0a97acf7764187e65a64a546335, type: 3}
-  _groundPrefabs:
-  - {fileID: 5870338377683659470, guid: 3e246e67ccaf51d4b9f6f7fff639dc94, type: 3}
-  - {fileID: 5870338377683659470, guid: 13fcd7954b02d7c4a8626421d9250e0a, type: 3}
-  _itemPrefabs:
-  - {fileID: 667844598502936005, guid: ec5c10212cae50947b123a4bb33a5833, type: 3}
-  - {fileID: 5584243791924015249, guid: 3ebce9287f4ff3b43b1aefd4f841f329, type: 3}
-  _playerPrefab: {fileID: 486475863234424499, guid: 1d91bc688150daf48a1f50d2c750e62f, type: 3}
-  _boxPrefab: {fileID: 2269101993774152916, guid: 81ced9c93bff0804cb3e086fa32be263, type: 3}
-  _targetPrefab: {fileID: 5870338377683659470, guid: 1b5173c5d4f665448b3a0cbc62ea5a47, type: 3}
+  _prefabs:
+  - key: 12
+    value:
+      item1: {fileID: 5870338377683659470, guid: 13f4b0a97acf7764187e65a64a546335, type: 3}
+      item2: 1
+  - key: 4
+    value:
+      item1: {fileID: 5870338377683659470, guid: 3e246e67ccaf51d4b9f6f7fff639dc94, type: 3}
+      item2: 3
+  - key: 6
+    value:
+      item1: {fileID: 5870338377683659470, guid: 1b5173c5d4f665448b3a0cbc62ea5a47, type: 3}
+      item2: 4
+  - key: 1
+    value:
+      item1: {fileID: 486475863234424499, guid: 1d91bc688150daf48a1f50d2c750e62f, type: 3}
+      item2: 5
+  - key: 2
+    value:
+      item1: {fileID: 2269101993774152916, guid: 81ced9c93bff0804cb3e086fa32be263, type: 3}
+      item2: 0
+  - key: 5
+    value:
+      item1: {fileID: 5870338377683659470, guid: 13fcd7954b02d7c4a8626421d9250e0a, type: 3}
+      item2: 2
+  - key: 124
+    value:
+      item1: {fileID: 5870338377683659470, guid: d750fa535e733524494e5deaf6933ca2, type: 3}
+      item2: 1
+  - key: 131
+    value:
+      item1: {fileID: 5870338377683659470, guid: 66045be281cab64439e43ead34327897, type: 3}
+      item2: 1
+  - key: 20
+    value:
+      item1: {fileID: 5870338377683659470, guid: 97e751d2b52f19f46acf2eb50533881e, type: 3}
+      item2: 3
+  - key: 33
+    value:
+      item1: {fileID: 5870338377683659470, guid: 23d82b2a57ff8dc4481776449730ea6f, type: 3}
+      item2: 1
+  - key: 18
+    value:
+      item1: {fileID: 5870338377683659470, guid: be20765d2c24ca14985929917087e5cb, type: 3}
+      item2: 1
+  - key: 26
+    value:
+      item1: {fileID: 5870338377683659470, guid: fc64c84a6555d7d4f8ca6cfafd5db74a, type: 3}
+      item2: 2
+  - key: 30
+    value:
+      item1: {fileID: 5870338377683659470, guid: aa3e6146c53cba141bfed9f4af28f200, type: 3}
+      item2: 1
 --- !u!114 &8560279949565117493
 MonoBehaviour:
   m_ObjectHideFlags: 0

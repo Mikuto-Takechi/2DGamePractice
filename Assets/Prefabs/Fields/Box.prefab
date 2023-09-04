@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 823788681676624707}
   m_Layer: 0
   m_Name: Box
-  m_TagString: Moveable
+  m_TagString: Movable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -73,7 +73,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d1b607e7bde6ae4bbf88361c975278e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _crateState: 0
 --- !u!95 &823788681676624707
 Animator:
   serializedVersion: 5

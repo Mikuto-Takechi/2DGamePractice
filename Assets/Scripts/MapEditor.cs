@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static GameManager;
 using System.Linq;
 using System.Xml.Linq;
 /// <summary>
@@ -10,8 +9,13 @@ using System.Xml.Linq;
 /// </summary>
 public class MapEditor : MonoBehaviour
 {
-    public string[,] _field { get; set; }  // アイテムの初期配置やゴールの場所の配列(layer1)
-    public string[,] _terrain { get; set; }  // 地形データ用の配列(layer0)
+    /// <summary>マップを構成するプレファブを設定するインスペクター用のクラス</summary>
+    [SerializeField,Tooltip("Keyに番号、ValueのItem1にプレファブ、Item2には名前を入れる")]
+    SerializableKeyPair<int, SerializableTuple<GameObject, PrefabType>>[] _prefabs = default;
+    /// <summary>実際にゲームの処理で使うマップを構成するプレファブを設定したDictionary</summary>
+    public Dictionary<int, (GameObject, PrefabType)> _prefabsDictionary { get; set; }
+    public int[,] _field { get; set; }  // アイテムの初期配置やゴールの場所の配列(layer1)
+    public int[,] _terrain { get; set; }  // 地形データ用の配列(layer0)
     public GameObject[,] _currentField { get; set; } // ゲーム管理用の配列
     public GameObject[,] _currentGimmick { get; set; }// ステージギミック用の配列
     public GameObject[,] _initialField { get; set; } // ゲーム管理用の配列の初期配置
@@ -21,15 +25,12 @@ public class MapEditor : MonoBehaviour
     TextAsset[] _allMap;
     public Stack<GameObject[,]> _fieldStack { get; set; } = new Stack<GameObject[,]>();
     public Stack<GameObject[,]> _gimmickStack { get; set; } = new Stack<GameObject[,]>();
-    [SerializeField] GameObject[] _wallPrefabs = default;
-    [SerializeField] GameObject[] _groundPrefabs = default;
-    [SerializeField] GameObject[] _itemPrefabs = default;
-    [SerializeField] GameObject _playerPrefab = default;
-    [SerializeField] GameObject _boxPrefab = default;
-    [SerializeField] GameObject _targetPrefab = default;
     private void Awake()
     {
+        //マップデータを全て読み込む
         _allMap = Resources.LoadAll<TextAsset>("Levels");
+        //Inspectorで設定するためのクラスからDictionaryに変換する
+        _prefabsDictionary ??= _prefabs.ToDictionary(p => p.Key, p => (p.Value.Item1, p.Value.Item2));
     }
     void OnEnable()
     {
@@ -62,8 +63,8 @@ public class MapEditor : MonoBehaviour
             IEnumerable<XElement> layers = from item in mapXml.Elements("layer")
                                            select item;
             //配列の領域を確保
-            _field = new string[height, width];
-            _terrain = new string[height, width];
+            _field = new int[height, width];
+            _terrain = new int[height, width];
             //レイヤー情報分ループ
             foreach (XElement layer in layers)
             {
@@ -73,11 +74,12 @@ public class MapEditor : MonoBehaviour
                 {
                     for (int row = 0; row < width; row++)
                     {
-                        string[] text = lines[col].Split(',');
+                        //int[] nums = Array.ConvertAll(lines[col].Split(','), int.Parse);
+                        var nums = lines[col].Split(',');
                         if (layer.Attribute("name").Value == "Terrain")
-                            _terrain[col, row] = text[row];
+                            _terrain[col, row] = int.Parse(nums[row]);
                         if (layer.Attribute("name").Value == "Field")
-                            _field[col, row] = text[row];
+                            _field[col, row] = int.Parse(nums[row]);
                     }
                 }
                 //デバッグログ
@@ -108,7 +110,6 @@ public class MapEditor : MonoBehaviour
         //フィールド用配列の領域を確保
         _currentField = new GameObject[_field.GetLength(0), _field.GetLength(1)];
         _currentGimmick = new GameObject[_field.GetLength(0), _field.GetLength(1)];
-        //string debugText = "";
         for (int y = 0; y < _field.GetLength(0); y++)
         {
             for (int x = 0; x < _field.GetLength(1); x++)
@@ -116,36 +117,19 @@ public class MapEditor : MonoBehaviour
                 GameObject prefab = null;
                 //そのままVector3(x, y, 0)で初期化すると上下が反転するのでmap.Length - y
                 Vector3 position = new Vector3(x, _field.GetLength(0) - y, 0);
-                string terrainId = _terrain[y, x];
-
-                if (terrainId.Contains("w"))//wall
-                    prefab = _wallPrefabs[0];
-                else if (terrainId.Contains("g"))//ground
-                    prefab = _groundPrefabs[0];
-                else if (terrainId.Contains("r"))//river
-                    prefab = _groundPrefabs[1];
-
-                if (prefab)
+                // キーと一致する要素が配列内にあるならValueを取り出して生成する
+                foreach (var keyValue in _prefabsDictionary)
                 {
-                    Instantiate(prefab, position, Quaternion.identity);   // 地形を置く
-                }
-                prefab = null;
-                string fieldId = _field[y, x];
-
-                if (fieldId.Contains("i0"))//item0
-                    prefab = _itemPrefabs[0];
-                else if (fieldId.Contains("i1"))//item1
-                    prefab = _itemPrefabs[1];
-                else if (fieldId.Contains("p"))//player
-                    prefab = _playerPrefab;
-                else if (fieldId.Contains("b"))//box
-                    prefab = _boxPrefab;
-                else if (fieldId.Contains("t"))//target
-                    prefab = _targetPrefab;
-
-                if (prefab)
-                {
-                    _currentField[y, x] = Instantiate(prefab, position, Quaternion.identity);
+                    if(keyValue.Key == _terrain[y, x])
+                    {
+                        prefab = keyValue.Value.Item1;
+                        Instantiate(prefab, position, Quaternion.identity); // 地形を置く
+                    }
+                    if(keyValue.Key == _field[y, x])
+                    {
+                        prefab = keyValue.Value.Item1;
+                        _currentField[y, x] = Instantiate(prefab, position, Quaternion.identity);
+                    }
                 }
                 //debugText += _field[y, x] + ", ";
             }
@@ -158,8 +142,12 @@ public class MapEditor : MonoBehaviour
         Array.Copy(_currentField, _initialField, _field.Length);
         _initialGimmick = new GameObject[_field.GetLength(0), _field.GetLength(1)];
         Array.Copy(_currentGimmick, _initialGimmick, _field.Length);
-
-        GameManager.instance._gameState = GameState.Idle;
+        //ゲームオブジェクトをすべて取得してUIlayerのオブジェクトを除外した物をカウントする
+        //int count = 0;
+        //FindObjectsOfType<GameObject>().Where(obj => obj.layer != 5)
+        //                               .ToList().ForEach(obj => count++);
+        //Debug.Log("オブジェクトの数： " + count);
+        GameManager.instance._gameState = GameManager.GameState.Idle;
     }
     /// <summary>
     /// プレイヤーの座標を取得する
@@ -256,8 +244,10 @@ public class MapEditor : MonoBehaviour
         {
             for (int x = 0; x < _field.GetLength(1); x++)
             {
+                var name = _prefabsDictionary.Where(pair => pair.Key == _field[y, x])
+                                             .Select(pair => pair.Value.Item2).FirstOrDefault();
                 // 格納場所か否かを判断
-                if (_field[y, x].Contains("t"))
+                if (name == PrefabType.Target)
                 {
                     // 格納場所のインデックスを控えておく
                     goals.Add(new Vector2Int(x, y));
@@ -269,7 +259,7 @@ public class MapEditor : MonoBehaviour
         for (int i = 0; i < goals.Count; i++)
         {
             GameObject f = _currentField[goals[i].y, goals[i].x];
-            if (f == null || f.tag != "Moveable")
+            if (f == null || f.tag != "Movable")
             {
                 // 一つでも箱が無かったら条件未達成
                 return false;
