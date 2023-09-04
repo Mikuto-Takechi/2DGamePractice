@@ -129,6 +129,14 @@ MonoBehaviour:
     value:
       item1: {fileID: 5870338377683659470, guid: aa3e6146c53cba141bfed9f4af28f200, type: 3}
       item2: 1
+  - key: 96
+    value:
+      item1: {fileID: 5870338377683659470, guid: 2a1632a2e321dec4f883a8596198232a, type: 3}
+      item2: 1
+  - key: 999
+    value:
+      item1: {fileID: 5584243791924015249, guid: 3ebce9287f4ff3b43b1aefd4f841f329, type: 3}
+      item2: 0
 --- !u!114 &8560279949565117493
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -144,6 +152,4 @@ MonoBehaviour:
   _gameState: 0
   _maxQueueCount: 2
   _moveSpeed: 0.3
-  _timeText: 
-  _stepText: 
   _shadow: {fileID: 2216680461163846205, guid: 570f0cfe8d00f014786973323f9afac6, type: 3}

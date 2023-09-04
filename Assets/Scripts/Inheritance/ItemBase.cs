@@ -4,39 +4,42 @@ using UnityEngine;
 /// <summary>
 /// 基底クラス
 /// </summary>
-public abstract class ItemBase : MonoBehaviour/*, IReload, IPushUndo, IPopUndo*/
+public abstract class ItemBase : MonoBehaviour
 {
-    GameObject _player;
     bool _active = true;
     SpriteRenderer _spriteRenderer;
     Stack<bool> _activeStack = new Stack<bool>();
     void OnEnable()
     {
+        GameManager.instance.MoveTo += PlayerMove;
         GameManager.instance.PushData += PushUndo;
         GameManager.instance.PopData += PopUndo;
         GameManager.instance.ReloadData += Reload;
     }
     void OnDisable()
     {
+        GameManager.instance.MoveTo -= PlayerMove;
         GameManager.instance.PushData -= PushUndo;
         GameManager.instance.PopData -= PopUndo;
         GameManager.instance.ReloadData -= Reload;
     }
     protected void Start()
     {
-        _player = GameObject.FindGameObjectWithTag("Player");
         _spriteRenderer = GetComponent<SpriteRenderer>();
     }
     public abstract void ItemEffect();
-    private void Update()
+    /// <summary>
+    /// プレイヤーが移動したときに呼ばれるメソッド
+    /// </summary>
+    /// <param name="pos">プレイヤーが移動した座標</param>
+    public void PlayerMove(Vector2 pos)
     {
-        if (_player == null) return;
         if (!_active) return;
-        if(transform.position == _player.transform.position && GameManager.instance._gameState == GameManager.GameState.Idle)
+        if ((Vector2)transform.position == pos)
         {
             ItemEffect();
             _active = false;
-            if(_spriteRenderer != null) _spriteRenderer.enabled = _active;
+            if (_spriteRenderer != null) _spriteRenderer.enabled = _active;
         }
     }
 

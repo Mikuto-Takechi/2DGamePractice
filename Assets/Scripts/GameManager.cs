@@ -7,7 +7,6 @@ using System;
 using System.Globalization;
 using MessagePack;
 using System.Linq;
-using static UnityEngine.EventSystems.EventTrigger;
 
 [RequireComponent(typeof(MapEditor))]
 public class GameManager : Singleton<GameManager>
@@ -24,10 +23,11 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] int _maxQueueCount = 2;
     /// <summary>移動速度</summary>
     public float _moveSpeed = 1.0f;
-    float _defaultSpeed;//デフォルトの移動速度
+    public float _defaultSpeed { get; set; }//デフォルトの移動速度
     public int _coroutineCount { get; set; } = 0;
     PlayerInput _playerInput;
-    public string _timeText, _stepText;
+    public string _timeText { get; set; }
+    public string _stepText { get; set; }
     public bool _toggleQuitSave { get; set; } = false;
     bool _singleCrateSound = false;
     bool _pushField = false;
@@ -41,6 +41,8 @@ public class GameManager : Singleton<GameManager>
     public event Action PopData;
     /// <summary>スタックに溜まっているデータをリセットする際に呼ばれるメソッド</summary>
     public event Action ReloadData;
+    /// <summary>移動先を登録元に知らせるメソッド</summary>
+    public event Action<Vector2> MoveTo;
     public enum GameState
     {
         Title,
@@ -84,6 +86,7 @@ public class GameManager : Singleton<GameManager>
         _inputQueue.Clear();//queueの中身を消す
         StopAllCoroutines();//コルーチンを全て止める
         _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
+        _moveSpeed = _defaultSpeed;
         _steps = 0;
         _stageTime = 0;
         _panel = FindObjectOfType<GamePanel>();
@@ -295,10 +298,18 @@ public class GameManager : Singleton<GameManager>
         var targetPosition = new Vector2(to.x, _mapEditor._field.GetLength(0) - to.y);
         var player = targetObject.GetComponent<Player>();
 
+        if (_pushField == false)
+        {
+            PushData();//登録されているステージ状態一時保存メソッドの呼び出し
+            _steps += 1;
+            _pushField = true;
+        }
         //移動させるオブジェクトがプレイヤーコンポーネントを持っていた場合の処理
         if (player)
         {
             AudioManager.instance.PlaySound(1);
+            // プレイヤーの移動先を登録元へ知らせる
+            if(MoveTo != null) MoveTo(targetPosition);
             //yは反転しているのでy方向の移動アニメーションは反転させる
             player.PlayAnimation(direction.y == 0 ? direction : -direction);
         }
@@ -312,12 +323,6 @@ public class GameManager : Singleton<GameManager>
                 AudioManager.instance.PlaySound(0);
             }
             _singleCrateSound = true;
-        }
-        if (_pushField == false)
-        {
-            PushData();//登録されているステージ状態一時保存メソッドの呼び出し
-            _steps += 1;
-            _pushField = true;
         }
         MoveFunction(targetObject.transform, targetPosition, _moveSpeed, 999);
         //移動先が川で何もオブジェクトが無いのなら
