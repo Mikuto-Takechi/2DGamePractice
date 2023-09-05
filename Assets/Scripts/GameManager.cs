@@ -43,6 +43,8 @@ public class GameManager : Singleton<GameManager>
     public event Action ReloadData;
     /// <summary>移動先を登録元に知らせるメソッド</summary>
     public event Action<Vector2> MoveTo;
+    /// <summary>移動終了を知らせるメソッド</summary>
+    public event Action MoveEnd;
     public enum GameState
     {
         Title,
@@ -143,7 +145,7 @@ public class GameManager : Singleton<GameManager>
         }
         if (_gameState == GameState.Pause) return;
         //Undo処理
-        if (_gameInputs.Player.Undo.IsPressed() && _coroutineCount == 0 && _gameState == GameState.Idle)
+        if (_gameInputs.Player.Undo.IsPressed() && _coroutineCount == 0 && _gameState == GameState.Idle && _mapEditor._fieldStack.Count != 0)
         {
             _inputQueue.Clear();//queueの中身を消す
             PopData();//登録されているステージ巻き戻しメソッドの呼び出し
@@ -194,26 +196,15 @@ public class GameManager : Singleton<GameManager>
         //stageTimeに加算
         _stageTime += Time.deltaTime;
     }
-    IEnumerator Move(Transform obj, Vector2 to, float endTime, float shadowInterval, Action callback)
+    IEnumerator Move(Transform obj, Vector2 to, float endTime, Action callback)
     {
         ++_coroutineCount;
-        float timer = 0, shadowTimer = 0;
+        float timer = 0;
         Vector2 from = obj.position;
-        SpriteRenderer objSR = obj.GetComponent<SpriteRenderer>();
         while (true)
         {
             timer += Time.deltaTime;
-            shadowTimer += Time.deltaTime;
             float x = timer / endTime;
-            //一定間隔で残像を生成
-            if (shadowTimer > shadowInterval)
-            {
-                GameObject shadow = Instantiate(_shadow, obj.position, Quaternion.identity);
-                SpriteRenderer shadowSR = shadow.GetComponent<SpriteRenderer>();
-                shadowSR.sprite = objSR.sprite;
-                shadowSR.flipX = objSR.flipX;
-                shadowTimer = 0;
-            }
             obj.position = Vector2.Lerp(from, to, x);
             if (timer > endTime)
             {
@@ -239,13 +230,14 @@ public class GameManager : Singleton<GameManager>
         //表示用の子オブジェクトを取得する。
         Transform sprite = main.GetChild(0);
         //表示用のオブジェクトだけ滑らかに移動させる。
-        StartCoroutine(Move(sprite, to, endTime, shadowInterval, () =>
+        StartCoroutine(Move(sprite, to, endTime, () =>
         {
             //移動処理終了後
             //実行されているコルーチンの数が0の場合はプレイヤーを操作可能な状態へ戻す
             if (_coroutineCount == 0 && _gameState == GameState.Move)
             {
                 _gameState = GameState.Idle;
+                if (MoveEnd != null) MoveEnd();
             }
             //親オブジェクトの座標を変えると子オブジェクトもついてくるので親子関係を解いてから、
             //親オブジェクトを終点に飛ばす。
@@ -277,9 +269,7 @@ public class GameManager : Singleton<GameManager>
         if (to.y < 0 || to.y >= _mapEditor._field.GetLength(0))
             return false;
         if (to.x < 0 || to.x >= _mapEditor._field.GetLength(1))
-            return false;
-        //if (_mapEditor._terrain[to.y, to.x].Contains("w"))
-        //    return false;   // 移動先が壁なら動かせない
+            return false;   
         var name = _mapEditor._prefabsDictionary.Where(pair => pair.Key == _mapEditor._terrain[to.y, to.x])
                                                 .Select(pair => pair.Value.Item2).FirstOrDefault();
         if (name == PrefabType.Wall)

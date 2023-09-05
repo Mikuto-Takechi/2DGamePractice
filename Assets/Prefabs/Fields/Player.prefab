@@ -77,6 +77,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5174536449383054130}
   - component: {fileID: 5603094404819636982}
+  - component: {fileID: 1648793097420426711}
   m_Layer: 0
   m_Name: PlayerSprite
   m_TagString: Untagged
@@ -151,3 +152,22 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1648793097420426711
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7519479984992401049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd91e92b5f6c74141acb10efd2dd7c16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _shadow: {fileID: 4332331252757274384, guid: 570f0cfe8d00f014786973323f9afac6, type: 3}
+  _shadowInterval: 0.1
+  _materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 90dc0d962070e1c48ab956fbd3748a3d, type: 2}
+  _shadowColor: {r: 0, g: 0.952482, b: 1, a: 0.50980395}
+  _shadowEnabled: 0
