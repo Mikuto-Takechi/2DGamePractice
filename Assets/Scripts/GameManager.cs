@@ -43,6 +43,8 @@ public class GameManager : Singleton<GameManager>
     public event Action ReloadData;
     /// <summary>移動先を登録元に知らせるメソッド</summary>
     public event Action<Vector2> MoveTo;
+    /// <summary>移動開始を知らせるメソッド</summary>
+    public event Action<Color> MoveStart;
     /// <summary>移動終了を知らせるメソッド</summary>
     public event Action MoveEnd;
     public enum GameState
@@ -216,17 +218,9 @@ public class GameManager : Singleton<GameManager>
             yield return null;
         }
     }
-    public void MoveFunction(Transform main, Vector2 to, float endTime, float shadowInterval)
+    public void MoveFunction(Transform main, Vector2 to, float endTime)
     {
         _gameState = GameState.Move;
-        //対象がプレイヤーの時 && 残像を表示する時(戻る時)
-        Player hasPlayerComponent = main.GetComponent<Player>();
-        if (hasPlayerComponent && shadowInterval < 100)
-        {
-            //プレイヤーのアニメーションを逆向きで再生
-            Vector2 dir = to - (Vector2)main.position;
-            hasPlayerComponent.PlayAnimation(Vector2Int.RoundToInt(-dir));
-        }
         //表示用の子オブジェクトを取得する。
         Transform sprite = main.GetChild(0);
         //表示用のオブジェクトだけ滑らかに移動させる。
@@ -314,7 +308,7 @@ public class GameManager : Singleton<GameManager>
             }
             _singleCrateSound = true;
         }
-        MoveFunction(targetObject.transform, targetPosition, _moveSpeed, 999);
+        MoveFunction(targetObject.transform, targetPosition, _moveSpeed);
         //移動先が川で何もオブジェクトが無いのなら
         if (name == PrefabType.Water && gimmickObject == null && targetObject.TryGetComponent(out IObjectState targetState))
         {

@@ -165,7 +165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _shadow: {fileID: 4332331252757274384, guid: 570f0cfe8d00f014786973323f9afac6, type: 3}
-  _shadowInterval: 0.1
+  _shadowInterval: 0.05
   _materials:
   - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   - {fileID: 2100000, guid: 7c36a65e6ae891a40a0e76e00a84668b, type: 2}

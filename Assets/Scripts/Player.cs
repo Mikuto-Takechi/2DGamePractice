@@ -2,7 +2,7 @@ using Cinemachine;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour, /*IReload, IPushUndo, IPopUndo,*/ IObjectState
+public class Player : MonoBehaviour, IObjectState
 {
     Animator _animator;
     CinemachineVirtualCamera _vcam;

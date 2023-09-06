@@ -195,7 +195,13 @@ public class MapEditor : MonoBehaviour
                         if (obj.position != to)
                         {
                             //y, x番目にあるGameobjectをx, 配列の縦の長さ-yへ移動させる
-                            GameManager.instance.MoveFunction(obj, to, 0.2f, 0.015f);
+                            GameManager.instance.MoveFunction(obj, to, 0.2f);
+                            Player player = obj.GetComponent<Player>();
+                            if (player)//プレイヤーのアニメーションを逆向きで再生
+                            {
+                                Vector2 dir = (Vector2)to - (Vector2)obj.position;
+                                player.PlayAnimation(Vector2Int.RoundToInt(-dir));
+                            }
                         }
                     }
                 }
