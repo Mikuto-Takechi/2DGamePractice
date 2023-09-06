@@ -33,6 +33,7 @@ public class SpeedUp : ItemBase
             {
                 GameManager.instance._moveSpeed = GameManager.instance._defaultSpeed;
                 _shadowRenderer._externalColor = default;
+                _shadowRenderer._shadowEnabled = false;
                 yield break;
             }
             yield return null;
