@@ -50,6 +50,8 @@ public class MapEditor : MonoBehaviour
         foreach (TextAsset map in _allMap)
         {
             XElement mapXml = XElement.Parse(map.text);
+            var stageData = mapXml.Element("stageData");
+            Debug.Log(stageData.Element("name").Value);
             //一番最初のタグ<map>の属性nameに指定した値が無いなら次のループへ移動する
             if (mapXml.Attribute("name").Value != stageName)
                 continue;

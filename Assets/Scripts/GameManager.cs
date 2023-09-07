@@ -43,8 +43,6 @@ public class GameManager : Singleton<GameManager>
     public event Action ReloadData;
     /// <summary>移動先を登録元に知らせるメソッド</summary>
     public event Action<Vector2> MoveTo;
-    /// <summary>移動開始を知らせるメソッド</summary>
-    public event Action<Color> MoveStart;
     /// <summary>移動終了を知らせるメソッド</summary>
     public event Action MoveEnd;
     public enum GameState

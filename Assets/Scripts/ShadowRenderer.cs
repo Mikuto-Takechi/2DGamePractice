@@ -10,7 +10,7 @@ public class ShadowRenderer : MonoBehaviour
     [SerializeField] SpriteRenderer _shadow = null;
     [SerializeField] float _shadowInterval = 0.1f;
     [SerializeField] Material[] _materials = null;
-    public Color _shadowColor = default;
+    Color _shadowColor = default;
     public Color _externalColor { get; set; }
     public bool _shadowEnabled = false;
     SpriteRenderer _sr = null;
@@ -47,7 +47,7 @@ public class ShadowRenderer : MonoBehaviour
     void ShadowEnabled()
     {
         _shadowEnabled = true;
-        _shadowColor = Color.gray;
+        _shadowColor = Color.black;
     }
     void ShadowDisable()
     {

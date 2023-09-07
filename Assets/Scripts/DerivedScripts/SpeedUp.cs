@@ -17,10 +17,12 @@ public class SpeedUp : ItemBase
     }
     public override void ItemEffect()
     {
+        AudioManager.instance.PlaySound(12);
         GameManager.instance._moveSpeed = _changeSpeed;
         if(_coroutine != null) StopCoroutine(_coroutine);
         _coroutine = StartCoroutine(EffectTime());
-        _shadowRenderer._externalColor = Color.blue;
+        ColorUtility.TryParseHtmlString("#00F3FF82", out Color color);
+        _shadowRenderer._externalColor = color;
     }
     IEnumerator EffectTime()
     {
