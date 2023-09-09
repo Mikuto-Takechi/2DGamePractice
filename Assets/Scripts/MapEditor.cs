@@ -50,14 +50,13 @@ public class MapEditor : MonoBehaviour
         foreach (TextAsset map in _allMap)
         {
             XElement mapXml = XElement.Parse(map.text);
-            var stageData = mapXml.Element("stageData");
-            Debug.Log(stageData.Element("name").Value);
-            //一番最初のタグ<map>の属性nameに指定した値が無いなら次のループへ移動する
-            if (mapXml.Attribute("name").Value != stageName)
+            //一番最初のタグ<map>の要素nameに指定した値が無いなら次のループへ移動する
+            if (mapXml.Element("name").Value != stageName)
                 continue;
-            //読み込み始めるマップの名前と次のステージの名前を登録
-            _mapName = mapXml.Attribute("name").Value;
-            _nextMapName = mapXml.Attribute("next").Value;
+            //読み込み始めるマップの名前と次のステージの名前と制限時間を登録
+            _mapName = mapXml.Element("name").Value;
+            _nextMapName = mapXml.Element("next").Value;
+            int _timeLimit = int.Parse(mapXml.Element("timeLimit").Value);
             //マップの幅と縦の大きさを取り出す
             int width = int.Parse(mapXml.Attribute("width").Value);
             int height = int.Parse(mapXml.Attribute("height").Value);
