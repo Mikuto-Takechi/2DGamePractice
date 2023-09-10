@@ -90,7 +90,6 @@ public class GameManager : Singleton<GameManager>
         _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
         _moveSpeed = _defaultSpeed;
         _steps = 0;
-        _stageTime = 0;
         _panel = FindObjectOfType<GamePanel>();
         _panel?.ChangePanel(0);
         _mapEditor._fieldStack.Clear();//フィールドのスタックを削除する
@@ -105,6 +104,7 @@ public class GameManager : Singleton<GameManager>
             //記録が追加されていないステージ名ならば新しくDictionaryに追加する
             _timeRecords.TryAdd(_mapEditor._mapName, 99999);
             _stepsRecords.TryAdd(_mapEditor._mapName, 99999);
+            _stageTime = _mapEditor._timeLimit;//制限時間を設定する
             _gameState = GameState.Idle;
         }
     }
@@ -194,7 +194,7 @@ public class GameManager : Singleton<GameManager>
             }
         }
         //stageTimeに加算
-        _stageTime += Time.deltaTime;
+        _stageTime -= Time.deltaTime;
     }
     IEnumerator Move(Transform obj, Vector2 to, float endTime, Action callback)
     {
