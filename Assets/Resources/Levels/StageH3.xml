@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map name="StageH3" next="StageH4" version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="16" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="1">
+<map version="1.10" tiledversion="1.10.1" orientation="orthogonal" renderorder="right-down" width="16" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="1">
  <tileset firstgid="1" source="6Tile.tsx"/>
  <tileset firstgid="7" source="dungeon-tileset.tsx"/>
  <tileset firstgid="37" source="tileset-world.tsx"/>
+	<name>StageH3</name>
+	<next>StageH4</next>
+	<timeLimit>60</timeLimit>
  <layer id="1" name="Terrain" width="16" height="16">
   <data encoding="csv">
 12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,

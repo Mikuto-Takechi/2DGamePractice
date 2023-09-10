@@ -22,6 +22,7 @@ public class MapEditor : MonoBehaviour
     public GameObject[,] _initialGimmick { get; set; }// ステージギミック用の配列の初期配置
     public string _mapName { get; set; } = "";//読み込んでいるマップの名前
     public string _nextMapName { get; set; } = "";//次のマップの名前
+    public float _timeLimit { get; set; } = 0;//制限時間
     TextAsset[] _allMap;
     public Stack<GameObject[,]> _fieldStack { get; set; } = new Stack<GameObject[,]>();
     public Stack<GameObject[,]> _gimmickStack { get; set; } = new Stack<GameObject[,]>();
@@ -56,7 +57,7 @@ public class MapEditor : MonoBehaviour
             //読み込み始めるマップの名前と次のステージの名前と制限時間を登録
             _mapName = mapXml.Element("name").Value;
             _nextMapName = mapXml.Element("next").Value;
-            int _timeLimit = int.Parse(mapXml.Element("timeLimit").Value);
+            _timeLimit = int.Parse(mapXml.Element("timeLimit").Value);
             //マップの幅と縦の大きさを取り出す
             int width = int.Parse(mapXml.Attribute("width").Value);
             int height = int.Parse(mapXml.Attribute("height").Value);
