@@ -52,6 +52,7 @@ public class GameManager : Singleton<GameManager>
         Clear,
         Idle,
         Move,
+        TimeOver,
     }
     public override void AwakeFunction()
     {
@@ -102,8 +103,8 @@ public class GameManager : Singleton<GameManager>
         {
             _mapEditor.InitializeGame();
             //記録が追加されていないステージ名ならば新しくDictionaryに追加する
-            _timeRecords.TryAdd(_mapEditor._mapName, 99999);
-            _stepsRecords.TryAdd(_mapEditor._mapName, 99999);
+            _timeRecords.TryAdd(_mapEditor._mapName, default);
+            _stepsRecords.TryAdd(_mapEditor._mapName, default);
             _stageTime = _mapEditor._timeLimit;//制限時間を設定する
             _gameState = GameState.Idle;
         }
@@ -139,9 +140,15 @@ public class GameManager : Singleton<GameManager>
             }
             return;
         }
+        if (_gameState == GameState.TimeOver) return;
         if (_gameInputs.Player.Pause.triggered)
         {
             _panel?.SwitchPause();
+        }
+        if(_stageTime < 0)
+        {
+            _panel?.ChangePanel(4);
+            _gameState = GameState.TimeOver;
         }
         if (_gameState == GameState.Pause) return;
         //Undo処理
@@ -160,10 +167,7 @@ public class GameManager : Singleton<GameManager>
             Fade fade = _panel.transform.GetComponentInChildren<Fade>();
             fade?.CallFadeIn(() =>
             {
-                _inputQueue.Clear();//queueの中身を消す
-                StopAllCoroutines();//コルーチンを全て止める
-                _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
-                ReloadData();//登録されているステージ初期化メソッドの呼び出し
+                ResetGame();
                 AudioManager.instance.PlaySound(8);
                 AudioManager.instance.PlaySound(9);
                 fade?.CallFadeOut(() => _gameState = GameState.Idle);
@@ -195,6 +199,14 @@ public class GameManager : Singleton<GameManager>
         }
         //stageTimeに加算
         _stageTime -= Time.deltaTime;
+    }
+    public void ResetGame()
+    {
+        _inputQueue.Clear();//queueの中身を消す
+        StopAllCoroutines();//コルーチンを全て止める
+        _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
+        ReloadData();//登録されているステージ初期化メソッドの呼び出し
+        _stageTime = _mapEditor._timeLimit;//制限時間を初期化
     }
     IEnumerator Move(Transform obj, Vector2 to, float endTime, Action callback)
     {

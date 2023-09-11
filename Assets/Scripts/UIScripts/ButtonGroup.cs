@@ -6,7 +6,7 @@ using UnityEngine.UI;
 /// <summary>
 /// ボタンを一定の数で分割して切り替えれるようにするスクリプト
 /// </summary>
-public class StageButtonSet : MonoBehaviour
+public class ButtonGroup : MonoBehaviour
 {
     [SerializeField] GameObject[] _allButton;
     /// <summary>アクティブ時の親オブジェクト</summary>

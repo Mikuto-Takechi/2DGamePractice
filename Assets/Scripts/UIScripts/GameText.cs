@@ -22,18 +22,30 @@ public class GameText : MonoBehaviour
         if (_type == TextType.Time) _text.text = $"時間 {GameManager.instance._stageTime.ToString("F2")}";
         if (_type == TextType.ClearSteps) _text.text = GameManager.instance._stepText;
         if (_type == TextType.ClearTime) _text.text = GameManager.instance._timeText;
-        if (_type == TextType.Records)
+        if (_type == TextType.TimeRecord)
         {
-            var steps = GameManager.instance._stepsRecords;
             var times = GameManager.instance._timeRecords;
-            if (steps == null || times == null) return;
-            if(steps.ContainsKey(_stageName) && times.ContainsKey(_stageName))
+            if (times == null) return;
+            if(times.ContainsKey(_stageName) && times[_stageName] != default)
             {
-                _text.text = $"歩数：{steps[_stageName]}\n時間：{times[_stageName].ToString("F2")}";
+                _text.text = $"時間：{times[_stageName].ToString("F2")}";
             }
             else
             {
-                _text.text = "記録なし\n記録なし";
+                _text.text = "- - -";
+            }
+        }
+        if(_type == TextType.StepRecord)
+        {
+            var steps = GameManager.instance._stepsRecords;
+            if (steps == null) return;
+            if (steps.ContainsKey(_stageName) && steps[_stageName] != default)
+            {
+                _text.text = $"歩数：{steps[_stageName]}";
+            }
+            else
+            {
+                _text.text = "- - -";
             }
         }
     }
@@ -55,6 +67,7 @@ enum TextType
     ClearSteps,
     ClearTime,
     MoveText,
-    Records,
+    TimeRecord,
+    StepRecord,
     None,
 }

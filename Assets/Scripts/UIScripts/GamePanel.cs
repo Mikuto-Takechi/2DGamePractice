@@ -94,4 +94,10 @@ public class GamePanel : MonoBehaviour
         Application.Quit();//ƒAƒvƒŠã‚È‚ç‚±‚Á‚¿
     #endif
     }
+    public void ResetGame()
+    {
+        GameManager.instance.ResetGame();
+        ChangePanel(0);
+        GameManager.instance._gameState = GameManager.GameState.Idle;
+    }
 }

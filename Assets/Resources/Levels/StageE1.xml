@@ -5,7 +5,7 @@
 	<tileset firstgid="37" source="tileset-world.tsx"/>
 	<name>StageE1</name>
 	<next>StageE2</next>
-	<timeLimit>60</timeLimit>
+	<timeLimit>10</timeLimit>
 	<layer id="1" name="Terrain" width="16" height="16">
 		<data encoding="csv">
 			12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
