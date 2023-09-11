@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using UnityEngine;
 using UnityEngine.UI;
 /// <summary>
@@ -42,11 +43,12 @@ public class StageButton : MonoBehaviour
     /// <typeparam name="T">記録の型</typeparam>
     /// <param name="dic">ステージ記録の入ったDictionary</param>
     /// <param name="text">表示用テキスト</param>
-    void StageRecord<T>(Dictionary<string, T> dic, Text text) where T : IComparable<T>, IFormattable
+    void StageRecord<T>(Dictionary<string, T> dic, Text text) where T : IFormattable
     {
         if (dic == null) return;
         if (text == null) return;
-        if (dic.ContainsKey(_stageName) && !dic[_stageName].Equals(default(T)))
+        //  ステージ記録が存在する && 記録の値が型の最大値ではない時
+        if (dic.ContainsKey(_stageName) && !dic[_stageName].Equals(MaxValue.Max<T>()))
         {
             //float型なら書式指定して表示
             if (typeof(T) == typeof(float))

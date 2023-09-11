@@ -103,8 +103,8 @@ public class GameManager : Singleton<GameManager>
         {
             _mapEditor.InitializeGame();
             //記録が追加されていないステージ名ならば新しくDictionaryに追加する
-            _timeRecords.TryAdd(_mapEditor._mapName, default);
-            _stepsRecords.TryAdd(_mapEditor._mapName, default);
+            _timeRecords.TryAdd(_mapEditor._mapName, MaxValue.floatValue);
+            _stepsRecords.TryAdd(_mapEditor._mapName, MaxValue.intValue);
             _stageTime = _mapEditor._timeLimit;//制限時間を設定する
             _gameState = GameState.Idle;
         }
