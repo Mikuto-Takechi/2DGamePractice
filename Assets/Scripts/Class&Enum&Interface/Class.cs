@@ -42,3 +42,13 @@ static class MaxValue
         throw new InvalidOperationException("この型は無効です");
     }
 }
+/// <summary>
+/// ステージのオブジェクトを管理する
+/// </summary>
+public class Layer
+{
+    public (int id, GameObject prefab, PrefabType type) field;
+    public (int id, GameObject prefab, PrefabType type) terrain;
+    public GameObject currentField;
+    public GameObject currentGimmick;
+}

@@ -8,11 +8,14 @@ public class Crate : MonoBehaviour, /*IReload, IPushUndo, IPopUndo,*/ IObjectSta
     Stack<ObjectState> _stateStack = new Stack<ObjectState>();
     ObjectState _initState;
     Animator _animator;
+    SpriteRenderer _sr;
 
     void Awake()
     {
         _initState = objectState;
         _animator = GetComponent<Animator>();
+        _sr = transform.GetComponentInChildren<SpriteRenderer>();
+        _sr.color = new Color(0,1,1,1);
     }
     void OnEnable()
     {

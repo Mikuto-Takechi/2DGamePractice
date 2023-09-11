@@ -21,8 +21,7 @@ public class SpeedUp : ItemBase
         GameManager.instance._moveSpeed = _changeSpeed;
         if(_coroutine != null) StopCoroutine(_coroutine);
         _coroutine = StartCoroutine(EffectTime());
-        ColorUtility.TryParseHtmlString("#00F3FF82", out Color color);
-        _shadowRenderer._externalColor = color;
+        _shadowRenderer._externalColor = new Color(0, 1, 1, 1); ;
     }
     IEnumerator EffectTime()
     {

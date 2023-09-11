@@ -14,6 +14,7 @@ public class MapEditor : MonoBehaviour
     SerializableKeyPair<int, SerializableTuple<GameObject, PrefabType>>[] _prefabs = default;
     /// <summary>実際にゲームの処理で使うマップを構成するプレファブを設定したDictionary</summary>
     public Dictionary<int, (GameObject, PrefabType)> _prefabsDictionary { get; set; }
+    public Layer[,] _layer { get; set; }
     public int[,] _field { get; set; }  // アイテムの初期配置やゴールの場所の配列(layer1)
     public int[,] _terrain { get; set; }  // 地形データ用の配列(layer0)
     public GameObject[,] _currentField { get; set; } // ゲーム管理用の配列
