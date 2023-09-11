@@ -451,7 +451,6 @@ GameObject:
   - component: {fileID: 5949741556383355897}
   - component: {fileID: 5949741556383355902}
   - component: {fileID: 2464401828318167652}
-  - component: {fileID: 1797670669316658015}
   - component: {fileID: 794858998018513814}
   m_Layer: 5
   m_Name: StageButton
@@ -592,24 +591,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42e84d82120ff5145af9d2a62dea7ac6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1797670669316658015
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5949741556383355900}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1a9c3ba555be92408d4cc96108bc528, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _stageName: 
-  _visibleObject: {fileID: 1456498770980547375}
-  _hiddenObjects:
-  - {fileID: 5949741557818126489}
-  - {fileID: 8267125901968715104}
-  - {fileID: 5949741555894230102}
 --- !u!114 &794858998018513814
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -622,9 +603,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bff5e3c00561d1049a4060243db9eed4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _stageName: 
+  _enableLockProcess: 1
   _timeRecord: {fileID: 8858445003235047952}
   _stepRecord: {fileID: 5949741557818126490}
-  _stageName: 
+  _lockImage: {fileID: 1456498770980547375}
+  _hiddenObjects:
+  - {fileID: 8267125901968715104}
+  - {fileID: 5949741557818126489}
+  - {fileID: 5949741555894230102}
 --- !u!1 &5949741557818126489
 GameObject:
   m_ObjectHideFlags: 0
@@ -685,7 +672,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.97334313, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -857,7 +844,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.97334313, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

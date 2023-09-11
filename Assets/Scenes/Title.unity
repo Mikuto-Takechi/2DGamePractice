@@ -402,6 +402,10 @@ PrefabInstance:
       propertyPath: _stageName
       value: StageE1
       objectReference: {fileID: 0}
+    - target: {fileID: 794858998018513814, guid: 5e431251a6f14294da836639bc6d0dbb, type: 3}
+      propertyPath: _enableLockProcess
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1257937209654271163, guid: 5e431251a6f14294da836639bc6d0dbb, type: 3}
       propertyPath: _stageName
       value: StageE1
@@ -5331,6 +5335,10 @@ PrefabInstance:
     - target: {fileID: 794858998018513814, guid: 5e431251a6f14294da836639bc6d0dbb, type: 3}
       propertyPath: _stageName
       value: StageH1
+      objectReference: {fileID: 0}
+    - target: {fileID: 794858998018513814, guid: 5e431251a6f14294da836639bc6d0dbb, type: 3}
+      propertyPath: _enableLockProcess
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1257937209654271163, guid: 5e431251a6f14294da836639bc6d0dbb, type: 3}
       propertyPath: _stageName
