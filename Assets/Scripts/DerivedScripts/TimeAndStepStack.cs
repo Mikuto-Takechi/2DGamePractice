@@ -7,7 +7,7 @@ using UnityEngine;
 public class TimeAndStepStack : MonoBehaviour/*, IReload, IPushUndo, IPopUndo*/
 {
     Stack<int> _stepStack = new Stack<int>();
-    Stack<float> _timeStack = new Stack<float>();
+    //Stack<float> _timeStack = new Stack<float>();
     void OnEnable()
     {
         GameManager.instance.PushData += PushUndo;
@@ -23,14 +23,14 @@ public class TimeAndStepStack : MonoBehaviour/*, IReload, IPushUndo, IPopUndo*/
     public void Reload()
     {
         GameManager.instance._steps = 0;
-        GameManager.instance._stageTime = 0;
+        //GameManager.instance._stageTime = 0;
         _stepStack.Clear();
-        _timeStack.Clear();
+        //_timeStack.Clear();
     }
     public void PushUndo()
     {
         _stepStack.Push(GameManager.instance._steps);
-        _timeStack.Push(GameManager.instance._stageTime);
+        //_timeStack.Push(GameManager.instance._stageTime);
     }
 
     public void PopUndo()
@@ -39,9 +39,9 @@ public class TimeAndStepStack : MonoBehaviour/*, IReload, IPushUndo, IPopUndo*/
         {
             GameManager.instance._steps = step;
         }
-        if (_timeStack.TryPop(out float time))
-        {
-            GameManager.instance._stageTime = time;
-        }
+        //if (_timeStack.TryPop(out float time))
+        //{
+        //    GameManager.instance._stageTime = time;
+        //}
     }
 }

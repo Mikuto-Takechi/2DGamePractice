@@ -127,7 +127,7 @@ public class GameManager : Singleton<GameManager>
             if (_gameState != GameState.Clear && _gameState != GameState.Move)//クリア後処理
             {
                 _gameState = GameState.Clear;
-                _timeText = CheckRecord(_stageTime, _timeRecords);
+                _timeText = CheckRecord(_mapEditor._timeLimit - _stageTime, _timeRecords);
                 _stepText = CheckRecord(_steps, _stepsRecords);
                 //マップエディタースクリプトを読み込み
                 MapEditor mapEditor = FindObjectOfType<MapEditor>();
