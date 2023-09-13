@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using UnityEngine.Rendering;
+using static UnityEditor.Experimental.GraphView.GraphView;
 /// <summary>
 /// DictionaryをInspector上で表示するためのクラス
 /// https://rimever.hatenablog.com/entry/2022/05/27/000000
@@ -43,12 +45,62 @@ static class MaxValue
     }
 }
 /// <summary>
-/// ステージのオブジェクトを管理する
+/// ステージのオブジェクトを管理するクラス
 /// </summary>
 public class Layer
 {
-    public (int id, GameObject prefab, PrefabType type) field;
-    public (int id, GameObject prefab, PrefabType type) terrain;
+    /// <summary>フィールドの情報。初期化以外は基本読み取り専用</summary>
+    public (int id, GameObject prefab, PrefabType type) field = (0, default, PrefabType.Default);
+    /// <summary>地形の情報。初期化以外は基本読み取り専用</summary>
+    public (int id, GameObject prefab, PrefabType type) terrain = (0, default, PrefabType.Default);
+    /// <summary>フィールドの情報。物が移動した時などに書き換える</summary>
     public GameObject currentField;
+    /// <summary>情報を得たいオブジェクトの位置が重なる場合に格納するための変数。箱が水に落ちた時など</summary>
     public GameObject currentGimmick;
+    /// <summary>初期情報</summary>
+    public GameObject initialField;
+    /// <summary>初期情報</summary>
+    public GameObject initialGimmick;
+    /// <summary>
+    /// Layerの二次元配列のcurrentFieldかcurrentGimmickを初期化する
+    /// </summary>
+    public static void Initialize(in Layer[,] layer, LayerMode mode)
+    {
+        for (int i = 0; i < layer.GetLength(0); i++)
+        for (int j = 0; j < layer.GetLength(1); j++)
+        {
+            if (mode == LayerMode.CurrentField)
+                layer[i, j].currentField = layer[i, j].initialField;
+            else if (mode == LayerMode.CurrentGimmick)
+                layer[i, j].currentGimmick = layer[i, j].initialGimmick;
+        }
+    }
+    /// <summary>
+    /// Layerの二次元配列のcurrentFieldかcurrentGimmickを引数で受け取った二次元配列で上書きする
+    /// </summary>
+    public static void Set(in Layer[,] layer, GameObject[,] set, LayerMode mode)
+    {
+        for (int i = 0; i < layer.GetLength(0); i++)
+        for (int j = 0; j < layer.GetLength(1); j++)
+        {
+            if (mode == LayerMode.CurrentField)
+                layer[i, j].currentField = set[i, j];
+            else if (mode == LayerMode.CurrentGimmick)
+                layer[i, j].currentGimmick = set[i, j];
+        }
+    }
+    /// <summary>
+    /// Layerの二次元配列のcurrentFieldかcurrentGimmickのデータを引数で受け取った二次元配列にコピーする
+    /// </summary>
+    public static void Copy(Layer[,] layer, in GameObject[,] copy, LayerMode mode)
+    {
+        for (int i = 0; i < layer.GetLength(0); i++)
+        for (int j = 0; j < layer.GetLength(1); j++)
+        {
+            if (mode == LayerMode.CurrentField)
+                copy[i, j] = layer[i, j].currentField;
+            else if (mode == LayerMode.CurrentGimmick)
+                copy[i, j] = layer[i, j].currentGimmick;
+        }
+    }
 }

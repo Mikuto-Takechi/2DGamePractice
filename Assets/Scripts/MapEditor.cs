@@ -15,12 +15,6 @@ public class MapEditor : MonoBehaviour
     /// <summary>実際にゲームの処理で使うマップを構成するプレファブを設定したDictionary</summary>
     public Dictionary<int, (GameObject, PrefabType)> _prefabsDictionary { get; set; }
     public Layer[,] _layer { get; set; }
-    public int[,] _field { get; set; }  // アイテムの初期配置やゴールの場所の配列(layer1)
-    public int[,] _terrain { get; set; }  // 地形データ用の配列(layer0)
-    public GameObject[,] _currentField { get; set; } // ゲーム管理用の配列
-    public GameObject[,] _currentGimmick { get; set; }// ステージギミック用の配列
-    public GameObject[,] _initialField { get; set; } // ゲーム管理用の配列の初期配置
-    public GameObject[,] _initialGimmick { get; set; }// ステージギミック用の配列の初期配置
     public string _mapName { get; set; } = "";//読み込んでいるマップの名前
     public string _nextMapName { get; set; } = "";//次のマップの名前
     public float _timeLimit { get; set; } = 0;//制限時間
@@ -66,8 +60,12 @@ public class MapEditor : MonoBehaviour
             IEnumerable<XElement> layers = from item in mapXml.Elements("layer")
                                            select item;
             //配列の領域を確保
-            _field = new int[height, width];
-            _terrain = new int[height, width];
+            _layer = new Layer[height, width];
+            for (int col = 0; col < height; col++)
+            for (int row = 0; row < width; row++)
+            {
+                _layer[col, row] = new Layer();
+            }
             //レイヤー情報分ループ
             foreach (XElement layer in layers)
             {
@@ -80,9 +78,9 @@ public class MapEditor : MonoBehaviour
                         //int[] nums = Array.ConvertAll(lines[col].Split(','), int.Parse);
                         var nums = lines[col].Split(',');
                         if (layer.Attribute("name").Value == "Terrain")
-                            _terrain[col, row] = int.Parse(nums[row]);
+                            _layer[col, row].terrain.id = int.Parse(nums[row]);
                         if (layer.Attribute("name").Value == "Field")
-                            _field[col, row] = int.Parse(nums[row]);
+                            _layer[col, row].field.id = int.Parse(nums[row]);
                     }
                 }
                 //デバッグログ
@@ -96,9 +94,9 @@ public class MapEditor : MonoBehaviour
                     for (int j = 0; j < width; j++)
                     {
                         if (layer.Attribute("name").Value == "Terrain")
-                            debugText += $"{_terrain[i, j]},";
+                            debugText += $"{_layer[i, j].terrain.id},";
                         if (layer.Attribute("name").Value == "Field")
-                            debugText += $"{_field[i, j]},";
+                            debugText += $"{_layer[i, j].field.id},";
                     }
                     debugText += "\n";
                 }
@@ -111,45 +109,33 @@ public class MapEditor : MonoBehaviour
     public void InitializeGame()
     {
         //フィールド用配列の領域を確保
-        _currentField = new GameObject[_field.GetLength(0), _field.GetLength(1)];
-        _currentGimmick = new GameObject[_field.GetLength(0), _field.GetLength(1)];
-        for (int y = 0; y < _field.GetLength(0); y++)
+        for (int y = 0; y < _layer.GetLength(0); y++)
         {
-            for (int x = 0; x < _field.GetLength(1); x++)
+            for (int x = 0; x < _layer.GetLength(1); x++)
             {
                 GameObject prefab = null;
                 //そのままVector3(x, y, 0)で初期化すると上下が反転するのでmap.Length - y
-                Vector3 position = new Vector3(x, _field.GetLength(0) - y, 0);
+                Vector3 position = new Vector3(x, _layer.GetLength(0) - y, 0);
                 // キーと一致する要素が配列内にあるならValueを取り出して生成する
                 foreach (var keyValue in _prefabsDictionary)
                 {
-                    if(keyValue.Key == _terrain[y, x])
+                    if(keyValue.Key == _layer[y, x].terrain.id)
                     {
                         prefab = keyValue.Value.Item1;
-                        Instantiate(prefab, position, Quaternion.identity); // 地形を置く
+                        _layer[y,x].terrain.prefab = Instantiate(prefab, position, Quaternion.identity); // 地形を置く
+                        _layer[y, x].terrain.type = keyValue.Value.Item2;
                     }
-                    if(keyValue.Key == _field[y, x])
+                    if(keyValue.Key == _layer[y, x].field.id)
                     {
                         prefab = keyValue.Value.Item1;
-                        _currentField[y, x] = Instantiate(prefab, position, Quaternion.identity);
+                        _layer[y, x].field.prefab = Instantiate(prefab, position, Quaternion.identity);
+                        _layer[y, x].field.type = keyValue.Value.Item2;
+                        _layer[y, x].currentField = _layer[y, x].field.prefab;
+                        _layer[y, x].initialField = _layer[y, x].field.prefab;
                     }
                 }
-                //debugText += _field[y, x] + ", ";
             }
-            //debugText += "\n";  // 改行
         }
-
-        //Debug.Log(debugText);
-        //初期状態の物の位置を保存する
-        _initialField = new GameObject[_field.GetLength(0), _field.GetLength(1)];
-        Array.Copy(_currentField, _initialField, _field.Length);
-        _initialGimmick = new GameObject[_field.GetLength(0), _field.GetLength(1)];
-        Array.Copy(_currentGimmick, _initialGimmick, _field.Length);
-        //ゲームオブジェクトをすべて取得してUIlayerのオブジェクトを除外した物をカウントする
-        //int count = 0;
-        //FindObjectsOfType<GameObject>().Where(obj => obj.layer != 5)
-        //                               .ToList().ForEach(obj => count++);
-        //Debug.Log("オブジェクトの数： " + count);
         GameManager.instance._gameState = GameManager.GameState.Idle;
     }
     /// <summary>
@@ -158,12 +144,12 @@ public class MapEditor : MonoBehaviour
     /// <returns></returns>
     public Vector2Int GetPlayerIndex()
     {
-        for (int y = 0; y < _field.GetLength(0); y++)
+        for (int y = 0; y < _layer.GetLength(0); y++)
         {
-            for (int x = 0; x < _field.GetLength(1); x++)
+            for (int x = 0; x < _layer.GetLength(1); x++)
             {
-                if (_currentField[y, x] == null) { continue; }
-                if (_currentField[y, x].tag == "Player")
+                if (_layer[y, x].currentField == null) { continue; }
+                if (_layer[y, x].currentField.tag == "Player")
                     return new Vector2Int(x, y);
             }
         }
@@ -173,11 +159,11 @@ public class MapEditor : MonoBehaviour
     public void PushField()
     {
         //この関数は再帰呼び出しで何回か繰り返されるので、最初の1回だけ盤面を保存させる。
-        GameObject[,] copyField = new GameObject[_field.GetLength(0), _field.GetLength(1)];
-        Array.Copy(_currentField, copyField, _field.Length);
+        GameObject[,] copyField = new GameObject[_layer.GetLength(0), _layer.GetLength(1)];
+        Layer.Copy(_layer, copyField, LayerMode.CurrentField);
         _fieldStack.Push(copyField);
-        GameObject[,] copyGimmick = new GameObject[_field.GetLength(0), _field.GetLength(1)];
-        Array.Copy(_currentGimmick, copyGimmick, _field.Length);
+        GameObject[,] copyGimmick = new GameObject[_layer.GetLength(0), _layer.GetLength(1)];
+        Layer.Copy(_layer, copyGimmick, LayerMode.CurrentGimmick);
         _gimmickStack.Push(copyGimmick);
     }
     public void PopField()
@@ -185,16 +171,16 @@ public class MapEditor : MonoBehaviour
         //スタックにフィールドの情報が入っているかを判定する。
         if (_fieldStack.TryPop(out var undoField))
         {
-            _currentField = undoField;
+            Layer.Set(_layer, undoField, LayerMode.CurrentField);
             AudioManager.instance.PlaySound(6);
-            for (int y = 0; y < _field.GetLength(0); y++)
+            for (int y = 0; y < _layer.GetLength(0); y++)
             {
-                for (int x = 0; x < _field.GetLength(1); x++)
+                for (int x = 0; x < _layer.GetLength(1); x++)
                 {
-                    if (_currentField[y, x] != null)
+                    if (_layer[y, x].currentField != null)
                     {
-                        Transform obj = _currentField[y, x].transform;
-                        Vector3 to = new Vector3(x, _field.GetLength(0) - y, 0);
+                        Transform obj = _layer[y, x].currentField.transform;
+                        Vector3 to = new Vector3(x, _layer.GetLength(0) - y, 0);
                         if (obj.position != to)
                         {
                             //y, x番目にあるGameobjectをx, 配列の縦の長さ-yへ移動させる
@@ -212,7 +198,7 @@ public class MapEditor : MonoBehaviour
         }
         if(_gimmickStack.TryPop(out var undoGimmick))
         {
-            _currentGimmick = undoGimmick;
+            Layer.Set(_layer, undoGimmick, LayerMode.CurrentGimmick);
         }
     }
     /// <summary>
@@ -220,24 +206,20 @@ public class MapEditor : MonoBehaviour
     /// </summary>
     public void InitializeField()
     {
-        //初期のフィールドをコピーして現在のフィールドを上書きする
-        GameObject[,] copyField = new GameObject[_field.GetLength(0), _field.GetLength(1)];
-        Array.Copy(_initialField, copyField, _initialField.Length);
-        _currentField = copyField;
-        GameObject[,] copyGimmick = new GameObject[_field.GetLength(0), _field.GetLength(1)];
-        Array.Copy(_initialGimmick, copyGimmick, _initialGimmick.Length);
-        _currentGimmick = copyGimmick;
+        //Layerクラスの初期化メソッドで初期化する
+        Layer.Initialize(_layer, LayerMode.CurrentField);
+        Layer.Initialize(_layer, LayerMode.CurrentGimmick);
         //スタックに溜まっているデータを削除する
         _fieldStack.Clear();
         _gimmickStack.Clear();
         //物の位置を戻す
-        for (int y = 0; y < _field.GetLength(0); y++)
+        for (int y = 0; y < _layer.GetLength(0); y++)
         {
-            for (int x = 0; x < _field.GetLength(1); x++)
+            for (int x = 0; x < _layer.GetLength(1); x++)
             {
-                if (_currentField[y, x] != null)
+                if (_layer[y, x].currentField != null)
                 {
-                    _currentField[y, x].transform.position = new Vector3(x, _field.GetLength(0) - y, 0);
+                    _layer[y, x].currentField.transform.position = new Vector3(x, _layer.GetLength(0) - y, 0);
                 }
             }
         }
@@ -249,14 +231,12 @@ public class MapEditor : MonoBehaviour
     public bool IsCleared()
     {
         List<Vector2Int> goals = new List<Vector2Int>();
-        for (int y = 0; y < _field.GetLength(0); y++)
+        for (int y = 0; y < _layer.GetLength(0); y++)
         {
-            for (int x = 0; x < _field.GetLength(1); x++)
+            for (int x = 0; x < _layer.GetLength(1); x++)
             {
-                var name = _prefabsDictionary.Where(pair => pair.Key == _field[y, x])
-                                             .Select(pair => pair.Value.Item2).FirstOrDefault();
                 // 格納場所か否かを判断
-                if (name == PrefabType.Target)
+                if (_layer[y, x].field.type == PrefabType.Target)
                 {
                     // 格納場所のインデックスを控えておく
                     goals.Add(new Vector2Int(x, y));
@@ -267,7 +247,7 @@ public class MapEditor : MonoBehaviour
         // 要素数はgoals.Countで取得
         for (int i = 0; i < goals.Count; i++)
         {
-            GameObject f = _currentField[goals[i].y, goals[i].x];
+            GameObject f = _layer[goals[i].y, goals[i].x].currentField;
             if (f == null || f.tag != "Movable")
             {
                 // 一つでも箱が無かったら条件未達成

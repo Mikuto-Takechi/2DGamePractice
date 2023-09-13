@@ -270,26 +270,24 @@ public class GameManager : Singleton<GameManager>
     bool IsMovable(Vector2Int from, Vector2Int to)
     {
         // 縦軸横軸の配列外参照をしていないか
-        if (to.y < 0 || to.y >= _mapEditor._field.GetLength(0))
+        if (to.y < 0 || to.y >= _mapEditor._layer.GetLength(0))
             return false;
-        if (to.x < 0 || to.x >= _mapEditor._field.GetLength(1))
+        if (to.x < 0 || to.x >= _mapEditor._layer.GetLength(1))
             return false;   
-        var name = _mapEditor._prefabsDictionary.Where(pair => pair.Key == _mapEditor._terrain[to.y, to.x])
-                                                .Select(pair => pair.Value.Item2).FirstOrDefault();
-        if (name == PrefabType.Wall)
+        if (_mapEditor._layer[to.y, to.x].terrain.type == PrefabType.Wall)
             return false;   // 移動先が壁なら動かせない
 
         Vector2Int direction = to - from;
-        var destinationObject = _mapEditor._currentField[to.y, to.x];
+        var destinationObject = _mapEditor._layer[to.y, to.x].currentField;
         if (destinationObject && destinationObject.CompareTag("Movable"))
         {
             bool success = IsMovable(to, to + direction);//再帰呼び出し
             if (!success) return false;
         }
         // GameObjectの座標(position)を移動させてからインデックスの入れ替え
-        var gimmickObject = _mapEditor._currentGimmick[to.y, to.x];
-        var targetObject = _mapEditor._currentField[from.y, from.x];
-        var targetPosition = new Vector2(to.x, _mapEditor._field.GetLength(0) - to.y);
+        var gimmickObject = _mapEditor._layer[to.y, to.x].currentGimmick;
+        var targetObject = _mapEditor._layer[from.y, from.x].currentField;
+        var targetPosition = new Vector2(to.x, _mapEditor._layer.GetLength(0) - to.y);
         var player = targetObject.GetComponent<Player>();
 
         if (_pushField == false)
@@ -320,7 +318,7 @@ public class GameManager : Singleton<GameManager>
         }
         MoveFunction(targetObject.transform, targetPosition, _moveSpeed);
         //移動先が川で何もオブジェクトが無いのなら
-        if (name == PrefabType.Water && gimmickObject == null && targetObject.TryGetComponent(out IObjectState targetState))
+        if (_mapEditor._layer[to.y, to.x].terrain.type == PrefabType.Water && gimmickObject == null && targetObject.TryGetComponent(out IObjectState targetState))
         {
             targetState.ChangeState(ObjectState.UnderWater);//水に沈む
         }
@@ -328,13 +326,13 @@ public class GameManager : Singleton<GameManager>
         if (targetObject.TryGetComponent(out IObjectState targetState2) && targetState2.objectState == ObjectState.UnderWater)
         {
             AudioManager.instance.PlaySound(10);
-            _mapEditor._currentGimmick[to.y, to.x] = _mapEditor._currentField[from.y, from.x];
-            _mapEditor._currentField[from.y, from.x] = null;
+            _mapEditor._layer[to.y, to.x].currentGimmick = _mapEditor._layer[from.y, from.x].currentField;
+            _mapEditor._layer[from.y, from.x].currentField = null;
         }
         else// 居なければ通常通りtoの要素へ移動し、fromの要素はnullで上書きする
         {
-            _mapEditor._currentField[to.y, to.x] = _mapEditor._currentField[from.y, from.x];
-            _mapEditor._currentField[from.y, from.x] = null;
+            _mapEditor._layer[to.y, to.x].currentField = _mapEditor._layer[from.y, from.x].currentField;
+            _mapEditor._layer[from.y, from.x].currentField = null;
         }
         return true;
     }

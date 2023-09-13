@@ -18,3 +18,8 @@ public enum PrefabType
     Target,
     Player,
 }
+public enum LayerMode
+{
+    CurrentField,
+    CurrentGimmick,
+}
