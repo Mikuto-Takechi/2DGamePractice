@@ -1,7 +1,6 @@
+using MessagePack;
 using System;
 using UnityEngine;
-using UnityEngine.Rendering;
-using static UnityEditor.Experimental.GraphView.GraphView;
 /// <summary>
 /// DictionaryをInspector上で表示するためのクラス
 /// https://rimever.hatenablog.com/entry/2022/05/27/000000
@@ -25,7 +24,7 @@ public class SerializableTuple<T1, T2>
     public T2 Item2 => item2;
 }
 /// <summary>
-/// 最大値
+/// 最大値を管理するクラス
 /// </summary>
 static class MaxValue
 {
@@ -101,6 +100,48 @@ public class Layer
                 copy[i, j] = layer[i, j].currentField;
             else if (mode == LayerMode.CurrentGimmick)
                 copy[i, j] = layer[i, j].currentGimmick;
+        }
+    }
+}
+namespace MyNamespace
+{
+    static class MessagePackMethods
+    {
+        //以下のライブラリを使用しデータをシリアライズしてPlayerPrefsに保存、読み込みを行う
+        //https://github.com/MessagePack-CSharp/MessagePack-CSharp/releases
+        /// <summary>
+        /// PlayerPrefsにデータを保存する
+        /// </summary>
+        /// <typeparam name="T">データの型</typeparam>
+        /// <param name="label">セーブ名</param>
+        /// <param name="data">保存するデータ</param>
+        public static void MessagePackSave<T>(string label, T data)
+        {
+            byte[] bytes = MessagePackSerializer.Serialize(data);
+            var json = MessagePackSerializer.ConvertToJson(bytes);
+            PlayerPrefs.SetString(label, json);
+        }
+        /// <summary>
+        /// PlayerPrefsからデータを読み込む
+        /// </summary>
+        /// <typeparam name="T">データの型</typeparam>
+        /// <param name="label">セーブ名</param>
+        /// <param name="data">読み込んだデータ</param>
+        /// <returns>読み込みが成功しているかをbool型で戻す</returns>
+        public static bool MessagePackLoad<T>(string label, out T data)
+        {
+            string json = PlayerPrefs.GetString(label, "");
+            if (json != null && json != "")
+            {
+                byte[] bytes = MessagePackSerializer.ConvertFromJson(json);
+                data = MessagePackSerializer.Deserialize<T>(bytes);
+                return true;
+            }
+            else
+            {
+                data = default;
+                return false;
+            }
         }
     }
 }

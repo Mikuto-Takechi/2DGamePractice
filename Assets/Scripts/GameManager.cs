@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using System;
 using System.Globalization;
-using MessagePack;
+using static MyNamespace.MessagePackMethods;
 using System.Linq;
 
 [RequireComponent(typeof(MapEditor))]
@@ -253,10 +253,8 @@ public class GameManager : Singleton<GameManager>
     IEnumerator Vibration(float left, float right, float waitTime)
     {
         Gamepad gamepad = Gamepad.current;//ゲームパッド接続確認
-        if (gamepad == null)
-        {
+        if (gamepad == null) 
             yield break;
-        }
         if (_playerInput.currentControlScheme == "Gamepad")//ゲームパッド操作確認
         {
             gamepad.SetMotorSpeeds(left, right);
@@ -368,41 +366,5 @@ public class GameManager : Singleton<GameManager>
             text = $"{label}：{display} 記録更新！！";
         }
         return text;
-    }
-    //以下のライブラリを使用しデータをシリアライズしてPlayerPrefsに保存、読み込みを行う
-    //https://github.com/MessagePack-CSharp/MessagePack-CSharp/releases
-    /// <summary>
-    /// PlayerPrefsにデータを保存する
-    /// </summary>
-    /// <typeparam name="T">データの型</typeparam>
-    /// <param name="label">セーブ名</param>
-    /// <param name="data">保存するデータ</param>
-    void MessagePackSave<T>(string label, T data)
-    {
-        byte[] bytes = MessagePackSerializer.Serialize(data);
-        var json = MessagePackSerializer.ConvertToJson(bytes);
-        PlayerPrefs.SetString(label, json);
-    }
-    /// <summary>
-    /// PlayerPrefsからデータを読み込む
-    /// </summary>
-    /// <typeparam name="T">データの型</typeparam>
-    /// <param name="label">セーブ名</param>
-    /// <param name="data">読み込んだデータ</param>
-    /// <returns>読み込みが成功しているかをbool型で戻す</returns>
-    bool MessagePackLoad<T>(string label, out T data)
-    {
-        string json = PlayerPrefs.GetString(label, "");
-        if (json != null && json != "")
-        {
-            byte[] bytes = MessagePackSerializer.ConvertFromJson(json);
-            data = MessagePackSerializer.Deserialize<T>(bytes);
-            return true;
-        }
-        else
-        {
-            data = default;
-            return false;
-        }
     }
 }

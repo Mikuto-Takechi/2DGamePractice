@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 [RequireComponent(typeof(Animator))]
-public class Crate : MonoBehaviour, /*IReload, IPushUndo, IPopUndo,*/ IObjectState
+public class Crate : MonoBehaviour, IObjectState
 {
     public ObjectState objectState { get; set; } = ObjectState.Default;
     Stack<ObjectState> _stateStack = new Stack<ObjectState>();
@@ -15,7 +15,6 @@ public class Crate : MonoBehaviour, /*IReload, IPushUndo, IPopUndo,*/ IObjectSta
         _initState = objectState;
         _animator = GetComponent<Animator>();
         _sr = transform.GetComponentInChildren<SpriteRenderer>();
-        _sr.color = new Color(0,1,1,1);
     }
     void OnEnable()
     {
@@ -39,6 +38,13 @@ public class Crate : MonoBehaviour, /*IReload, IPushUndo, IPopUndo,*/ IObjectSta
         {
             _animator.SetBool("UnderWater", false);
         }
+        var layer = GameManager.instance._mapEditor._layer;
+        int x = (int)transform.position.x;
+        int y = layer.GetLength(0) - (int)transform.position.y;
+        if (layer[y,x].field.type == PrefabType.Target)
+            _sr.color = new Color(0, 1, 1, 1);
+        else
+            _sr.color = new Color(0, 0, 0, 1);
     }
     public void Reload()
     {
