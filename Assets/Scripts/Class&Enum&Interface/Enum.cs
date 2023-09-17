@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public enum ObjectState
 {
     /// <summary>í èÌ</summary>
@@ -22,4 +18,8 @@ public enum LayerMode
 {
     CurrentField,
     CurrentGimmick,
+}
+public enum Stars
+{
+    Star1, Star2, Star3,
 }

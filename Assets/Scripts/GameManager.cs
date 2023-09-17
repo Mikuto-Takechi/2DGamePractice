@@ -16,6 +16,7 @@ public class GameManager : Singleton<GameManager>
     public GameState _gameState = GameState.Title;
     public Dictionary<string, float> _timeRecords = new Dictionary<string, float>();
     public Dictionary<string, int> _stepsRecords = new Dictionary<string, int>();
+    public Dictionary<string, Stars> _achievements = new Dictionary<string, Stars>();
     public HashSet<string> _unlockStages = new HashSet<string>();
     GamePanel _panel;
     Queue<Vector2Int> _inputQueue = new Queue<Vector2Int>();
@@ -366,5 +367,13 @@ public class GameManager : Singleton<GameManager>
             text = $"{label}：{display} 記録更新！！";
         }
         return text;
+    }
+    /// <summary>
+    /// 実績に到達しているかを確認して数値で返す
+    /// </summary>
+    int CheckAchievements()
+    {
+        int result = 0;
+        return result;
     }
 }

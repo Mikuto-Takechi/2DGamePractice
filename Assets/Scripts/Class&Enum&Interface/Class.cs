@@ -103,6 +103,16 @@ public class Layer
         }
     }
 }
+/// <summary>
+/// 実績を管理するクラス
+/// </summary>
+public class Achievement
+{
+    public string name;         // 実績の名前
+    public bool isAchieved;     // 実績達成状態
+    public int progress;        // 実績の進捗
+    public int targetProgress;  // 実績の目標進捗
+}
 namespace MyNamespace
 {
     static class MessagePackMethods

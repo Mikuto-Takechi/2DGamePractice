@@ -1910,7 +1910,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 519420031}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -2545,7 +2545,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 1, g: 1, b: 1, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -3672,6 +3672,7 @@ GameObject:
   - component: {fileID: 835027756}
   - component: {fileID: 835027755}
   - component: {fileID: 835027758}
+  - component: {fileID: 835027759}
   m_Layer: 5
   m_Name: Return
   m_TagString: Untagged
@@ -3806,6 +3807,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42e84d82120ff5145af9d2a62dea7ac6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &835027759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 835027753}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18f1e8943f93dea4b82e2699ffc5bf2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: a6239cbb-9b81-4b9c-8a1a-9cedffb86dad
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 916542d4-2679-4990-ace1-4a0a5670b9fb
+      m_Path: <Keyboard>/escape
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
+    m_Flags: 0
 --- !u!1001 &850947732
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5038,6 +5068,7 @@ GameObject:
   - component: {fileID: 1111750643}
   - component: {fileID: 1111750642}
   - component: {fileID: 1111750641}
+  - component: {fileID: 1111750645}
   m_Layer: 5
   m_Name: Return
   m_TagString: Untagged
@@ -5172,6 +5203,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1111750639}
   m_CullTransparentMesh: 1
+--- !u!114 &1111750645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1111750639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18f1e8943f93dea4b82e2699ffc5bf2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: a6239cbb-9b81-4b9c-8a1a-9cedffb86dad
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 916542d4-2679-4990-ace1-4a0a5670b9fb
+      m_Path: <Keyboard>/escape
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
+    m_Flags: 0
 --- !u!1 &1114425009
 GameObject:
   m_ObjectHideFlags: 0
@@ -6085,6 +6145,7 @@ GameObject:
   - component: {fileID: 1284174579}
   - component: {fileID: 1284174578}
   - component: {fileID: 1284174581}
+  - component: {fileID: 1284174582}
   m_Layer: 5
   m_Name: Return
   m_TagString: Untagged
@@ -6219,6 +6280,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42e84d82120ff5145af9d2a62dea7ac6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1284174582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1284174576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18f1e8943f93dea4b82e2699ffc5bf2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: a6239cbb-9b81-4b9c-8a1a-9cedffb86dad
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 916542d4-2679-4990-ace1-4a0a5670b9fb
+      m_Path: <Keyboard>/escape
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
+    m_Flags: 0
 --- !u!1 &1301024855
 GameObject:
   m_ObjectHideFlags: 0
@@ -7225,6 +7315,7 @@ GameObject:
   - component: {fileID: 1532038704}
   - component: {fileID: 1532038703}
   - component: {fileID: 1532038702}
+  - component: {fileID: 1532038706}
   m_Layer: 5
   m_Name: Return
   m_TagString: Untagged
@@ -7359,6 +7450,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1532038700}
   m_CullTransparentMesh: 1
+--- !u!114 &1532038706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1532038700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18f1e8943f93dea4b82e2699ffc5bf2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _action:
+    m_Name: Action
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: a6239cbb-9b81-4b9c-8a1a-9cedffb86dad
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 916542d4-2679-4990-ace1-4a0a5670b9fb
+      m_Path: <Keyboard>/escape
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Action
+      m_Flags: 0
+    m_Flags: 0
 --- !u!1 &1578702466
 GameObject:
   m_ObjectHideFlags: 0
