@@ -21,5 +21,7 @@ public enum LayerMode
 }
 public enum Stars
 {
-    Star1, Star2, Star3,
+    Star1 = 1 << 0,
+    Star2 = 1 << 1,
+    Star3 = 1 << 2,
 }

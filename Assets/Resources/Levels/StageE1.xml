@@ -6,6 +6,9 @@
 	<name>StageE1</name>
 	<next>StageE2</next>
 	<timeLimit>10</timeLimit>
+	<achievement_1>30</achievement_1>//何秒以内にクリア
+	<achievement_2>50</achievement_2>//何歩以内にクリア
+	<achievement_3>25</achievement_3>//何歩以内にクリア
 	<layer id="1" name="Terrain" width="16" height="16">
 		<data encoding="csv">
 			12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,

@@ -130,6 +130,7 @@ public class GameManager : Singleton<GameManager>
                 _gameState = GameState.Clear;
                 _timeText = CheckRecord(_mapEditor._timeLimit - _stageTime, _timeRecords);
                 _stepText = CheckRecord(_steps, _stepsRecords);
+                CheckAchievements();
                 //マップエディタースクリプトを読み込み
                 MapEditor mapEditor = FindObjectOfType<MapEditor>();
                 _unlockStages.Add(mapEditor._nextMapName);
@@ -371,9 +372,24 @@ public class GameManager : Singleton<GameManager>
     /// <summary>
     /// 実績に到達しているかを確認して数値で返す
     /// </summary>
-    int CheckAchievements()
+    void CheckAchievements()
     {
-        int result = 0;
-        return result;
+        Stars result = 0;
+        if (_mapEditor._timeLimit - _stageTime <= 30)
+        {
+            result |= Stars.Star1;
+            if (_steps <= 50)
+            {
+                result |= Stars.Star2;
+                if (_steps <= 25)
+                {
+                    result |= Stars.Star3;
+                }
+            }
+        }
+        if ((result & Stars.Star1) == Stars.Star1) Debug.Log("星1");
+        if ((result & Stars.Star2) == Stars.Star2) Debug.Log("星2");
+        if ((result & Stars.Star3) == Stars.Star3) Debug.Log("星3");
+        //return result;
     }
 }
