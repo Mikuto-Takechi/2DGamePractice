@@ -36,8 +36,10 @@ public class GameManager : Singleton<GameManager>
     bool _pushField = false;
     [SerializeField] GameObject _shadow;
     public MapEditor _mapEditor { get; set; }
-    List<Func<int>> _processes;
-    int _initProcess = 0;
+    List<Func<int>> _inputProcesses;
+    int _initInputProcess = 0;
+    /// <summary>実績が解除されているかを判定してbool型で返すメソッドを入れるリスト</summary>
+    public List<Func<bool>> _isAchieved { get; set; } = null;
     /// <summary>データをスタックにプッシュする際に呼ばれるメソッド</summary>
     public event Action PushData;
     /// <summary>データをスタックからポップする際に呼ばれるメソッド</summary>
@@ -72,12 +74,18 @@ public class GameManager : Singleton<GameManager>
         if (MessagePackLoad("Achievements", out Dictionary<string, Stars> achievementsData))
             _achievements = achievementsData;
         //引数無し戻り値intの型のリスト
-        _processes = new List<Func<int>>
+        _inputProcesses = new List<Func<int>>
         {
             () => InputProcess(_gameInputs.Player.Up.IsPressed(), Vector2Int.down, 1),
             () => InputProcess(_gameInputs.Player.Right.IsPressed(), Vector2Int.right, 2),
             () => InputProcess(_gameInputs.Player.Down.IsPressed(), Vector2Int.up, 3),
             () => InputProcess(_gameInputs.Player.Left.IsPressed(), Vector2Int.left, 0)
+        };
+        _isAchieved = new List<Func<bool>>
+        {
+            () => _mapEditor._stageData.timeLimit - _stageTime <= _mapEditor._stageData.timeAchievement,
+            () => _steps <= _mapEditor._stageData.stepAchievement1,
+            () => _steps <= _mapEditor._stageData.stepAchievement2
         };
     }
     int InputProcess(bool flag, Vector2Int dir, int next)
@@ -87,7 +95,7 @@ public class GameManager : Singleton<GameManager>
             _inputQueue.Enqueue(dir);
             if (!(_inputQueue.Count < _maxQueueCount)) return next;
         }
-        return _initProcess;
+        return _initInputProcess;
     }
     void SceneLoaded(Scene nextScene, LoadSceneMode mode)//シーンが読み込まれた時の処理
     {
@@ -183,11 +191,11 @@ public class GameManager : Singleton<GameManager>
         // 入力バッファに追加する
         if (_gameState == GameState.Idle)
         {
-            int count = _initProcess;
+            int count = _initInputProcess;
             Enumerable.Range(0, 4).ToList().ForEach(i =>
             {
                 count %= 4;
-                _initProcess = _processes[count]();
+                _initInputProcess = _inputProcesses[count]();
                 count++;
             });
         }
@@ -379,15 +387,15 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     void CheckAchievements(Dictionary<string, Stars> dic , string key)
     {
-        if (_mapEditor._stageData.timeLimit - _stageTime <= _mapEditor._stageData.timeAchievement)
+        if (_isAchieved[0]())
         {
             dic[key] |= Stars.Star1;
             Debug.Log("星1");
-            if (_steps <= _mapEditor._stageData.stepAchievement1)
+            if (_isAchieved[1]())
             {
                 dic[key] |= Stars.Star2;
                 Debug.Log("星2");
-                if (_steps <= _mapEditor._stageData.stepAchievement2)
+                if (_isAchieved[2]())
                 {
                     dic[key] |= Stars.Star3;
                     Debug.Log("星3");

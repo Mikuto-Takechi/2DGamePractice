@@ -8,7 +8,7 @@
 		"name": "StageE1",
 		"next": "StageE2",
 		"timeLimit": 15,
-		"timeAchievement": 15,
+		"timeAchievement": 10,
 		"stepAchievement1": 50,
 		"stepAchievement2": 25
 		}

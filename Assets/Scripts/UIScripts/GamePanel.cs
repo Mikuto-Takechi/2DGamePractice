@@ -1,4 +1,4 @@
-using System.Security.Cryptography.X509Certificates;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -7,6 +7,8 @@ using UnityEngine.UI;
 public class GamePanel : MonoBehaviour
 {
     [SerializeField] CanvasGroup[] _panels;
+    [SerializeField] Image _fadePanel;
+    Tween _fadeTween;
     public void ChangePanel(int index)
     {
         EventSystem.current.SetSelectedGameObject(null);
@@ -67,8 +69,12 @@ public class GamePanel : MonoBehaviour
     public void StartGame(string stageName)
     {
         MapEditor mapEditor = FindObjectOfType<MapEditor>();
-        if(mapEditor.BuildMapData(stageName))
-            SceneManager.LoadScene("CSVTest");
+        if (_fadeTween != null) return;
+        _fadeTween = _fadePanel.DOFade(1, 1).OnComplete(() => 
+        {
+            if (mapEditor.BuildMapData(stageName))
+                SceneManager.LoadScene("CSVTest");
+        });
     }
     /// <summary>
     /// 次のステージへ移動させる
