@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using System;
-using System.Globalization;
 using static MyNamespace.MessagePackMethods;
 using System.Linq;
 using UnityEngine.UI;
@@ -29,8 +28,6 @@ public class GameManager : Singleton<GameManager>
     public float _defaultSpeed { get; set; }//デフォルトの移動速度
     public int _coroutineCount { get; set; } = 0;
     PlayerInput _playerInput;
-    public string _timeText { get; set; }
-    public string _stepText { get; set; }
     public bool _toggleQuitSave { get; set; } = false;
     bool _singleCrateSound = false;
     bool _pushField = false;
@@ -50,6 +47,8 @@ public class GameManager : Singleton<GameManager>
     public event Action<Vector2> MoveTo;
     /// <summary>移動終了を知らせるメソッド</summary>
     public event Action MoveEnd;
+    /// <summary>記録更新を知らせるメソッド</summary>
+    public event Action<TextType> NewRecord;
     public enum GameState
     {
         Title,
@@ -142,8 +141,8 @@ public class GameManager : Singleton<GameManager>
             if (_gameState != GameState.Clear && _gameState != GameState.Move)//クリア後処理
             {
                 _gameState = GameState.Clear;
-                _timeText = CheckRecord(_mapEditor._stageData.timeLimit - _stageTime, _timeRecords);
-                _stepText = CheckRecord(_steps, _stepsRecords);
+                CheckRecord(_mapEditor._stageData.timeLimit - _stageTime, _timeRecords);
+                CheckRecord(_steps, _stepsRecords);
                 CheckAchievements(_achievements, _mapEditor._stageData.name);
                 MessagePackSave("Achievements", _achievements);
                 _unlockStages.Add(_mapEditor._stageData.next);
@@ -354,33 +353,29 @@ public class GameManager : Singleton<GameManager>
     /// 値が記録を更新しているかを確認して文字列を返す
     /// 値が記録を更新していたら記録を上書きする
     /// </summary>
-    string CheckRecord<T>(T current, Dictionary<string, T> dic) where T : IComparable<T>, IFormattable
+    void CheckRecord<T>(T current, Dictionary<string, T> dic) where T : IComparable<T>
     {
         string stageName = _mapEditor._stageData.name;
-        string label = "", saveLabel = "", display = "";
+        string saveLabel = "";
+        TextType textType = 0;
 
         if (typeof(T) == typeof(int))
         {
             saveLabel = "StepRecords";
-            label = "歩数";
-            display = current.ToString();
+            textType =  TextType.ClearSteps;
         }
         if (typeof(T) == typeof(float))
         {
             saveLabel = "TimeRecords";
-            label = "時間";
-            display = current.ToString("F2", new CultureInfo("en-US"));
+            textType = TextType.ClearTime;
         }
-
-        string text = $"{label}：{display}";
-
+        // 記録更新
         if (dic[stageName].CompareTo(current) > 0)
         {
+            NewRecord(textType);
             dic[stageName] = current;
             MessagePackSave(saveLabel, dic);
-            text = $"{label}：{display} 記録更新！！";
         }
-        return text;
     }
     /// <summary>
     /// 実績に到達しているかを確認してディクショナリを書き換える
@@ -390,15 +385,12 @@ public class GameManager : Singleton<GameManager>
         if (_isAchieved[0]())
         {
             dic[key] |= Stars.Star1;
-            Debug.Log("星1");
             if (_isAchieved[1]())
             {
                 dic[key] |= Stars.Star2;
-                Debug.Log("星2");
                 if (_isAchieved[2]())
                 {
                     dic[key] |= Stars.Star3;
-                    Debug.Log("星3");
                 }
             }
         }

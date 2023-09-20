@@ -28,3 +28,17 @@ public enum Stars
     Star2 = 1 << 1,
     Star3 = 1 << 2,
 }
+public enum TextType
+{
+    Steps,
+    Time,
+    ClearSteps,
+    ClearTime,
+    MoveText,
+    TimeRecord,
+    StepRecord,
+    timeAchievement,
+    stepAchievement1,
+    stepAchievement2,
+    None,
+}

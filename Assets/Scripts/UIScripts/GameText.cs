@@ -2,6 +2,7 @@ using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UniRx;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UI;
 [RequireComponent(typeof(Text))]
@@ -10,8 +11,17 @@ public class GameText : MonoBehaviour
     Text _text;
     [SerializeField] string[] _texts;
     [SerializeField] TextType _type = TextType.None;
+    [SerializeField] Text _newRecord;
     ReactiveProperty<int> _time = new IntReactiveProperty();
     int _indexNumber = 0;
+    void OnEnable()
+    {
+        GameManager.instance.NewRecord += NewRecord;
+    }
+    void OnDisable()
+    {
+        GameManager.instance.NewRecord -= NewRecord;
+    }
     void Start()
     {
         _text = GetComponent<Text>();
@@ -30,7 +40,6 @@ public class GameText : MonoBehaviour
                 _text.DOColor(new Color(1, 0, 0), 0.9f);
             });
         }
-
     }
 
     void Update()
@@ -42,10 +51,13 @@ public class GameText : MonoBehaviour
         }
         if (_type == TextType.Steps) 
             _text.text = GameManager.instance._steps.ToString("0000");
-        if (_type == TextType.ClearSteps) 
-            _text.text = GameManager.instance._stepText;
-        if (_type == TextType.ClearTime) 
-            _text.text = GameManager.instance._timeText;
+        if(_type == TextType.ClearSteps)
+            _text.text = "クリア歩数：" + GameManager.instance._steps.ToString();
+        if (_type == TextType.ClearTime)
+        {
+            var gm = GameManager.instance;
+            _text.text = "クリア時間：" + (gm._mapEditor._stageData.timeLimit - gm._stageTime).ToString("0.00");
+        }
         if (_type == TextType.timeAchievement)
         {
             _text.text = $"[1]{GameManager.instance._mapEditor._stageData.timeAchievement}秒以内にクリア";
@@ -84,20 +96,19 @@ public class GameText : MonoBehaviour
         minutes += (int)seconds / 60;
         seconds %= 60;
         minutes %= 60;
-        return $"{minutes.ToString("00")}:{seconds.ToString("0.00")}";
+        return $"{minutes.ToString("00")}:{seconds.ToString("00.00")}";
     }
-}
-enum TextType
-{
-    Steps,
-    Time,
-    ClearSteps,
-    ClearTime,
-    MoveText,
-    TimeRecord,
-    StepRecord,
-    timeAchievement,
-    stepAchievement1,
-    stepAchievement2,
-    None,
+    void NewRecord(TextType type)
+    {
+        if (_type != type) return;
+        if (_newRecord == null) return;
+        Text newRecord = Instantiate(_newRecord, transform);
+        float spacing = _text.rectTransform.rect.width / 2 + newRecord.rectTransform.rect.width / 2;
+        newRecord.transform.position += new Vector3(spacing, 0 ,0);
+        newRecord.rectTransform.DOLocalMoveY(20f, 0.4f)
+                               .SetRelative(true)
+                               .SetEase(Ease.OutQuad)
+                               .SetLoops(-1, LoopType.Yoyo)
+                               .SetLink(gameObject);
+    }
 }
