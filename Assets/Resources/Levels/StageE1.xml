@@ -3,12 +3,17 @@
 	<tileset firstgid="1" source="6Tile.tsx"/>
 	<tileset firstgid="7" source="dungeon-tileset.tsx"/>
 	<tileset firstgid="37" source="tileset-world.tsx"/>
-	<name>StageE1</name>
-	<next>StageE2</next>
-	<timeLimit>10</timeLimit>
-	<achievement_1>30</achievement_1>//何秒以内にクリア
-	<achievement_2>50</achievement_2>//何歩以内にクリア
-	<achievement_3>25</achievement_3>//何歩以内にクリア
+	<stageData>
+		{
+		"name": "StageE1",
+		"next": "StageE2",
+		"timeLimit": 60,
+		"timeAchievement": 60,
+		"stepAchievement1": 50,
+		"stepAchievement2": 25
+		}
+	</stageData>
+	<achievement>{"time": 10, "step1": 50, "step2": 25}</achievement>
 	<layer id="1" name="Terrain" width="16" height="16">
 		<data encoding="csv">
 			12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,

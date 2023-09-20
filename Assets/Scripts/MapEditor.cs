@@ -15,9 +15,7 @@ public class MapEditor : MonoBehaviour
     /// <summary>実際にゲームの処理で使うマップを構成するプレファブを設定したDictionary</summary>
     public Dictionary<int, (GameObject, PrefabType)> _prefabsDictionary { get; set; }
     public Layer[,] _layer { get; set; }
-    public string _mapName { get; set; } = "";//読み込んでいるマップの名前
-    public string _nextMapName { get; set; } = "";//次のマップの名前
-    public float _timeLimit { get; set; } = 0;//制限時間
+    public StageData _stageData { get; set; }
     TextAsset[] _allMap;
     public Stack<GameObject[,]> _fieldStack { get; set; } = new Stack<GameObject[,]>();
     public Stack<GameObject[,]> _gimmickStack { get; set; } = new Stack<GameObject[,]>();
@@ -46,13 +44,14 @@ public class MapEditor : MonoBehaviour
         foreach (TextAsset map in _allMap)
         {
             XElement mapXml = XElement.Parse(map.text);
+            string stageDataString = mapXml.Element("stageData")?.Value;
+            if (stageDataString == null)
+                continue;
+            _stageData = JsonUtility.FromJson<StageData>(stageDataString);
             //一番最初のタグ<map>の要素nameに指定した値が無いなら次のループへ移動する
-            if (mapXml.Element("name").Value != stageName)
+            if (_stageData.name != stageName)
                 continue;
             //読み込み始めるマップの名前と次のステージの名前と制限時間を登録
-            _mapName = mapXml.Element("name").Value;
-            _nextMapName = mapXml.Element("next").Value;
-            _timeLimit = int.Parse(mapXml.Element("timeLimit").Value);
             //マップの幅と縦の大きさを取り出す
             int width = int.Parse(mapXml.Attribute("width").Value);
             int height = int.Parse(mapXml.Attribute("height").Value);

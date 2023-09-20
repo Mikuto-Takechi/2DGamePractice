@@ -67,6 +67,8 @@ public class GameManager : Singleton<GameManager>
             _timeRecords = timeData;
         if (MessagePackLoad("UnlockStages", out HashSet<string> unlockData))
             _unlockStages = unlockData;
+        if (MessagePackLoad("Achievements", out Dictionary<string, Stars> achievementsData))
+            _achievements = achievementsData;
         //引数無し戻り値intの型のリスト
         _processes = new List<Func<int>>
         {
@@ -104,9 +106,10 @@ public class GameManager : Singleton<GameManager>
         {
             _mapEditor.InitializeGame();
             //記録が追加されていないステージ名ならば新しくDictionaryに追加する
-            _timeRecords.TryAdd(_mapEditor._mapName, MaxValue.floatValue);
-            _stepsRecords.TryAdd(_mapEditor._mapName, MaxValue.intValue);
-            _stageTime = _mapEditor._timeLimit;//制限時間を設定する
+            _timeRecords.TryAdd(_mapEditor._stageData.name, MaxValue.floatValue);
+            _stepsRecords.TryAdd(_mapEditor._stageData.name, MaxValue.intValue);
+            _achievements.TryAdd(_mapEditor._stageData.name, 0);
+            _stageTime = _mapEditor._stageData.timeLimit;//制限時間を設定する
             _gameState = GameState.Idle;
         }
     }
@@ -117,6 +120,7 @@ public class GameManager : Singleton<GameManager>
             MessagePackSave("StepRecords", _stepsRecords);
             MessagePackSave("TimeRecords", _timeRecords);
             MessagePackSave("UnlockStages", _unlockStages);
+            MessagePackSave("Achievements", _achievements);
         }
     }
     private void Update()
@@ -128,12 +132,11 @@ public class GameManager : Singleton<GameManager>
             if (_gameState != GameState.Clear && _gameState != GameState.Move)//クリア後処理
             {
                 _gameState = GameState.Clear;
-                _timeText = CheckRecord(_mapEditor._timeLimit - _stageTime, _timeRecords);
+                _timeText = CheckRecord(_mapEditor._stageData.timeLimit - _stageTime, _timeRecords);
                 _stepText = CheckRecord(_steps, _stepsRecords);
-                CheckAchievements();
-                //マップエディタースクリプトを読み込み
-                MapEditor mapEditor = FindObjectOfType<MapEditor>();
-                _unlockStages.Add(mapEditor._nextMapName);
+                CheckAchievements(_achievements, _mapEditor._stageData.name);
+                MessagePackSave("Achievements", _achievements);
+                _unlockStages.Add(_mapEditor._stageData.next);
                 MessagePackSave("UnlockStages", _unlockStages);
                 _panel.ChangePanel(1);
                 _panel.Clear();
@@ -208,7 +211,7 @@ public class GameManager : Singleton<GameManager>
         StopAllCoroutines();//コルーチンを全て止める
         _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
         ReloadData();//登録されているステージ初期化メソッドの呼び出し
-        _stageTime = _mapEditor._timeLimit;//制限時間を初期化
+        _stageTime = _mapEditor._stageData.timeLimit;//制限時間を初期化
     }
     IEnumerator Move(Transform obj, Vector2 to, float endTime, Action callback)
     {
@@ -343,7 +346,7 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     string CheckRecord<T>(T current, Dictionary<string, T> dic) where T : IComparable<T>, IFormattable
     {
-        string stageName = _mapEditor._mapName;
+        string stageName = _mapEditor._stageData.name;
         string label = "", saveLabel = "", display = "";
 
         if (typeof(T) == typeof(int))
@@ -370,26 +373,24 @@ public class GameManager : Singleton<GameManager>
         return text;
     }
     /// <summary>
-    /// 実績に到達しているかを確認して数値で返す
+    /// 実績に到達しているかを確認してディクショナリを書き換える
     /// </summary>
-    void CheckAchievements()
+    void CheckAchievements(Dictionary<string, Stars> dic , string key)
     {
-        Stars result = 0;
-        if (_mapEditor._timeLimit - _stageTime <= 30)
+        if (_mapEditor._stageData.timeLimit - _stageTime <= _mapEditor._stageData.timeAchievement)
         {
-            result |= Stars.Star1;
-            if (_steps <= 50)
+            dic[key] |= Stars.Star1;
+            Debug.Log("星1");
+            if (_steps <= _mapEditor._stageData.stepAchievement1)
             {
-                result |= Stars.Star2;
-                if (_steps <= 25)
+                dic[key] |= Stars.Star2;
+                Debug.Log("星2");
+                if (_steps <= _mapEditor._stageData.stepAchievement2)
                 {
-                    result |= Stars.Star3;
+                    dic[key] |= Stars.Star3;
+                    Debug.Log("星3");
                 }
             }
         }
-        if ((result & Stars.Star1) == Stars.Star1) Debug.Log("星1");
-        if ((result & Stars.Star2) == Stars.Star2) Debug.Log("星2");
-        if ((result & Stars.Star3) == Stars.Star3) Debug.Log("星3");
-        //return result;
     }
 }

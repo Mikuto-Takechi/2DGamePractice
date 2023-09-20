@@ -3,9 +3,16 @@
  <tileset firstgid="1" source="6Tile.tsx"/>
  <tileset firstgid="7" source="dungeon-tileset.tsx"/>
  <tileset firstgid="37" source="tileset-world.tsx"/>
-	<name>StageH3</name>
-	<next>StageH4</next>
-	<timeLimit>60</timeLimit>
+	<stageData>
+		{
+		"name": "StageH3",
+		"next": "StageH4",
+		"timeLimit": 60,
+		"timeAchievement": 60,
+		"stepAchievement1": 50,
+		"stepAchievement2": 25
+		}
+	</stageData>
  <layer id="1" name="Terrain" width="16" height="16">
   <data encoding="csv">
 12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,

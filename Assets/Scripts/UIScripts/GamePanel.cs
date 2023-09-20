@@ -76,9 +76,9 @@ public class GamePanel : MonoBehaviour
     public void NextGame()
     {
         MapEditor mapEditor = FindObjectOfType<MapEditor>();
-        if(mapEditor._nextMapName != null)
+        if(mapEditor._stageData.next != null)
         {
-            if (mapEditor.BuildMapData(mapEditor._nextMapName))
+            if (mapEditor.BuildMapData(mapEditor._stageData.next))
                 SceneManager.LoadScene("CSVTest");
         }
         else

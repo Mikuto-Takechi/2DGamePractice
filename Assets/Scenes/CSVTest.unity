@@ -256,7 +256,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _material: {fileID: 2100000, guid: 5d0e4305f27997b4293ef0c871bdc8fd, type: 2}
-  _activeEffect: 0
+  _activeEffect: 1
 --- !u!1001 &825286654
 PrefabInstance:
   m_ObjectHideFlags: 0

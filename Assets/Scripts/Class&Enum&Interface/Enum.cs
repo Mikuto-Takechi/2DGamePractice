@@ -1,3 +1,5 @@
+using System;
+
 public enum ObjectState
 {
     /// <summary>’Êí</summary>
@@ -19,6 +21,7 @@ public enum LayerMode
     CurrentField,
     CurrentGimmick,
 }
+[Flags]
 public enum Stars
 {
     Star1 = 1 << 0,

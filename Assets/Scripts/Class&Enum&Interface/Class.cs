@@ -49,9 +49,9 @@ static class MaxValue
 public class Layer
 {
     /// <summary>フィールドの情報。初期化以外は基本読み取り専用</summary>
-    public (int id, GameObject prefab, PrefabType type) field = (0, default, PrefabType.Default);
+    public (int id, GameObject prefab, PrefabType type) field;
     /// <summary>地形の情報。初期化以外は基本読み取り専用</summary>
-    public (int id, GameObject prefab, PrefabType type) terrain = (0, default, PrefabType.Default);
+    public (int id, GameObject prefab, PrefabType type) terrain;
     /// <summary>フィールドの情報。物が移動した時などに書き換える</summary>
     public GameObject currentField;
     /// <summary>情報を得たいオブジェクトの位置が重なる場合に格納するための変数。箱が水に落ちた時など</summary>
@@ -104,14 +104,16 @@ public class Layer
     }
 }
 /// <summary>
-/// 実績を管理するクラス
+/// ステージのデータを管理する構造体
 /// </summary>
-public class Achievement
+public struct StageData
 {
-    public string name;         // 実績の名前
-    public bool isAchieved;     // 実績達成状態
-    public int progress;        // 実績の進捗
-    public int targetProgress;  // 実績の目標進捗
+    public string name;
+    public string next;
+    public float timeLimit;
+    public float timeAchievement;
+    public int stepAchievement1;
+    public int stepAchievement2;
 }
 namespace MyNamespace
 {
