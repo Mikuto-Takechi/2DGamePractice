@@ -992,6 +992,7 @@ RectTransform:
   - {fileID: 282088940754912102}
   - {fileID: 3253914631247674294}
   - {fileID: 182631016435640476}
+  - {fileID: 4143554103991993091}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1726,7 +1727,6 @@ RectTransform:
   - {fileID: 2351475664045970674}
   - {fileID: 397097199417217876}
   - {fileID: 282088941068667019}
-  - {fileID: 4143554103991993091}
   m_Father: {fileID: 282088940778190805}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5448,7 +5448,6 @@ GameObject:
   - component: {fileID: 4143554103991993091}
   - component: {fileID: 3335865868605494019}
   - component: {fileID: 7732445009544559029}
-  - component: {fileID: 1106294434124017019}
   m_Layer: 5
   m_Name: Fade
   m_TagString: Untagged
@@ -5463,12 +5462,12 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5353958973999358812}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 282088941571436895}
+  m_Father: {fileID: 282088940778190805}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -5514,19 +5513,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &1106294434124017019
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5353958973999358812}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50873e6ad25d49748b783c75b669512f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _fadeSpeed: 0.5
 --- !u!1 &5456749129426712222
 GameObject:
   m_ObjectHideFlags: 0

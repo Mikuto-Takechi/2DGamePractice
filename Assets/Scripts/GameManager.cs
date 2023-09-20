@@ -7,6 +7,8 @@ using System;
 using System.Globalization;
 using static MyNamespace.MessagePackMethods;
 using System.Linq;
+using UnityEngine.UI;
+using DG.Tweening;
 
 [RequireComponent(typeof(MapEditor))]
 public class GameManager : Singleton<GameManager>
@@ -20,11 +22,11 @@ public class GameManager : Singleton<GameManager>
     public HashSet<string> _unlockStages = new HashSet<string>();
     GamePanel _panel;
     Queue<Vector2Int> _inputQueue = new Queue<Vector2Int>();
-    /// <summary>“ü—Íƒoƒbƒtƒ@ƒTƒCƒY</summary>
+    /// <summary>å…¥åŠ›ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚º</summary>
     [SerializeField] int _maxQueueCount = 2;
-    /// <summary>ˆÚ“®‘¬“x</summary>
+    /// <summary>ç§»å‹•é€Ÿåº¦</summary>
     public float _moveSpeed = 1.0f;
-    public float _defaultSpeed { get; set; }//ƒfƒtƒHƒ‹ƒg‚ÌˆÚ“®‘¬“x
+    public float _defaultSpeed { get; set; }//ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ç§»å‹•é€Ÿåº¦
     public int _coroutineCount { get; set; } = 0;
     PlayerInput _playerInput;
     public string _timeText { get; set; }
@@ -36,15 +38,15 @@ public class GameManager : Singleton<GameManager>
     public MapEditor _mapEditor { get; set; }
     List<Func<int>> _processes;
     int _initProcess = 0;
-    /// <summary>ƒf[ƒ^‚ğƒXƒ^ƒbƒN‚ÉƒvƒbƒVƒ…‚·‚éÛ‚ÉŒÄ‚Î‚ê‚éƒƒ\ƒbƒh</summary>
+    /// <summary>ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¹ã‚¿ãƒƒã‚¯ã«ãƒ—ãƒƒã‚·ãƒ¥ã™ã‚‹éš›ã«å‘¼ã°ã‚Œã‚‹ãƒ¡ã‚½ãƒƒãƒ‰</summary>
     public event Action PushData;
-    /// <summary>ƒf[ƒ^‚ğƒXƒ^ƒbƒN‚©‚çƒ|ƒbƒv‚·‚éÛ‚ÉŒÄ‚Î‚ê‚éƒƒ\ƒbƒh</summary>
+    /// <summary>ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¹ã‚¿ãƒƒã‚¯ã‹ã‚‰ãƒãƒƒãƒ—ã™ã‚‹éš›ã«å‘¼ã°ã‚Œã‚‹ãƒ¡ã‚½ãƒƒãƒ‰</summary>
     public event Action PopData;
-    /// <summary>ƒXƒ^ƒbƒN‚É—­‚Ü‚Á‚Ä‚¢‚éƒf[ƒ^‚ğƒŠƒZƒbƒg‚·‚éÛ‚ÉŒÄ‚Î‚ê‚éƒƒ\ƒbƒh</summary>
+    /// <summary>ã‚¹ã‚¿ãƒƒã‚¯ã«æºœã¾ã£ã¦ã„ã‚‹ãƒ‡ãƒ¼ã‚¿ã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹éš›ã«å‘¼ã°ã‚Œã‚‹ãƒ¡ã‚½ãƒƒãƒ‰</summary>
     public event Action ReloadData;
-    /// <summary>ˆÚ“®æ‚ğ“o˜^Œ³‚É’m‚ç‚¹‚éƒƒ\ƒbƒh</summary>
+    /// <summary>ç§»å‹•å…ˆã‚’ç™»éŒ²å…ƒã«çŸ¥ã‚‰ã›ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰</summary>
     public event Action<Vector2> MoveTo;
-    /// <summary>ˆÚ“®I—¹‚ğ’m‚ç‚¹‚éƒƒ\ƒbƒh</summary>
+    /// <summary>ç§»å‹•çµ‚äº†ã‚’çŸ¥ã‚‰ã›ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰</summary>
     public event Action MoveEnd;
     public enum GameState
     {
@@ -69,7 +71,7 @@ public class GameManager : Singleton<GameManager>
             _unlockStages = unlockData;
         if (MessagePackLoad("Achievements", out Dictionary<string, Stars> achievementsData))
             _achievements = achievementsData;
-        //ˆø”–³‚µ–ß‚è’lint‚ÌŒ^‚ÌƒŠƒXƒg
+        //å¼•æ•°ç„¡ã—æˆ»ã‚Šå€¤intã®å‹ã®ãƒªã‚¹ãƒˆ
         _processes = new List<Func<int>>
         {
             () => InputProcess(_gameInputs.Player.Up.IsPressed(), Vector2Int.down, 1),
@@ -87,17 +89,17 @@ public class GameManager : Singleton<GameManager>
         }
         return _initProcess;
     }
-    void SceneLoaded(Scene nextScene, LoadSceneMode mode)//ƒV[ƒ“‚ª“Ç‚İ‚Ü‚ê‚½‚Ìˆ—
+    void SceneLoaded(Scene nextScene, LoadSceneMode mode)//ã‚·ãƒ¼ãƒ³ãŒèª­ã¿è¾¼ã¾ã‚ŒãŸæ™‚ã®å‡¦ç†
     {
-        _inputQueue.Clear();//queue‚Ì’†g‚ğÁ‚·
-        StopAllCoroutines();//ƒRƒ‹[ƒ`ƒ“‚ğ‘S‚Ä~‚ß‚é
-        _coroutineCount = 0;//Às’†‚ÌƒRƒ‹[ƒ`ƒ“‚ÌƒJƒEƒ“ƒg‚ğƒŠƒZƒbƒg
+        _inputQueue.Clear();//queueã®ä¸­èº«ã‚’æ¶ˆã™
+        StopAllCoroutines();//ã‚³ãƒ«ãƒ¼ãƒãƒ³ã‚’å…¨ã¦æ­¢ã‚ã‚‹
+        _coroutineCount = 0;//å®Ÿè¡Œä¸­ã®ã‚³ãƒ«ãƒ¼ãƒãƒ³ã®ã‚«ã‚¦ãƒ³ãƒˆã‚’ãƒªã‚»ãƒƒãƒˆ
         _moveSpeed = _defaultSpeed;
         _steps = 0;
         _panel = FindObjectOfType<GamePanel>();
         _panel?.ChangePanel(0);
-        _mapEditor._fieldStack.Clear();//ƒtƒB[ƒ‹ƒh‚ÌƒXƒ^ƒbƒN‚ğíœ‚·‚é
-        _mapEditor._gimmickStack.Clear();//ƒMƒ~ƒbƒN‚ÌƒXƒ^ƒbƒN‚ğíœ‚·‚é
+        _mapEditor._fieldStack.Clear();//ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã®ã‚¹ã‚¿ãƒƒã‚¯ã‚’å‰Šé™¤ã™ã‚‹
+        _mapEditor._gimmickStack.Clear();//ã‚®ãƒŸãƒƒã‚¯ã®ã‚¹ã‚¿ãƒƒã‚¯ã‚’å‰Šé™¤ã™ã‚‹
         if (nextScene.name.Contains("Title"))
         {
             _gameState = GameState.Title;
@@ -105,11 +107,11 @@ public class GameManager : Singleton<GameManager>
         else
         {
             _mapEditor.InitializeGame();
-            //‹L˜^‚ª’Ç‰Á‚³‚ê‚Ä‚¢‚È‚¢ƒXƒe[ƒW–¼‚È‚ç‚ÎV‚µ‚­Dictionary‚É’Ç‰Á‚·‚é
+            //è¨˜éŒ²ãŒè¿½åŠ ã•ã‚Œã¦ã„ãªã„ã‚¹ãƒ†ãƒ¼ã‚¸åãªã‚‰ã°æ–°ã—ãDictionaryã«è¿½åŠ ã™ã‚‹
             _timeRecords.TryAdd(_mapEditor._stageData.name, MaxValue.floatValue);
             _stepsRecords.TryAdd(_mapEditor._stageData.name, MaxValue.intValue);
             _achievements.TryAdd(_mapEditor._stageData.name, 0);
-            _stageTime = _mapEditor._stageData.timeLimit;//§ŒÀŠÔ‚ğİ’è‚·‚é
+            _stageTime = _mapEditor._stageData.timeLimit;//åˆ¶é™æ™‚é–“ã‚’è¨­å®šã™ã‚‹
             _gameState = GameState.Idle;
         }
     }
@@ -129,7 +131,7 @@ public class GameManager : Singleton<GameManager>
         if (_gameState == GameState.Clear) return;
         if (_mapEditor.IsCleared())
         {
-            if (_gameState != GameState.Clear && _gameState != GameState.Move)//ƒNƒŠƒAŒãˆ—
+            if (_gameState != GameState.Clear && _gameState != GameState.Move)//ã‚¯ãƒªã‚¢å¾Œå‡¦ç†
             {
                 _gameState = GameState.Clear;
                 _timeText = CheckRecord(_mapEditor._stageData.timeLimit - _stageTime, _timeRecords);
@@ -156,29 +158,29 @@ public class GameManager : Singleton<GameManager>
             _gameState = GameState.TimeOver;
         }
         if (_gameState == GameState.Pause) return;
-        //Undoˆ—
+        //Undoå‡¦ç†
         if (_gameInputs.Player.Undo.IsPressed() && _coroutineCount == 0 && _gameState == GameState.Idle && _mapEditor._fieldStack.Count != 0)
         {
-            _inputQueue.Clear();//queue‚Ì’†g‚ğÁ‚·
-            PopData();//“o˜^‚³‚ê‚Ä‚¢‚éƒXƒe[ƒWŠª‚«–ß‚µƒƒ\ƒbƒh‚ÌŒÄ‚Ño‚µ
+            _inputQueue.Clear();//queueã®ä¸­èº«ã‚’æ¶ˆã™
+            PopData();//ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ã‚¹ãƒ†ãƒ¼ã‚¸å·»ãæˆ»ã—ãƒ¡ã‚½ãƒƒãƒ‰ã®å‘¼ã³å‡ºã—
         }
-        //ƒŠƒZƒbƒgˆ—
+        //ãƒªã‚»ãƒƒãƒˆå‡¦ç†
         if (_gameInputs.Player.Reset.triggered)
         {
-            //‘€ìo—ˆ‚È‚­‚·‚é
+            //æ“ä½œå‡ºæ¥ãªãã™ã‚‹
             _gameState = GameState.Title;
-            //‰æ–Ê‚ğ™X‚ÉˆÃ‚­‚·‚é
+            //ç”»é¢ã‚’å¾ã€…ã«æš—ãã™ã‚‹
             AudioManager.instance.PlaySound(7);
-            Fade fade = _panel.transform.GetComponentInChildren<Fade>();
-            fade?.CallFadeIn(() =>
+            var fade = _panel.transform.Find("Fade").GetComponent<Image>();
+            fade.DOFade(1,1).OnComplete(() => 
             {
                 ResetGame();
                 AudioManager.instance.PlaySound(8);
                 AudioManager.instance.PlaySound(9);
-                fade?.CallFadeOut(() => _gameState = GameState.Idle);
+                fade.DOFade(0, 1f).OnComplete(() => _gameState = GameState.Idle);
             });
         }
-        // “ü—Íƒoƒbƒtƒ@‚É’Ç‰Á‚·‚é
+        // å…¥åŠ›ãƒãƒƒãƒ•ã‚¡ã«è¿½åŠ ã™ã‚‹
         if (_gameState == GameState.Idle)
         {
             int count = _initProcess;
@@ -189,7 +191,7 @@ public class GameManager : Singleton<GameManager>
                 count++;
             });
         }
-        // ƒoƒbƒtƒ@‚©‚ç“ü—Í‚ğˆ—‚·‚é
+        // ãƒãƒƒãƒ•ã‚¡ã‹ã‚‰å…¥åŠ›ã‚’å‡¦ç†ã™ã‚‹
         if (_gameState == GameState.Idle && _inputQueue.Count > 0 && _coroutineCount == 0)
         {
             if (_inputQueue.TryDequeue(out Vector2Int pos))
@@ -202,16 +204,16 @@ public class GameManager : Singleton<GameManager>
                 }
             }
         }
-        //stageTime‚É‰ÁZ
+        //stageTimeã«åŠ ç®—
         _stageTime -= Time.deltaTime;
     }
     public void ResetGame()
     {
-        _inputQueue.Clear();//queue‚Ì’†g‚ğÁ‚·
-        StopAllCoroutines();//ƒRƒ‹[ƒ`ƒ“‚ğ‘S‚Ä~‚ß‚é
-        _coroutineCount = 0;//Às’†‚ÌƒRƒ‹[ƒ`ƒ“‚ÌƒJƒEƒ“ƒg‚ğƒŠƒZƒbƒg
-        ReloadData();//“o˜^‚³‚ê‚Ä‚¢‚éƒXƒe[ƒW‰Šú‰»ƒƒ\ƒbƒh‚ÌŒÄ‚Ño‚µ
-        _stageTime = _mapEditor._stageData.timeLimit;//§ŒÀŠÔ‚ğ‰Šú‰»
+        _inputQueue.Clear();//queueã®ä¸­èº«ã‚’æ¶ˆã™
+        StopAllCoroutines();//ã‚³ãƒ«ãƒ¼ãƒãƒ³ã‚’å…¨ã¦æ­¢ã‚ã‚‹
+        _coroutineCount = 0;//å®Ÿè¡Œä¸­ã®ã‚³ãƒ«ãƒ¼ãƒãƒ³ã®ã‚«ã‚¦ãƒ³ãƒˆã‚’ãƒªã‚»ãƒƒãƒˆ
+        ReloadData();//ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ã‚¹ãƒ†ãƒ¼ã‚¸åˆæœŸåŒ–ãƒ¡ã‚½ãƒƒãƒ‰ã®å‘¼ã³å‡ºã—
+        _stageTime = _mapEditor._stageData.timeLimit;//åˆ¶é™æ™‚é–“ã‚’åˆæœŸåŒ–
     }
     IEnumerator Move(Transform obj, Vector2 to, float endTime, Action callback)
     {
@@ -229,27 +231,27 @@ public class GameManager : Singleton<GameManager>
                 callback();
                 yield break;
             }
-            //ˆ—‘¬“x‚ª‘¬‚·‚¬‚é‚Ì‚ÅUpdate‚Æ“¯‚¶‚­1f‘Ò‚Â
+            //å‡¦ç†é€Ÿåº¦ãŒé€Ÿã™ãã‚‹ã®ã§Updateã¨åŒã˜ã1få¾…ã¤
             yield return null;
         }
     }
     public void MoveFunction(Transform main, Vector2 to, float endTime)
     {
         _gameState = GameState.Move;
-        //•\¦—p‚ÌqƒIƒuƒWƒFƒNƒg‚ğæ“¾‚·‚éB
+        //è¡¨ç¤ºç”¨ã®å­ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å–å¾—ã™ã‚‹ã€‚
         Transform sprite = main.GetChild(0);
-        //•\¦—p‚ÌƒIƒuƒWƒFƒNƒg‚¾‚¯ŠŠ‚ç‚©‚ÉˆÚ“®‚³‚¹‚éB
+        //è¡¨ç¤ºç”¨ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã ã‘æ»‘ã‚‰ã‹ã«ç§»å‹•ã•ã›ã‚‹ã€‚
         StartCoroutine(Move(sprite, to, endTime, () =>
         {
-            //ˆÚ“®ˆ—I—¹Œã
-            //Às‚³‚ê‚Ä‚¢‚éƒRƒ‹[ƒ`ƒ“‚Ì”‚ª0‚Ìê‡‚ÍƒvƒŒƒCƒ„[‚ğ‘€ì‰Â”\‚Èó‘Ô‚Ö–ß‚·
+            //ç§»å‹•å‡¦ç†çµ‚äº†å¾Œ
+            //å®Ÿè¡Œã•ã‚Œã¦ã„ã‚‹ã‚³ãƒ«ãƒ¼ãƒãƒ³ã®æ•°ãŒ0ã®å ´åˆã¯ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’æ“ä½œå¯èƒ½ãªçŠ¶æ…‹ã¸æˆ»ã™
             if (_coroutineCount == 0 && _gameState == GameState.Move)
             {
                 _gameState = GameState.Idle;
                 if (MoveEnd != null) MoveEnd();
             }
-            //eƒIƒuƒWƒFƒNƒg‚ÌÀ•W‚ğ•Ï‚¦‚é‚ÆqƒIƒuƒWƒFƒNƒg‚à‚Â‚¢‚Ä‚­‚é‚Ì‚ÅeqŠÖŒW‚ğ‰ğ‚¢‚Ä‚©‚çA
-            //eƒIƒuƒWƒFƒNƒg‚ğI“_‚É”ò‚Î‚·B
+            //è¦ªã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®åº§æ¨™ã‚’å¤‰ãˆã‚‹ã¨å­ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚‚ã¤ã„ã¦ãã‚‹ã®ã§è¦ªå­é–¢ä¿‚ã‚’è§£ã„ã¦ã‹ã‚‰ã€
+            //è¦ªã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’çµ‚ç‚¹ã«é£›ã°ã™ã€‚
             sprite.SetParent(null);
             main.position = to;
             sprite.SetParent(main);
@@ -257,10 +259,10 @@ public class GameManager : Singleton<GameManager>
     }
     IEnumerator Vibration(float left, float right, float waitTime)
     {
-        Gamepad gamepad = Gamepad.current;//ƒQ[ƒ€ƒpƒbƒhÚ‘±Šm”F
+        Gamepad gamepad = Gamepad.current;//ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰æ¥ç¶šç¢ºèª
         if (gamepad == null) 
             yield break;
-        if (_playerInput.currentControlScheme == "Gamepad")//ƒQ[ƒ€ƒpƒbƒh‘€ìŠm”F
+        if (_playerInput.currentControlScheme == "Gamepad")//ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰æ“ä½œç¢ºèª
         {
             gamepad.SetMotorSpeeds(left, right);
             yield return new WaitForSeconds(waitTime);
@@ -268,26 +270,26 @@ public class GameManager : Singleton<GameManager>
         }
     }
     /// <summary>
-    /// ˆÚ“®‚Ì”»’è‚ğæ‚Á‚Äˆ—‚É‚Â‚È‚°‚é
+    /// ç§»å‹•ã®åˆ¤å®šã‚’å–ã£ã¦å‡¦ç†ã«ã¤ãªã’ã‚‹
     /// </summary>
     bool IsMovable(Vector2Int from, Vector2Int to)
     {
-        // c²‰¡²‚Ì”z—ñŠOQÆ‚ğ‚µ‚Ä‚¢‚È‚¢‚©
+        // ç¸¦è»¸æ¨ªè»¸ã®é…åˆ—å¤–å‚ç…§ã‚’ã—ã¦ã„ãªã„ã‹
         if (to.y < 0 || to.y >= _mapEditor._layer.GetLength(0))
             return false;
         if (to.x < 0 || to.x >= _mapEditor._layer.GetLength(1))
             return false;   
         if (_mapEditor._layer[to.y, to.x].terrain.type == PrefabType.Wall)
-            return false;   // ˆÚ“®æ‚ª•Ç‚È‚ç“®‚©‚¹‚È‚¢
+            return false;   // ç§»å‹•å…ˆãŒå£ãªã‚‰å‹•ã‹ã›ãªã„
 
         Vector2Int direction = to - from;
         var destinationObject = _mapEditor._layer[to.y, to.x].currentField;
         if (destinationObject && destinationObject.CompareTag("Movable"))
         {
-            bool success = IsMovable(to, to + direction);//Ä‹AŒÄ‚Ño‚µ
+            bool success = IsMovable(to, to + direction);//å†å¸°å‘¼ã³å‡ºã—
             if (!success) return false;
         }
-        // GameObject‚ÌÀ•W(position)‚ğˆÚ“®‚³‚¹‚Ä‚©‚çƒCƒ“ƒfƒbƒNƒX‚Ì“ü‚ê‘Ö‚¦
+        // GameObjectã®åº§æ¨™(position)ã‚’ç§»å‹•ã•ã›ã¦ã‹ã‚‰ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®å…¥ã‚Œæ›¿ãˆ
         var gimmickObject = _mapEditor._layer[to.y, to.x].currentGimmick;
         var targetObject = _mapEditor._layer[from.y, from.x].currentField;
         var targetPosition = new Vector2(to.x, _mapEditor._layer.GetLength(0) - to.y);
@@ -295,44 +297,44 @@ public class GameManager : Singleton<GameManager>
 
         if (_pushField == false)
         {
-            PushData();//“o˜^‚³‚ê‚Ä‚¢‚éƒXƒe[ƒWó‘Ôˆê•Û‘¶ƒƒ\ƒbƒh‚ÌŒÄ‚Ño‚µ
+            PushData();//ç™»éŒ²ã•ã‚Œã¦ã„ã‚‹ã‚¹ãƒ†ãƒ¼ã‚¸çŠ¶æ…‹ä¸€æ™‚ä¿å­˜ãƒ¡ã‚½ãƒƒãƒ‰ã®å‘¼ã³å‡ºã—
             _steps += 1;
             _pushField = true;
         }
-        //ˆÚ“®‚³‚¹‚éƒIƒuƒWƒFƒNƒg‚ªƒvƒŒƒCƒ„[ƒRƒ“ƒ|[ƒlƒ“ƒg‚ğ‚Á‚Ä‚¢‚½ê‡‚Ìˆ—
+        //ç§»å‹•ã•ã›ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’æŒã£ã¦ã„ãŸå ´åˆã®å‡¦ç†
         if (player)
         {
             AudioManager.instance.PlaySound(1);
-            // ƒvƒŒƒCƒ„[‚ÌˆÚ“®æ‚ğ“o˜^Œ³‚Ö’m‚ç‚¹‚é
+            // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç§»å‹•å…ˆã‚’ç™»éŒ²å…ƒã¸çŸ¥ã‚‰ã›ã‚‹
             if(MoveTo != null) MoveTo(targetPosition);
-            //y‚Í”½“]‚µ‚Ä‚¢‚é‚Ì‚Åy•ûŒü‚ÌˆÚ“®ƒAƒjƒ[ƒVƒ‡ƒ“‚Í”½“]‚³‚¹‚é
+            //yã¯åè»¢ã—ã¦ã„ã‚‹ã®ã§yæ–¹å‘ã®ç§»å‹•ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã¯åè»¢ã•ã›ã‚‹
             player.PlayAnimation(direction.y == 0 ? direction : -direction);
         }
-        //Movableƒ^ƒO‚ª•t‚¢‚Ä‚¢‚½‚Ìˆ—
+        //Movableã‚¿ã‚°ãŒä»˜ã„ã¦ã„ãŸæ™‚ã®å‡¦ç†
         if (targetObject.CompareTag("Movable"))
         {
             StartCoroutine(Vibration(0.0f, 1.0f, 0.07f));
             if (_singleCrateSound == false)
             {
-                //” ‚ğŒ³‚ÉŒÄ‚Ño‚³‚ê‚½AÅ‰‚Ì1‰ñ‚¾‚¯‰¹‚ğ–Â‚ç‚·B
+                //ç®±ã‚’å…ƒã«å‘¼ã³å‡ºã•ã‚ŒãŸæ™‚ã€æœ€åˆã®1å›ã ã‘éŸ³ã‚’é³´ã‚‰ã™ã€‚
                 AudioManager.instance.PlaySound(0);
             }
             _singleCrateSound = true;
         }
         MoveFunction(targetObject.transform, targetPosition, _moveSpeed);
-        //ˆÚ“®æ‚ªì‚Å‰½‚àƒIƒuƒWƒFƒNƒg‚ª–³‚¢‚Ì‚È‚ç
+        //ç§»å‹•å…ˆãŒå·ã§ä½•ã‚‚ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒç„¡ã„ã®ãªã‚‰
         if (_mapEditor._layer[to.y, to.x].terrain.type == PrefabType.Water && gimmickObject == null && targetObject.TryGetComponent(out IObjectState targetState))
         {
-            targetState.ChangeState(ObjectState.UnderWater);//…‚É’¾‚Ş
+            targetState.ChangeState(ObjectState.UnderWater);//æ°´ã«æ²ˆã‚€
         }
-        //ƒIƒuƒWƒFƒNƒg‚ª…’†‚É‹‚é‚Ì‚È‚ç_currentGimmick‚Ìto‚Ì—v‘f‚ÖˆÚ“®‚µAfrom‚Ì—v‘f‚Ínull‚Åã‘‚«‚·‚é
+        //ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒæ°´ä¸­ã«å±…ã‚‹ã®ãªã‚‰_currentGimmickã®toã®è¦ç´ ã¸ç§»å‹•ã—ã€fromã®è¦ç´ ã¯nullã§ä¸Šæ›¸ãã™ã‚‹
         if (targetObject.TryGetComponent(out IObjectState targetState2) && targetState2.objectState == ObjectState.UnderWater)
         {
             AudioManager.instance.PlaySound(10);
             _mapEditor._layer[to.y, to.x].currentGimmick = _mapEditor._layer[from.y, from.x].currentField;
             _mapEditor._layer[from.y, from.x].currentField = null;
         }
-        else// ‹‚È‚¯‚ê‚Î’Êí’Ê‚èto‚Ì—v‘f‚ÖˆÚ“®‚µAfrom‚Ì—v‘f‚Ínull‚Åã‘‚«‚·‚é
+        else// å±…ãªã‘ã‚Œã°é€šå¸¸é€šã‚Štoã®è¦ç´ ã¸ç§»å‹•ã—ã€fromã®è¦ç´ ã¯nullã§ä¸Šæ›¸ãã™ã‚‹
         {
             _mapEditor._layer[to.y, to.x].currentField = _mapEditor._layer[from.y, from.x].currentField;
             _mapEditor._layer[from.y, from.x].currentField = null;
@@ -341,8 +343,8 @@ public class GameManager : Singleton<GameManager>
     }
 
     /// <summary>
-    /// ’l‚ª‹L˜^‚ğXV‚µ‚Ä‚¢‚é‚©‚ğŠm”F‚µ‚Ä•¶š—ñ‚ğ•Ô‚·
-    /// ’l‚ª‹L˜^‚ğXV‚µ‚Ä‚¢‚½‚ç‹L˜^‚ğã‘‚«‚·‚é
+    /// å€¤ãŒè¨˜éŒ²ã‚’æ›´æ–°ã—ã¦ã„ã‚‹ã‹ã‚’ç¢ºèªã—ã¦æ–‡å­—åˆ—ã‚’è¿”ã™
+    /// å€¤ãŒè¨˜éŒ²ã‚’æ›´æ–°ã—ã¦ã„ãŸã‚‰è¨˜éŒ²ã‚’ä¸Šæ›¸ãã™ã‚‹
     /// </summary>
     string CheckRecord<T>(T current, Dictionary<string, T> dic) where T : IComparable<T>, IFormattable
     {
@@ -352,43 +354,43 @@ public class GameManager : Singleton<GameManager>
         if (typeof(T) == typeof(int))
         {
             saveLabel = "StepRecords";
-            label = "•à”";
+            label = "æ­©æ•°";
             display = current.ToString();
         }
         if (typeof(T) == typeof(float))
         {
             saveLabel = "TimeRecords";
-            label = "ŠÔ";
+            label = "æ™‚é–“";
             display = current.ToString("F2", new CultureInfo("en-US"));
         }
 
-        string text = $"{label}F{display}";
+        string text = $"{label}ï¼š{display}";
 
         if (dic[stageName].CompareTo(current) > 0)
         {
             dic[stageName] = current;
             MessagePackSave(saveLabel, dic);
-            text = $"{label}F{display} ‹L˜^XVII";
+            text = $"{label}ï¼š{display} è¨˜éŒ²æ›´æ–°ï¼ï¼";
         }
         return text;
     }
     /// <summary>
-    /// ÀÑ‚É“’B‚µ‚Ä‚¢‚é‚©‚ğŠm”F‚µ‚ÄƒfƒBƒNƒVƒ‡ƒiƒŠ‚ğ‘‚«Š·‚¦‚é
+    /// å®Ÿç¸¾ã«åˆ°é”ã—ã¦ã„ã‚‹ã‹ã‚’ç¢ºèªã—ã¦ãƒ‡ã‚£ã‚¯ã‚·ãƒ§ãƒŠãƒªã‚’æ›¸ãæ›ãˆã‚‹
     /// </summary>
     void CheckAchievements(Dictionary<string, Stars> dic , string key)
     {
         if (_mapEditor._stageData.timeLimit - _stageTime <= _mapEditor._stageData.timeAchievement)
         {
             dic[key] |= Stars.Star1;
-            Debug.Log("¯1");
+            Debug.Log("æ˜Ÿ1");
             if (_steps <= _mapEditor._stageData.stepAchievement1)
             {
                 dic[key] |= Stars.Star2;
-                Debug.Log("¯2");
+                Debug.Log("æ˜Ÿ2");
                 if (_steps <= _mapEditor._stageData.stepAchievement2)
                 {
                     dic[key] |= Stars.Star3;
-                    Debug.Log("¯3");
+                    Debug.Log("æ˜Ÿ3");
                 }
             }
         }
