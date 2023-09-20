@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public class EaseText : Ease
+public class EaseText : MyEase
 {
     [SerializeField] float _easeTime = 1f;
     public void EaseStart()

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 //https://hirukotime.hatenablog.jp/entry/2022/11/15/205224
 //https://easings.net/ja#easeOutBounce
-public class Ease : MonoBehaviour
+public class MyEase : MonoBehaviour
 {
     [SerializeField] protected EaseType _easeType;
     protected enum EaseType

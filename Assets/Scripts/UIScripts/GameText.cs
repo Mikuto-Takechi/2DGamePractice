@@ -1,5 +1,7 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
 [RequireComponent(typeof(Text))]
@@ -8,19 +10,38 @@ public class GameText : MonoBehaviour
     Text _text;
     [SerializeField] string[] _texts;
     [SerializeField] TextType _type = TextType.None;
+    ReactiveProperty<int> _time = new IntReactiveProperty();
     int _indexNumber = 0;
     void Start()
     {
         _text = GetComponent<Text>();
-        if(_type == TextType.MoveText) StartCoroutine(MoveText());
+        if(_type == TextType.MoveText) 
+            StartCoroutine(MoveText());
+        if( _type == TextType.Time)
+        {
+            _time.Value = (int)GameManager.instance._stageTime;
+            _time.Where(time => time > 7).Subscribe(_ => _text.color = Color.white);
+            _time.Where(time => time > 5 && time <= 7).Subscribe(_ => _text.DOColor(new Color(1, 1, 0), 0.9f));
+            _time.Where(time => time <= 5)
+            .Subscribe(_ =>
+            {
+                _text.rectTransform.localScale = Vector3.zero;
+                _text.rectTransform.DOScale(1, 0.9f).SetEase(Ease.OutElastic);
+                _text.DOColor(new Color(1, 0, 0), 0.9f);
+            });
+        }
+
     }
 
     void Update()
     {
-        if(_type == TextType.Steps) 
-            _text.text = GameManager.instance._steps.ToString();
-        if (_type == TextType.Time) 
+        if(_type == TextType.Time)
+        {
+            _time.Value = (int)GameManager.instance._stageTime;
             _text.text = TimeDisplay(GameManager.instance._stageTime);
+        }
+        if (_type == TextType.Steps) 
+            _text.text = GameManager.instance._steps.ToString("0000");
         if (_type == TextType.ClearSteps) 
             _text.text = GameManager.instance._stepText;
         if (_type == TextType.ClearTime) 

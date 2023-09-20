@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LerpTest : Ease
+public class LerpTest : MyEase
 {
     [SerializeField] Transform _startTrans;
     [SerializeField] Transform _endTrans;
