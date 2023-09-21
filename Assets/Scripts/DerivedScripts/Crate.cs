@@ -38,7 +38,7 @@ public class Crate : MonoBehaviour, IObjectState
         {
             _animator.SetBool("UnderWater", false);
         }
-        var layer = GameManager.instance._mapEditor._layer;
+        var layer = GameManager.instance.mapEditor._layer;
         int x = (int)transform.position.x;
         int y = layer.GetLength(0) - (int)transform.position.y;
         if (layer[y,x].field.type == PrefabType.Target)

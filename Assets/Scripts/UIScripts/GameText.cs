@@ -1,8 +1,6 @@
 using DG.Tweening;
 using System.Collections;
-using System.Collections.Generic;
 using UniRx;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UI;
 [RequireComponent(typeof(Text))]
@@ -56,25 +54,25 @@ public class GameText : MonoBehaviour
         if (_type == TextType.ClearTime)
         {
             var gm = GameManager.instance;
-            _text.text = "クリア時間：" + (gm._mapEditor._stageData.timeLimit - gm._stageTime).ToString("0.00");
+            _text.text = "クリア時間：" + (gm.mapEditor._stageData.timeLimit - gm._stageTime).ToString("0.00");
         }
         if (_type == TextType.timeAchievement)
         {
-            _text.text = $"[1]{GameManager.instance._mapEditor._stageData.timeAchievement}秒以内にクリア";
+            _text.text = $"[1]{GameManager.instance.mapEditor._stageData.timeAchievement}秒以内にクリア";
             if (GameManager.instance._isAchieved[0]())
                 _text.color = Color.white;
             else _text.color = Color.red;
         }
         if (_type == TextType.stepAchievement1)
         {
-            _text.text = $"[2]{GameManager.instance._mapEditor._stageData.stepAchievement1}歩以内にクリア";
+            _text.text = $"[2]{GameManager.instance.mapEditor._stageData.stepAchievement1}歩以内にクリア";
             if (GameManager.instance._isAchieved[0]() && GameManager.instance._isAchieved[1]())
                 _text.color = Color.white;
             else _text.color = Color.red;
         }
         if (_type == TextType.stepAchievement2)
         {
-            _text.text = $"[3]{GameManager.instance._mapEditor._stageData.stepAchievement2}歩以内にクリア";
+            _text.text = $"[3]{GameManager.instance.mapEditor._stageData.stepAchievement2}歩以内にクリア";
             if (GameManager.instance._isAchieved[0]() && GameManager.instance._isAchieved[1]() && GameManager.instance._isAchieved[2]())
                 _text.color = Color.white;
             else _text.color = Color.red;

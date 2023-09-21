@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
@@ -7,6 +5,7 @@ using System.Xml.Linq;
 /// <summary>
 /// マップを管理するクラス
 /// </summary>
+[RequireComponent(typeof(GameManager))]
 public class MapEditor : MonoBehaviour
 {
     /// <summary>マップを構成するプレファブを設定するインスペクター用のクラス</summary>
@@ -19,8 +18,10 @@ public class MapEditor : MonoBehaviour
     TextAsset[] _allMap;
     public Stack<GameObject[,]> _fieldStack { get; set; } = new Stack<GameObject[,]>();
     public Stack<GameObject[,]> _gimmickStack { get; set; } = new Stack<GameObject[,]>();
+    GameManager gameManager;
     private void Awake()
     {
+        gameManager = GetComponent<GameManager>();
         //マップデータを全て読み込む
         _allMap = Resources.LoadAll<TextAsset>("Levels");
         //Inspectorで設定するためのクラスからDictionaryに変換する
@@ -28,15 +29,15 @@ public class MapEditor : MonoBehaviour
     }
     void OnEnable()
     {
-        GameManager.instance.PushData += PushField;
-        GameManager.instance.PopData += PopField;
-        GameManager.instance.ReloadData += InitializeField;
+        gameManager.PushData += PushField;
+        gameManager.PopData += PopField;
+        gameManager.ReloadData += InitializeField;
     }
     void OnDisable()
     {
-        GameManager.instance.PushData -= PushField;
-        GameManager.instance.PopData -= PopField;
-        GameManager.instance.ReloadData -= InitializeField;
+        gameManager.PushData -= PushField;
+        gameManager.PopData -= PopField;
+        gameManager.ReloadData -= InitializeField;
     }
     public bool BuildMapData(string stageName)
     {
@@ -60,11 +61,6 @@ public class MapEditor : MonoBehaviour
                                            select item;
             //配列の領域を確保
             _layer = new Layer[height, width];
-            for (int col = 0; col < height; col++)
-            for (int row = 0; row < width; row++)
-            {
-                _layer[col, row] = new Layer();
-            }
             //レイヤー情報分ループ
             foreach (XElement layer in layers)
             {
@@ -135,7 +131,7 @@ public class MapEditor : MonoBehaviour
                 }
             }
         }
-        GameManager.instance._gameState = GameState.Idle;
+        gameManager._gameState = GameState.Idle;
     }
     /// <summary>
     /// プレイヤーの座標を取得する
@@ -159,10 +155,10 @@ public class MapEditor : MonoBehaviour
     {
         //この関数は再帰呼び出しで何回か繰り返されるので、最初の1回だけ盤面を保存させる。
         GameObject[,] copyField = new GameObject[_layer.GetLength(0), _layer.GetLength(1)];
-        Layer.Copy(_layer, copyField, LayerMode.CurrentField);
+        LayerArray.Copy(_layer, copyField, LayerMode.CurrentField);
         _fieldStack.Push(copyField);
         GameObject[,] copyGimmick = new GameObject[_layer.GetLength(0), _layer.GetLength(1)];
-        Layer.Copy(_layer, copyGimmick, LayerMode.CurrentGimmick);
+        LayerArray.Copy(_layer, copyGimmick, LayerMode.CurrentGimmick);
         _gimmickStack.Push(copyGimmick);
     }
     public void PopField()
@@ -170,7 +166,7 @@ public class MapEditor : MonoBehaviour
         //スタックにフィールドの情報が入っているかを判定する。
         if (_fieldStack.TryPop(out var undoField))
         {
-            Layer.Set(_layer, undoField, LayerMode.CurrentField);
+            LayerArray.Set(_layer, undoField, LayerMode.CurrentField);
             AudioManager.instance.PlaySound(6);
             for (int y = 0; y < _layer.GetLength(0); y++)
             {
@@ -183,7 +179,7 @@ public class MapEditor : MonoBehaviour
                         if (obj.position != to)
                         {
                             //y, x番目にあるGameobjectをx, 配列の縦の長さ-yへ移動させる
-                            GameManager.instance.MoveFunction(obj, to, 0.2f);
+                            gameManager.MoveFunction(obj, to, 0.2f);
                             Player player = obj.GetComponent<Player>();
                             if (player)//プレイヤーのアニメーションを逆向きで再生
                             {
@@ -197,7 +193,7 @@ public class MapEditor : MonoBehaviour
         }
         if(_gimmickStack.TryPop(out var undoGimmick))
         {
-            Layer.Set(_layer, undoGimmick, LayerMode.CurrentGimmick);
+            LayerArray.Set(_layer, undoGimmick, LayerMode.CurrentGimmick);
         }
     }
     /// <summary>
@@ -206,8 +202,8 @@ public class MapEditor : MonoBehaviour
     public void InitializeField()
     {
         //Layerクラスの初期化メソッドで初期化する
-        Layer.Initialize(_layer, LayerMode.CurrentField);
-        Layer.Initialize(_layer, LayerMode.CurrentGimmick);
+        LayerArray.Initialize(_layer, LayerMode.CurrentField);
+        LayerArray.Initialize(_layer, LayerMode.CurrentGimmick);
         //スタックに溜まっているデータを削除する
         _fieldStack.Clear();
         _gimmickStack.Clear();
