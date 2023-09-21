@@ -9,8 +9,8 @@
 		"next": "StageE2",
 		"timeLimit": 15,
 		"timeAchievement": 10,
-		"stepAchievement1": 50,
-		"stepAchievement2": 25
+		"stepAchievement1": 30,
+		"stepAchievement2": 22
 		}
 	</stageData>
 	<achievement>{"time": 10, "step1": 50, "step2": 25}</achievement>

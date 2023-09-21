@@ -210,11 +210,12 @@ public class GameManager : Singleton<GameManager>
     }
     public void ResetGame()
     {
-        _inputQueue.Clear();//queueの中身を消す
-        StopAllCoroutines();//コルーチンを全て止める
-        _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
-        ReloadData();//登録されているステージ初期化メソッドの呼び出し
-        _stageTime = mapEditor._stageData.timeLimit;//制限時間を初期化
+        _inputQueue.Clear();// queueの中身を消す
+        StopAllCoroutines();// コルーチンを全て止める
+        _coroutineCount = 0;// 実行中のコルーチンのカウントをリセット
+        ReloadData();// 登録されているステージ初期化メソッドの呼び出し
+        _steps = 0;// 歩数を初期化
+        _stageTime = mapEditor._stageData.timeLimit;// 制限時間を初期化
     }
     IEnumerator Move(Transform obj, Vector2 to, float endTime, Action callback)
     {
