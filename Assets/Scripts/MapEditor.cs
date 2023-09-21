@@ -135,7 +135,7 @@ public class MapEditor : MonoBehaviour
                 }
             }
         }
-        GameManager.instance._gameState = GameManager.GameState.Idle;
+        GameManager.instance._gameState = GameState.Idle;
     }
     /// <summary>
     /// プレイヤーの座標を取得する

@@ -42,3 +42,12 @@ public enum TextType
     stepAchievement2,
     None,
 }
+public enum GameState
+{
+    Title,
+    Pause,
+    Clear,
+    Idle,
+    Move,
+    TimeOver,
+}

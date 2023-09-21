@@ -49,15 +49,8 @@ public class GameManager : Singleton<GameManager>
     public event Action MoveEnd;
     /// <summary>記録更新を知らせるメソッド</summary>
     public event Action<TextType> NewRecord;
-    public enum GameState
-    {
-        Title,
-        Pause,
-        Clear,
-        Idle,
-        Move,
-        TimeOver,
-    }
+    /// <summary>ゲームクリアを知らせるメソッド</summary>
+    public event Action GameClear;
     public override void AwakeFunction()
     {
         _defaultSpeed = _moveSpeed;
@@ -141,6 +134,7 @@ public class GameManager : Singleton<GameManager>
             if (_gameState != GameState.Clear && _gameState != GameState.Move)//クリア後処理
             {
                 _gameState = GameState.Clear;
+                GameClear();
                 CheckRecord(_mapEditor._stageData.timeLimit - _stageTime, _timeRecords);
                 CheckRecord(_steps, _stepsRecords);
                 CheckAchievements(_achievements, _mapEditor._stageData.name);
