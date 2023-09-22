@@ -156,6 +156,8 @@ public class GameManager : Singleton<GameManager>
         if(_stageTime < 0)
         {
             _panel?.ChangePanel(4);
+            AudioManager.instance.StopBGM();
+            AudioManager.instance.PlaySound(13);
             _gameState = GameState.TimeOver;
         }
         if (_gameState == GameState.Pause) return;
@@ -280,9 +282,9 @@ public class GameManager : Singleton<GameManager>
         if (to.y < 0 || to.y >= mapEditor._layer.GetLength(0))
             return false;
         if (to.x < 0 || to.x >= mapEditor._layer.GetLength(1))
-            return false;   
+            return false;
         if (mapEditor._layer[to.y, to.x].terrain.type == PrefabType.Wall)
-            return false;   // 移動先が壁なら動かせない
+            return false;
 
         Vector2Int direction = to - from;
         var destinationObject = mapEditor._layer[to.y, to.x].currentField;

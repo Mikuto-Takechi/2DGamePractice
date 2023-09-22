@@ -104,6 +104,7 @@ public class GamePanel : MonoBehaviour
     {
         GameManager.instance.ResetGame();
         ChangePanel(0);
+        AudioManager.instance.PlayBGM(2);
         GameManager.instance._gameState = GameState.Idle;
     }
 }
