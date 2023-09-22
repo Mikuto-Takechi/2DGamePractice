@@ -14,12 +14,14 @@ public class Player : MonoBehaviour, IObjectState
         GameManager.instance.PushData += PushUndo;
         GameManager.instance.PopData += PopUndo;
         GameManager.instance.ReloadData += Reload;
+        GameManager.instance.MoveEnd += ChangeAnimationState;
     }
     void OnDisable()
     {
         GameManager.instance.PushData -= PushUndo;
         GameManager.instance.PopData -= PopUndo;
         GameManager.instance.ReloadData -= Reload;
+        GameManager.instance.MoveEnd -= ChangeAnimationState;
     }
     private void Start()
     {
@@ -29,7 +31,7 @@ public class Player : MonoBehaviour, IObjectState
             _vcam.Follow = transform.GetChild(0);//プレイヤーの子オブジェクト(表示用)を追従対象に指定する
         _initState = objectState;
     }
-    private void Update()
+    void ChangeAnimationState()
     {
         if (objectState == ObjectState.UnderWater)
         {
@@ -71,6 +73,7 @@ public class Player : MonoBehaviour, IObjectState
         if (_stateStack.TryPop(out ObjectState state))
         {
             objectState = state;
+            ChangeAnimationState();
         }
     }
 
