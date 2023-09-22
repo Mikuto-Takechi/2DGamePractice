@@ -1,6 +1,6 @@
 //https://3dcg-school.pro/uv-scroll-shader/
 //https://unity-yuji.xyz/image-sprite-scroll-texture/
-Shader "Custom/UVScroll"
+Shader "Custom/UVScrollVertical"
 {
     Properties
     {
@@ -37,7 +37,7 @@ Shader "Custom/UVScroll"
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                float2 offset = float2(_Time.x, 0);
+                float2 offset = float2(0, _Time.x);
                 o.uv = TRANSFORM_TEX(v.uv + offset, _MainTex);
                 return o;
             }
