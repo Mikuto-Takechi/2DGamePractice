@@ -52,7 +52,6 @@ public class GameManager : Singleton<GameManager>
     public event Action<TextType> NewRecord;
     /// <summary>ゲームクリアを知らせるメソッド</summary>
     public event Action GameClear;
-    Subject<int> _audioInterval = new Subject<int>();
     public override void AwakeFunction()
     {
         _defaultSpeed = _moveSpeed;
@@ -81,7 +80,6 @@ public class GameManager : Singleton<GameManager>
             () => _steps <= mapEditor._stageData.stepAchievement1,
             () => _steps <= mapEditor._stageData.stepAchievement2
         };
-        _audioInterval.ThrottleFirst(TimeSpan.FromSeconds(0.5f)).Subscribe(num => AudioManager.instance.PlaySound(num));
     }
     int InputProcess(bool flag, Vector2Int dir, int next)
     {
@@ -134,7 +132,7 @@ public class GameManager : Singleton<GameManager>
         if (_gameState == GameState.Clear) return;
         if (mapEditor.IsCleared())
         {
-            if (_gameState != GameState.Clear && _gameState != GameState.Move)//クリア後処理
+            if (_gameState != GameState.Move)//クリア後処理
             {
                 _gameState = GameState.Clear;
                 GameClear();
@@ -156,7 +154,7 @@ public class GameManager : Singleton<GameManager>
         {
             _panel?.SwitchPause();
         }
-        if(_stageTime < 0)
+        if(_stageTime < 0 && _gameState != GameState.Move)
         {
             _panel?.ChangePanel(4);
             AudioManager.instance.StopBGM();
