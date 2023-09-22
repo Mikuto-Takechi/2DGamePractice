@@ -8,6 +8,7 @@ using static MyNamespace.MessagePackMethods;
 using System.Linq;
 using UnityEngine.UI;
 using DG.Tweening;
+using UniRx;
 
 [RequireComponent(typeof(MapEditor))]
 public class GameManager : Singleton<GameManager>
@@ -51,6 +52,7 @@ public class GameManager : Singleton<GameManager>
     public event Action<TextType> NewRecord;
     /// <summary>ゲームクリアを知らせるメソッド</summary>
     public event Action GameClear;
+    Subject<int> _audioInterval = new Subject<int>();
     public override void AwakeFunction()
     {
         _defaultSpeed = _moveSpeed;
@@ -79,6 +81,7 @@ public class GameManager : Singleton<GameManager>
             () => _steps <= mapEditor._stageData.stepAchievement1,
             () => _steps <= mapEditor._stageData.stepAchievement2
         };
+        _audioInterval.ThrottleFirst(TimeSpan.FromSeconds(0.5f)).Subscribe(num => AudioManager.instance.PlaySound(num));
     }
     int InputProcess(bool flag, Vector2Int dir, int next)
     {
@@ -205,6 +208,8 @@ public class GameManager : Singleton<GameManager>
                     _singleCrateSound = false;
                     _pushField = false;
                 }
+                else
+                    _audioInterval.OnNext(14);
             }
         }
         //stageTimeに加算
