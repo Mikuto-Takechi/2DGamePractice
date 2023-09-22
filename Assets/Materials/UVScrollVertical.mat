@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: UVScrollVertical
-  m_Shader: {fileID: 4800000, guid: c0cb136db15b0344c9fd0e50fb6eccef, type: 3}
+  m_Shader: {fileID: 4800000, guid: 032e940b8bab7a342b7dbc1f5f3d1ebd, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
