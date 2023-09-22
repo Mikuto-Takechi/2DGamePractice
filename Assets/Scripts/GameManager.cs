@@ -215,7 +215,7 @@ public class GameManager : Singleton<GameManager>
                     {
                         _gameState = GameState.Move;
                         AudioManager.instance.PlaySound(14);
-                        Vector2 moveToIndexHalf = (Vector2)playerIndex + (Vector2)pos / 2;
+                        Vector2 moveToIndexHalf = (Vector2)playerIndex + (Vector2)pos / 3;
                         var moveToPos = new Vector2(moveToIndexHalf.x, mapEditor._layer.GetLength(0) - moveToIndexHalf.y);
                         player.transform.DOMove(moveToPos, 0.1f).SetLoops(2, LoopType.Yoyo).OnComplete(() => _gameState = GameState.Idle);
                     }
