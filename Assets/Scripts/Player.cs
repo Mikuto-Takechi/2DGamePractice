@@ -61,6 +61,7 @@ public class Player : MonoBehaviour, IObjectState
     {
         objectState = _initState;
         _stateStack.Clear();
+        ChangeAnimationState();
     }
 
     public void PushUndo()
