@@ -203,13 +203,25 @@ public class GameManager : Singleton<GameManager>
             if (_inputQueue.TryDequeue(out Vector2Int pos))
             {
                 var playerIndex = mapEditor.GetPlayerIndex();
-                if (IsMovable(playerIndex, playerIndex + pos))
+                var moveToIndex = playerIndex + pos;
+                if(playerIndex != new Vector2Int(-1, -1))// プレイヤーのインデックスが取得出来ている場合の処理
                 {
-                    _singleCrateSound = false;
-                    _pushField = false;
+                    var player = mapEditor._layer[playerIndex.y, playerIndex.x].currentField.GetComponent<Player>();
+                    player.PlayAnimation(pos.y == 0 ? pos : -pos);// yが反転しているのでy方向の移動アニメーションは反転させる
+                    if (IsMovable(playerIndex, moveToIndex))
+                    {
+                        _singleCrateSound = false;
+                        _pushField = false;
+                    }
+                    else// 移動ができなかった場合の処理
+                    {
+                        _gameState = GameState.Move;
+                        AudioManager.instance.PlaySound(14);
+                        Vector2 moveToIndexHalf = (Vector2)playerIndex + (Vector2)pos / 2;
+                        var moveToPos = new Vector2(moveToIndexHalf.x, mapEditor._layer.GetLength(0) - moveToIndexHalf.y);
+                        player.transform.DOMove(moveToPos, 0.1f).SetLoops(2, LoopType.Yoyo).OnComplete(() => _gameState = GameState.Idle);
+                    }
                 }
-                else
-                    _audioInterval.OnNext(14);
             }
         }
         //stageTimeに加算
@@ -316,8 +328,6 @@ public class GameManager : Singleton<GameManager>
             AudioManager.instance.PlaySound(1);
             // プレイヤーの移動先を登録元へ知らせる
             if(MoveTo != null) MoveTo(targetPosition);
-            //yは反転しているのでy方向の移動アニメーションは反転させる
-            player.PlayAnimation(direction.y == 0 ? direction : -direction);
         }
         //Movableタグが付いていた時の処理
         if (targetObject.CompareTag("Movable"))
