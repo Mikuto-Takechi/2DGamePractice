@@ -12,6 +12,7 @@ public class ShadowRenderer : MonoBehaviour
     [SerializeField] Material[] _materials = null;
     Color _shadowColor = default;
     public Color _externalColor { get; set; }
+    public bool _effectEnabled { get; set; } = false;
     public bool _shadowEnabled = false;
     SpriteRenderer _sr = null;
     float timer = 0;
@@ -34,7 +35,7 @@ public class ShadowRenderer : MonoBehaviour
     {
         timer += Time.deltaTime;
         //ˆê’èŠÔŠu‚ÅŽc‘œ‚ð¶¬
-        if (timer > _shadowInterval && _shadowEnabled)
+        if (timer > _shadowInterval && (_shadowEnabled || _effectEnabled))
         {
             SpriteRenderer shadow = Instantiate(_shadow, transform.position, Quaternion.identity);
             shadow.sprite = _sr.sprite;

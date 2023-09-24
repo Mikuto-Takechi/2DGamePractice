@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class SpeedUp : ItemBase
@@ -8,8 +7,9 @@ public class SpeedUp : ItemBase
     [SerializeField] float _changeSpeed = 0.1f;
     //Œø‰ÊŽžŠÔ
     [SerializeField] float _effectTime = 1f;
-    Coroutine _coroutine;
     ShadowRenderer _shadowRenderer;
+    static Tween _removeEffect;
+    
     private new void Start()
     {
         base.Start();
@@ -19,25 +19,19 @@ public class SpeedUp : ItemBase
     {
         AudioManager.instance.PlaySound(12);
         GameManager.instance._moveSpeed = _changeSpeed;
-        if(_coroutine != null) StopCoroutine(_coroutine);
-        _coroutine = StartCoroutine(EffectTime());
-        _shadowRenderer._externalColor = new Color(0, 1, 1, 1); ;
-    }
-    IEnumerator EffectTime()
-    {
-        float timer = 0f;
-        while (true)
+        _shadowRenderer._effectEnabled = true;
+        _shadowRenderer._externalColor = new Color(0, 1, 1, 1);
+        if( _removeEffect != null ) 
         {
-            timer += Time.deltaTime;
-            _shadowRenderer._shadowEnabled = true;
-            if (timer > _effectTime)
-            {
-                GameManager.instance._moveSpeed = GameManager.instance._defaultSpeed;
-                _shadowRenderer._externalColor = default;
-                _shadowRenderer._shadowEnabled = false;
-                yield break;
-            }
-            yield return null;
+            _removeEffect.Kill();
+            _removeEffect = null;
         }
+        // Žw’è‚µ‚½ŽžŠÔ‚ªŒo‰ß‚µ‚½‚çŒø‰Ê‚ð‰ðœ‚·‚é
+        _removeEffect = DOVirtual.DelayedCall(_effectTime ,() => 
+        {
+            GameManager.instance._moveSpeed = GameManager.instance._defaultSpeed;
+            _shadowRenderer._effectEnabled = false;
+            _shadowRenderer._externalColor = default;
+        }).SetLink(gameObject);
     }
 }
