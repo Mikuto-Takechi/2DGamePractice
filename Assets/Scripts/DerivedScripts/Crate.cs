@@ -21,23 +21,17 @@ public class Crate : MonoBehaviour, IObjectState
         GameManager.instance.PushData += PushUndo;
         GameManager.instance.PopData += PopUndo;
         GameManager.instance.ReloadData += Reload;
+        GameManager.instance.MoveEnd += ChangeAnimationState;
     }
     void OnDisable()
     {
         GameManager.instance.PushData -= PushUndo;
         GameManager.instance.PopData -= PopUndo;
         GameManager.instance.ReloadData -= Reload;
+        GameManager.instance.MoveEnd -= ChangeAnimationState;
     }
     private void Update()
     {
-        if(objectState == ObjectState.UnderWater)
-        {
-            _animator.SetBool("UnderWater", true);
-        }
-        else
-        {
-            _animator.SetBool("UnderWater", false);
-        }
         var layer = GameManager.instance.mapEditor._layer;
         int x = (int)transform.position.x;
         int y = layer.GetLength(0) - (int)transform.position.y;
@@ -46,10 +40,22 @@ public class Crate : MonoBehaviour, IObjectState
         else
             _sr.color = new Color(0, 0, 0, 1);
     }
+    void ChangeAnimationState()
+    {
+        if (objectState == ObjectState.UnderWater)
+        {
+            _animator.SetBool("UnderWater", true);
+        }
+        else
+        {
+            _animator.SetBool("UnderWater", false);
+        }
+    }
     public void Reload()
     {
         objectState = _initState;
         _stateStack.Clear();
+        ChangeAnimationState();
     }
     public void PushUndo()
     {
@@ -61,6 +67,7 @@ public class Crate : MonoBehaviour, IObjectState
         if (_stateStack.TryPop(out ObjectState state))
         {
             objectState = state;
+            ChangeAnimationState();
         }
     }
 
