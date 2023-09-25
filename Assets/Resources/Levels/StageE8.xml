@@ -8,9 +8,9 @@
 		"name": "StageE8",
 		"next": "StageE9",
 		"timeLimit": 180,
-		"timeAchievement": 60,
-		"stepAchievement1": 50,
-		"stepAchievement2": 25
+		"timeAchievement": 165,
+		"stepAchievement1": 580,
+		"stepAchievement2": 555
 		}
 	</stageData>
  <layer id="1" name="Terrain" width="32" height="16">

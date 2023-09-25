@@ -7,10 +7,10 @@
 		{
 		"name": "StageH3",
 		"next": "StageH4",
-		"timeLimit": 60,
-		"timeAchievement": 60,
-		"stepAchievement1": 50,
-		"stepAchievement2": 25
+		"timeLimit": 120,
+		"timeAchievement": 100,
+		"stepAchievement1": 210,
+		"stepAchievement2": 190
 		}
 	</stageData>
  <layer id="1" name="Terrain" width="16" height="16">
