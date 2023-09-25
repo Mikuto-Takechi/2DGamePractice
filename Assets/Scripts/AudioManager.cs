@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 
 public class AudioManager : Singleton<AudioManager>
 {
@@ -9,15 +12,20 @@ public class AudioManager : Singleton<AudioManager>
     public AudioSource _loop;
     [SerializeField] List<AudioClip> _audioList;
     [SerializeField] List<AudioClip> _bgmList;
-    public bool _toggleQuitSave { get; set; } = false;
-
-public override void AwakeFunction()
+    public event Action DeleteSetting;
+    public override void AwakeFunction()
     {
         float bgmVol = PlayerPrefs.GetFloat("BGM", 999);
         float seVol = PlayerPrefs.GetFloat("SE", 999);
         if (bgmVol != 999) _loop.volume = bgmVol;
-        if(seVol != 999) _se.volume = seVol;
+        if (seVol != 999) _se.volume = seVol;
         SceneManager.sceneLoaded += SceneLoaded;
+        // GameObjectが破棄されるまで繰り返す
+        Observable.Timer(TimeSpan.FromSeconds(10))
+            .DoOnCompleted(Save)
+            .RepeatUntilDestroy(gameObject)
+            .Subscribe()
+            .AddTo(this);
     }
     public void PlaySound(int num)
     {
@@ -45,12 +53,12 @@ public override void AwakeFunction()
     }
     void SceneLoaded(Scene nextScene, LoadSceneMode mode)
     {
-        if(nextScene.name == "Title")
+        if (nextScene.name == "Title")
         {
             StopBGM();
             PlayBGM(3);
         }
-        if(nextScene.name == "CSVTest")
+        if (nextScene.name == "CSVTest")
         {
             StopBGM();
             PlayBGM(2);
@@ -58,10 +66,20 @@ public override void AwakeFunction()
     }
     private void OnApplicationQuit()
     {
-        if(!_toggleQuitSave)
-        {
-            PlayerPrefs.SetFloat("BGM", _loop.volume);
-            PlayerPrefs.SetFloat("SE", _se.volume);
-        }
+        Save();
+    }
+    public void Save()
+    {
+        //Debug.Log("オーディオデータセーブ");
+        PlayerPrefs.SetFloat("BGM", _loop.volume);
+        PlayerPrefs.SetFloat("SE", _se.volume);
+    }
+    public void DeleteSave()
+    {
+        DeleteSetting();
+        PlayerPrefs.DeleteKey("BGM");
+        PlayerPrefs.DeleteKey("SE");
+        _loop.volume = 1;
+        _se.volume = 1;
     }
 }

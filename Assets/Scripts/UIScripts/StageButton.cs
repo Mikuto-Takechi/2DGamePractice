@@ -38,8 +38,8 @@ public class StageButton : MonoBehaviour
     }
     private void Update()
     {
-        StageRecord(GameManager.instance._timeRecords, _timeRecord);
-        StageRecord(GameManager.instance._stepsRecords, _stepRecord);
+        StageRecord(GameManager.instance._saveData.TimeRecords, _timeRecord);
+        StageRecord(GameManager.instance._saveData.StepRecords, _stepRecord);
         StageAchievements();
         if (_enableLockProcess == false) return;
         StageLock();
@@ -76,7 +76,7 @@ public class StageButton : MonoBehaviour
     {
         if (_button.IsInteractable())//ボタンが干渉可能ならば
         {
-            if (GameManager.instance._unlockStages.Contains(_stageName))//ステージが解放されているかを確認する
+            if (GameManager.instance._saveData.UnlockStages.Contains(_stageName))//ステージが解放されているかを確認する
             {
                 _button.interactable = true;
             }
@@ -93,22 +93,22 @@ public class StageButton : MonoBehaviour
     /// </summary>
     void StageAchievements()
     {
-        if(!GameManager.instance._achievements.ContainsKey(_stageName))
+        if(!GameManager.instance._saveData.Missions.ContainsKey(_stageName))
         {
             _achievementStar1.sprite = _notAchievedImage;
             _achievementStar2.sprite = _notAchievedImage;
             _achievementStar3.sprite = _notAchievedImage;
             return;
         }
-        if ((GameManager.instance._achievements[_stageName] & Stars.Star1) == Stars.Star1)
+        if ((GameManager.instance._saveData.Missions[_stageName] & Stars.Star1) == Stars.Star1)
             _achievementStar1.sprite = _achievedImage;
         else
             _achievementStar1.sprite = _notAchievedImage;
-        if ((GameManager.instance._achievements[_stageName] & Stars.Star2) == Stars.Star2)
+        if ((GameManager.instance._saveData.Missions[_stageName] & Stars.Star2) == Stars.Star2)
             _achievementStar2.sprite = _achievedImage;
         else
             _achievementStar2.sprite = _notAchievedImage;
-        if ((GameManager.instance._achievements[_stageName] & Stars.Star3) == Stars.Star3)
+        if ((GameManager.instance._saveData.Missions[_stageName] & Stars.Star3) == Stars.Star3)
             _achievementStar3.sprite = _achievedImage;
         else
             _achievementStar3.sprite = _notAchievedImage;

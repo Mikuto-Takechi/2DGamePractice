@@ -9,6 +9,14 @@ public class GameSlider : MonoBehaviour
     [SerializeField] SliderType _sliderType = SliderType.None;
     Slider _slider;
     Text _sliderText;
+    void OnEnable()
+    {
+        AudioManager.instance.DeleteSetting += DeleteSave;
+    }
+    void OnDisable()
+    {
+        AudioManager.instance.DeleteSetting -= DeleteSave;
+    }
     void Start()
     {
         _slider = GetComponent<Slider>();
@@ -44,6 +52,10 @@ public class GameSlider : MonoBehaviour
     void SliderSound(float num)
     {
         AudioManager.instance.PlaySound(4);
+    }
+    void DeleteSave()
+    {
+        _slider.value = 1;
     }
 }
 enum SliderType
