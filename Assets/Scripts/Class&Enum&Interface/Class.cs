@@ -1,5 +1,6 @@
 using MessagePack;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 /// <summary>
 /// DictionaryをInspector上で表示するためのクラス
@@ -157,6 +158,51 @@ namespace MyNamespace
                 data = default;
                 return false;
             }
+        }
+        //public static void MessagePackInitialize()
+        //{
+        //    Debug.Log("メッセージパック初期化");
+        //    MessagePack.Resolvers.StaticCompositeResolver.Instance.Register(
+        //    MessagePack.Resolvers.GeneratedResolver.Instance, // コード生成した型解決クラス
+        //    MessagePack.Unity.UnityResolver.Instance,
+        //    MessagePack.Unity.Extension.UnityBlitWithPrimitiveArrayResolver.Instance,
+        //    MessagePack.Resolvers.StandardResolver.Instance
+        //    );
+        //    var option = MessagePack.MessagePackSerializerOptions.Standard
+        //    .WithCompression(MessagePack.MessagePackCompression.Lz4BlockArray) // LZ4 圧縮利用
+        //    .WithResolver(MessagePack.Resolvers.StaticCompositeResolver.Instance);
+        //    MessagePack.MessagePackSerializer.DefaultOptions = option;
+        //}
+    }
+}
+namespace Takechi
+{
+    /// <summary>
+    /// セーブデータ
+    /// </summary>
+    [MessagePackObject]
+    [Serializable]
+    public partial class SaveData
+    {
+        [Key(0)]
+        public Dictionary<string, float> TimeRecords { get; set; } = new Dictionary<string, float>();
+        [Key(1)]
+        public Dictionary<string, int> StepRecords { get; set; } = new Dictionary<string, int>();
+        [Key(2)]
+        public Dictionary<string, Stars> Missions { get; set; } = new Dictionary<string, Stars>();
+        [Key(3)]
+        public HashSet<string> UnlockStages { get; set; } = new HashSet<string>();
+        public SaveData()
+        {
+        }
+
+        [SerializationConstructor]
+        public SaveData(Dictionary<string, float> timeRecords, Dictionary<string, int> stepRecords, Dictionary<string, Stars> missions, HashSet<string> unlockStages)
+        {
+            this.TimeRecords = timeRecords;
+            this.StepRecords = stepRecords;
+            this.Missions = missions;
+            this.UnlockStages = unlockStages;
         }
     }
 }

@@ -79,23 +79,23 @@ public class MapEditor : MonoBehaviour
                     }
                 }
                 //デバッグログ
-                string debugText = "";
-                if (layer.Attribute("name").Value == "Terrain")
-                    debugText += "Terrain\n";
-                if (layer.Attribute("name").Value == "Field")
-                    debugText += "Field\n";
-                for (int i = 0; i < height; i++)
-                {
-                    for (int j = 0; j < width; j++)
-                    {
-                        if (layer.Attribute("name").Value == "Terrain")
-                            debugText += $"{_layer[i, j].terrain.id},";
-                        if (layer.Attribute("name").Value == "Field")
-                            debugText += $"{_layer[i, j].field.id},";
-                    }
-                    debugText += "\n";
-                }
-                Debug.Log(debugText);
+                //string debugText = "";
+                //if (layer.Attribute("name").Value == "Terrain")
+                //    debugText += "Terrain\n";
+                //if (layer.Attribute("name").Value == "Field")
+                //    debugText += "Field\n";
+                //for (int i = 0; i < height; i++)
+                //{
+                //    for (int j = 0; j < width; j++)
+                //    {
+                //        if (layer.Attribute("name").Value == "Terrain")
+                //            debugText += $"{_layer[i, j].terrain.id},";
+                //        if (layer.Attribute("name").Value == "Field")
+                //            debugText += $"{_layer[i, j].field.id},";
+                //    }
+                //    debugText += "\n";
+                //}
+                //Debug.Log(debugText);
             }
             return true;
         }

@@ -6,14 +6,9 @@ public class DeleteAllPlayerPrefs : MonoBehaviour
 {
     public void Delete()
     {
-        GameManager.instance._toggleQuitSave = true;
-        AudioManager.instance._toggleQuitSave = true;
-        PlayerPrefs.DeleteAll();
+        //PlayerPrefs.DeleteAll();
+        GameManager.instance.DeleteSave();
+        AudioManager.instance.DeleteSave();
         Debug.Log("PlayerPrefsのデータをすべて削除した");
-    #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;//Unityエディター上ならこっち
-    #else
-        Application.Quit();//アプリ上ならこっち
-    #endif
     }
 }

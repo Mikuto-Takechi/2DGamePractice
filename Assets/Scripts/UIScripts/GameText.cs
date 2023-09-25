@@ -10,6 +10,7 @@ public class GameText : MonoBehaviour
     [SerializeField] string[] _texts;
     [SerializeField] TextType _type = TextType.None;
     [SerializeField] Text _newRecord;
+    [SerializeField] Transform _newRecordAnchor;
     ReactiveProperty<int> _time = new IntReactiveProperty();
     int _indexNumber = 0;
     void OnEnable()
@@ -100,9 +101,8 @@ public class GameText : MonoBehaviour
     {
         if (_type != type) return;
         if (_newRecord == null) return;
-        Text newRecord = Instantiate(_newRecord, transform);
-        float spacing = _text.rectTransform.rect.width / 2 + newRecord.rectTransform.rect.width / 2;
-        newRecord.transform.position += new Vector3(spacing, 0 ,0);
+        if (_newRecordAnchor == null) return;
+        Text newRecord = Instantiate(_newRecord, _newRecordAnchor);
         newRecord.rectTransform.DOLocalMoveY(20f, 0.4f)
                                .SetRelative(true)
                                .SetEase(Ease.OutQuad)

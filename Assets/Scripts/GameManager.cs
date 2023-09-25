@@ -9,6 +9,7 @@ using System.Linq;
 using UnityEngine.UI;
 using DG.Tweening;
 using UniRx;
+using Takechi;
 
 [RequireComponent(typeof(MapEditor))]
 public class GameManager : Singleton<GameManager>
@@ -16,10 +17,7 @@ public class GameManager : Singleton<GameManager>
     public int _steps { get; set; } = 0;
     public float _stageTime { get; set; } = 0;
     public GameState _gameState = GameState.Title;
-    public Dictionary<string, float> _timeRecords = new Dictionary<string, float>();
-    public Dictionary<string, int> _stepsRecords = new Dictionary<string, int>();
-    public Dictionary<string, Stars> _achievements = new Dictionary<string, Stars>();
-    public HashSet<string> _unlockStages = new HashSet<string>();
+    public SaveData _saveData { get; set; } = new SaveData();
     GamePanel _panel;
     Queue<Vector2Int> _inputQueue = new Queue<Vector2Int>();
     /// <summary>入力バッファサイズ</summary>
@@ -29,7 +27,6 @@ public class GameManager : Singleton<GameManager>
     public float _defaultSpeed { get; set; }//デフォルトの移動速度
     public int _coroutineCount { get; set; } = 0;
     PlayerInput _playerInput;
-    public bool _toggleQuitSave { get; set; } = false;
     bool _singleCrateSound = false;
     bool _pushField = false;
     [SerializeField] GameObject _shadow;
@@ -59,13 +56,19 @@ public class GameManager : Singleton<GameManager>
         mapEditor = GetComponent<MapEditor>();
         _playerInput = GetComponent<PlayerInput>();
         if (MessagePackLoad("StepRecords", out Dictionary<string, int> stepData))
-            _stepsRecords = stepData;
+            _saveData.StepRecords = stepData;
         if (MessagePackLoad("TimeRecords", out Dictionary<string, float> timeData))
-            _timeRecords = timeData;
+            _saveData.TimeRecords = timeData;
         if (MessagePackLoad("UnlockStages", out HashSet<string> unlockData))
-            _unlockStages = unlockData;
+            _saveData.UnlockStages = unlockData;
         if (MessagePackLoad("Achievements", out Dictionary<string, Stars> achievementsData))
-            _achievements = achievementsData;
+            _saveData.Missions = achievementsData;
+        // GameObjectが破棄されるまで繰り返す
+        Observable.Timer(TimeSpan.FromSeconds(10))
+            .DoOnCompleted(Save)
+            .RepeatUntilDestroy(gameObject)
+            .Subscribe()
+            .AddTo(this);
         //引数無し戻り値intの型のリスト
         _inputProcesses = new List<Func<int>>
         {
@@ -109,22 +112,16 @@ public class GameManager : Singleton<GameManager>
         {
             mapEditor.InitializeGame();
             //記録が追加されていないステージ名ならば新しくDictionaryに追加する
-            _timeRecords.TryAdd(mapEditor._stageData.name, MaxValue.floatValue);
-            _stepsRecords.TryAdd(mapEditor._stageData.name, MaxValue.intValue);
-            _achievements.TryAdd(mapEditor._stageData.name, 0);
+            _saveData.TimeRecords.TryAdd(mapEditor._stageData.name, MaxValue.floatValue);
+            _saveData.StepRecords.TryAdd(mapEditor._stageData.name, MaxValue.intValue);
+            _saveData.Missions.TryAdd(mapEditor._stageData.name, 0);
             _stageTime = mapEditor._stageData.timeLimit;//制限時間を設定する
             _gameState = GameState.Idle;
         }
     }
     private void OnApplicationQuit()
     {
-        if (!_toggleQuitSave)
-        {
-            MessagePackSave("StepRecords", _stepsRecords);
-            MessagePackSave("TimeRecords", _timeRecords);
-            MessagePackSave("UnlockStages", _unlockStages);
-            MessagePackSave("Achievements", _achievements);
-        }
+        Save();
     }
     private void Update()
     {
@@ -136,12 +133,12 @@ public class GameManager : Singleton<GameManager>
             {
                 _gameState = GameState.Clear;
                 GameClear();
-                CheckRecord(mapEditor._stageData.timeLimit - _stageTime, _timeRecords);
-                CheckRecord(_steps, _stepsRecords);
-                CheckAchievements(_achievements, mapEditor._stageData.name);
-                MessagePackSave("Achievements", _achievements);
-                _unlockStages.Add(mapEditor._stageData.next);
-                MessagePackSave("UnlockStages", _unlockStages);
+                CheckRecord(mapEditor._stageData.timeLimit - _stageTime, _saveData.TimeRecords);
+                CheckRecord(_steps, _saveData.StepRecords);
+                CheckAchievements(_saveData.Missions, mapEditor._stageData.name);
+                MessagePackSave("Achievements", _saveData.Missions);
+                _saveData.UnlockStages.Add(mapEditor._stageData.next);
+                MessagePackSave("UnlockStages", _saveData.UnlockStages);
                 _panel.ChangePanel(1);
                 _panel.Clear();
                 AudioManager.instance.StopBGM();
@@ -404,5 +401,24 @@ public class GameManager : Singleton<GameManager>
                 }
             }
         }
+    }
+    public void Save()
+    {
+        //Debug.Log("ゲームデータセーブ");
+        MessagePackSave("StepRecords", _saveData.StepRecords);
+        MessagePackSave("TimeRecords", _saveData.TimeRecords);
+        MessagePackSave("UnlockStages", _saveData.UnlockStages);
+        MessagePackSave("Achievements", _saveData.Missions);
+    }
+    public void DeleteSave()
+    {
+        PlayerPrefs.DeleteKey("StepRecords");
+        PlayerPrefs.DeleteKey("TimeRecords");
+        PlayerPrefs.DeleteKey("UnlockStages");
+        PlayerPrefs.DeleteKey("Achievements");
+        _saveData.TimeRecords.Clear();
+        _saveData.StepRecords.Clear();
+        _saveData.Missions.Clear();
+        _saveData.UnlockStages.Clear();
     }
 }
