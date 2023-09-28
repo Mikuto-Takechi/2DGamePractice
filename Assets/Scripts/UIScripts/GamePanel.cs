@@ -59,6 +59,10 @@ public class GamePanel : MonoBehaviour
         }
         _panels[1].transform.GetComponentInChildren<Button>().Select();
     }
+    public void LoadScene(string sceneName)
+    {
+        SceneChanger.Instance.LoadScene(sceneName);
+    }
     /// <summary>
     /// ÉQÅ[ÉÄäJén
     /// </summary>
