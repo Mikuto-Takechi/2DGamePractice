@@ -1,7 +1,6 @@
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GamePanel : MonoBehaviour
@@ -19,8 +18,6 @@ public class GamePanel : MonoBehaviour
             panel.blocksRaycasts = false;
             if (panel == _panels[index])
             {
-                //panel.transform.localScale = Vector3.zero;
-                //panel.transform.DOScale(1f, 1f).SetEase(Ease.OutBounce).SetLink(gameObject);
                 panel.alpha = 1;
                 panel.interactable = true;
                 panel.blocksRaycasts = true;
@@ -28,6 +25,11 @@ public class GamePanel : MonoBehaviour
                 if (button != null) EventSystem.current.SetSelectedGameObject(button.gameObject);
             }
         }
+    }
+    public void TweenPanel(int index)
+    {
+        _panels[index].transform.localScale = Vector3.zero;
+        _panels[index].transform.DOScale(1, 0.5f).SetEase(Ease.OutBounce).SetLink(gameObject);
     }
     public void SwitchPause()
     {
@@ -41,22 +43,24 @@ public class GamePanel : MonoBehaviour
         {
             GameManager.Instance._gameState = GameState.Pause;
             ChangePanel(2);//É|Å[ÉYUI
-            EaseText[] ease = _panels[2].transform.GetComponentsInChildren<EaseText>();
-            foreach (var e in ease)
-            {
-                if (e != null) e.EaseStart();
-            }
+            TweenPanel(2);
+            //EaseText[] ease = _panels[2].transform.GetComponentsInChildren<EaseText>();
+            //foreach (var e in ease)
+            //{
+            //    if (e != null) e.EaseStart();
+            //}
             AudioManager.Instance.PauseBGM(true);
             AudioManager.Instance.PlaySound(2);
         }
     }
     public void Clear()
     {
-        EaseText[] ease = _panels[1].transform.GetComponentsInChildren<EaseText>();
-        foreach (var e in ease)
-        {
-            if (e != null) e.EaseStart();
-        }
+        //EaseText[] ease = _panels[1].transform.GetComponentsInChildren<EaseText>();
+        //foreach (var e in ease)
+        //{
+        //    if (e != null) e.EaseStart();
+        //}
+        TweenPanel(1);
         _panels[1].transform.GetComponentInChildren<Button>().Select();
     }
     public void LoadScene(string sceneName)

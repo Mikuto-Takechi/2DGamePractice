@@ -154,6 +154,7 @@ public class GameManager : Singleton<GameManager>
         if(_stageTime < 0 && _gameState != GameState.Move)
         {
             _panel?.ChangePanel(4);
+            _panel?.TweenPanel(4);
             AudioManager.Instance.StopBGM();
             AudioManager.Instance.PlaySound(13);
             _gameState = GameState.TimeOver;
