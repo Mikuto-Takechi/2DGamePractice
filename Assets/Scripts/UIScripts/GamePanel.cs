@@ -19,8 +19,8 @@ public class GamePanel : MonoBehaviour
             panel.blocksRaycasts = false;
             if (panel == _panels[index])
             {
-                panel.transform.localScale = Vector3.zero;
-                panel.transform.DOScale(1f, 1f).SetEase(Ease.OutBounce).SetLink(gameObject);
+                //panel.transform.localScale = Vector3.zero;
+                //panel.transform.DOScale(1f, 1f).SetEase(Ease.OutBounce).SetLink(gameObject);
                 panel.alpha = 1;
                 panel.interactable = true;
                 panel.blocksRaycasts = true;
