@@ -9,24 +9,23 @@ using UnityEngine.UI;
 
 public class SceneChanger : Singleton<SceneChanger>
 {
-    [SerializeField] Image _fadePanel;
+    Image _fadePanel;
     [SerializeField] Sprite _loadSceneSprite;
     [SerializeField] Sprite _resetGameSprite;
     Tween _tween;
     public override void AwakeFunction()
     {
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+        _fadePanel = transform.GetComponentInChildren<Image>();
     }
     public void LoadScene(string sceneName)
     {
         if (_tween != null) return;
         _fadePanel.sprite = _loadSceneSprite;
-        _tween = DOVirtual.Float(0, 1, 1.5f, value => _fadePanel.material.SetFloat("_Alpha", value));
+        _tween = DOVirtual.Float(0, 1, 1, value => _fadePanel.material.SetFloat("_Alpha", value));
         _tween.OnComplete(() =>
         {
             SceneManager.LoadSceneAsync(sceneName);
-            DOVirtual.Float(1, 0, 1.5f, value => _fadePanel.material.SetFloat("_Alpha", value))
+            DOVirtual.Float(1, 0, 1, value => _fadePanel.material.SetFloat("_Alpha", value))
                      .OnComplete(() => _tween = null);
         });
     }
