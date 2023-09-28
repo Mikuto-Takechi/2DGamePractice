@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -7,16 +8,18 @@ public class Select : MonoBehaviour, ISelectHandler,IDeselectHandler, ISubmitHan
     Transform _arrow;
     Image _image;
     Coroutine _coroutine;
+    Text[] _texts;
     private void Awake()
     {
         _arrow = transform.Find("Arrow");
         _image = _arrow.GetComponent<Image>();
+        _texts = GetComponentsInChildren<Text>();
         if(_image) _image.enabled = false;
     }
     //選択状態のときに呼ばれる
     public void OnSelect(BaseEventData eventData)
     {
-        AudioManager.instance.PlaySound(4);
+        AudioManager.Instance.PlaySound(4);
         _coroutine = StartCoroutine(Selected());
     }
     //選択解除のときに呼ばれる
@@ -41,11 +44,11 @@ public class Select : MonoBehaviour, ISelectHandler,IDeselectHandler, ISubmitHan
     //Navigationでボタンを押したときに呼ばれる
     public void OnSubmit(BaseEventData eventData)
     {
-        AudioManager.instance.PlaySound(5);
+        AudioManager.Instance.PlaySound(5);
     }
     //マウスでクリックしたときに呼ばれる
     public void OnPointerClick(PointerEventData eventData)
     {
-        AudioManager.instance.PlaySound(5);
+        AudioManager.Instance.PlaySound(5);
     }
 }

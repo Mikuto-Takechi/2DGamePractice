@@ -30,7 +30,7 @@ public class GameManager : Singleton<GameManager>
     bool _singleCrateSound = false;
     bool _pushField = false;
     [SerializeField] GameObject _shadow;
-    public MapEditor mapEditor { get; set; }
+    public MapEditor MapEditor { get; set; }
     List<Func<int>> _inputProcesses;
     int _initInputProcess = 0;
     /// <summary>実績が解除されているかを判定してbool型で返すメソッドを入れるリスト</summary>
@@ -53,7 +53,7 @@ public class GameManager : Singleton<GameManager>
     {
         _defaultSpeed = _moveSpeed;
         SceneManager.sceneLoaded += SceneLoaded;
-        mapEditor = GetComponent<MapEditor>();
+        MapEditor = GetComponent<MapEditor>();
         _playerInput = GetComponent<PlayerInput>();
         if (MessagePackLoad("StepRecords", out Dictionary<string, int> stepData))
             _saveData.StepRecords = stepData;
@@ -79,9 +79,9 @@ public class GameManager : Singleton<GameManager>
         };
         _isAchieved = new List<Func<bool>>
         {
-            () => mapEditor._stageData.timeLimit - _stageTime <= mapEditor._stageData.timeAchievement,
-            () => _steps <= mapEditor._stageData.stepAchievement1,
-            () => _steps <= mapEditor._stageData.stepAchievement2
+            () => MapEditor._stageData.timeLimit - _stageTime <= MapEditor._stageData.timeAchievement,
+            () => _steps <= MapEditor._stageData.stepAchievement1,
+            () => _steps <= MapEditor._stageData.stepAchievement2
         };
     }
     int InputProcess(bool flag, Vector2Int dir, int next)
@@ -102,20 +102,20 @@ public class GameManager : Singleton<GameManager>
         _steps = 0;
         _panel = FindObjectOfType<GamePanel>();
         _panel?.ChangePanel(0);
-        mapEditor._fieldStack.Clear();//フィールドのスタックを削除する
-        mapEditor._gimmickStack.Clear();//ギミックのスタックを削除する
+        MapEditor._fieldStack.Clear();//フィールドのスタックを削除する
+        MapEditor._gimmickStack.Clear();//ギミックのスタックを削除する
         if (nextScene.name.Contains("Title"))
         {
             _gameState = GameState.Title;
         }
         else
         {
-            mapEditor.InitializeGame();
+            MapEditor.InitializeGame();
             //記録が追加されていないステージ名ならば新しくDictionaryに追加する
-            _saveData.TimeRecords.TryAdd(mapEditor._stageData.name, MaxValue.floatValue);
-            _saveData.StepRecords.TryAdd(mapEditor._stageData.name, MaxValue.intValue);
-            _saveData.Missions.TryAdd(mapEditor._stageData.name, 0);
-            _stageTime = mapEditor._stageData.timeLimit;//制限時間を設定する
+            _saveData.TimeRecords.TryAdd(MapEditor._stageData.name, MaxValue.floatValue);
+            _saveData.StepRecords.TryAdd(MapEditor._stageData.name, MaxValue.intValue);
+            _saveData.Missions.TryAdd(MapEditor._stageData.name, 0);
+            _stageTime = MapEditor._stageData.timeLimit;//制限時間を設定する
             _gameState = GameState.Idle;
         }
     }
@@ -127,22 +127,22 @@ public class GameManager : Singleton<GameManager>
     {
         if (_gameState == GameState.Title) return;
         if (_gameState == GameState.Clear) return;
-        if (mapEditor.IsCleared())
+        if (MapEditor.IsCleared())
         {
             if (_gameState != GameState.Move)//クリア後処理
             {
                 _gameState = GameState.Clear;
                 GameClear();
-                CheckRecord(mapEditor._stageData.timeLimit - _stageTime, _saveData.TimeRecords);
+                CheckRecord(MapEditor._stageData.timeLimit - _stageTime, _saveData.TimeRecords);
                 CheckRecord(_steps, _saveData.StepRecords);
-                CheckAchievements(_saveData.Missions, mapEditor._stageData.name);
+                CheckAchievements(_saveData.Missions, MapEditor._stageData.name);
                 MessagePackSave("Achievements", _saveData.Missions);
-                _saveData.UnlockStages.Add(mapEditor._stageData.next);
+                _saveData.UnlockStages.Add(MapEditor._stageData.next);
                 MessagePackSave("UnlockStages", _saveData.UnlockStages);
                 _panel.ChangePanel(1);
                 _panel.Clear();
-                AudioManager.instance.StopBGM();
-                AudioManager.instance.PlaySound(3);
+                AudioManager.Instance.StopBGM();
+                AudioManager.Instance.PlaySound(3);
             }
             return;
         }
@@ -154,13 +154,13 @@ public class GameManager : Singleton<GameManager>
         if(_stageTime < 0 && _gameState != GameState.Move)
         {
             _panel?.ChangePanel(4);
-            AudioManager.instance.StopBGM();
-            AudioManager.instance.PlaySound(13);
+            AudioManager.Instance.StopBGM();
+            AudioManager.Instance.PlaySound(13);
             _gameState = GameState.TimeOver;
         }
         if (_gameState == GameState.Pause) return;
         //Undo処理
-        if (_gameInputs.Player.Undo.IsPressed() && _coroutineCount == 0 && _gameState == GameState.Idle && mapEditor._fieldStack.Count != 0)
+        if (_gameInputs.Player.Undo.IsPressed() && _coroutineCount == 0 && _gameState == GameState.Idle && MapEditor._fieldStack.Count != 0)
         {
             _inputQueue.Clear();//queueの中身を消す
             PopData();//登録されているステージ巻き戻しメソッドの呼び出し
@@ -168,18 +168,8 @@ public class GameManager : Singleton<GameManager>
         //リセット処理
         if (_gameInputs.Player.Reset.triggered)
         {
-            //操作出来なくする
-            _gameState = GameState.Title;
-            //画面を徐々に暗くする
-            AudioManager.instance.PlaySound(7);
-            var fade = _panel.transform.Find("Fade").GetComponent<Image>();
-            fade.DOFade(1,1).OnComplete(() => 
-            {
-                ResetGame();
-                AudioManager.instance.PlaySound(8);
-                AudioManager.instance.PlaySound(9);
-                fade.DOFade(0, 1f).OnComplete(() => _gameState = GameState.Idle);
-            });
+            _gameState = GameState.Title;// 操作できなくさせる
+            SceneChanger.Instance.ResetGame();// 画面をフェードさせる
         }
         // 入力バッファに追加する
         if (_gameState == GameState.Idle)
@@ -197,11 +187,11 @@ public class GameManager : Singleton<GameManager>
         {
             if (_inputQueue.TryDequeue(out Vector2Int pos))
             {
-                var playerIndex = mapEditor.GetPlayerIndex();
+                var playerIndex = MapEditor.GetPlayerIndex();
                 var moveToIndex = playerIndex + pos;
                 if(playerIndex != new Vector2Int(-1, -1))// プレイヤーのインデックスが取得出来ている場合の処理
                 {
-                    var player = mapEditor._layer[playerIndex.y, playerIndex.x].currentField.GetComponent<Player>();
+                    var player = MapEditor._layer[playerIndex.y, playerIndex.x].currentField.GetComponent<Player>();
                     player.PlayAnimation(pos.y == 0 ? pos : -pos);// yが反転しているのでy方向の移動アニメーションは反転させる
                     if (IsMovable(playerIndex, moveToIndex))
                     {
@@ -211,9 +201,9 @@ public class GameManager : Singleton<GameManager>
                     else// 移動ができなかった場合の処理
                     {
                         _gameState = GameState.Move;
-                        AudioManager.instance.PlaySound(14);
+                        AudioManager.Instance.PlaySound(14);
                         Vector2 moveToIndexHalf = (Vector2)playerIndex + (Vector2)pos / 3;
-                        var moveToPos = new Vector2(moveToIndexHalf.x, mapEditor._layer.GetLength(0) - moveToIndexHalf.y);
+                        var moveToPos = new Vector2(moveToIndexHalf.x, MapEditor._layer.GetLength(0) - moveToIndexHalf.y);
                         player.transform.DOMove(moveToPos, 0.1f).SetLoops(2, LoopType.Yoyo).OnComplete(() => _gameState = GameState.Idle);
                     }
                 }
@@ -229,7 +219,7 @@ public class GameManager : Singleton<GameManager>
         _coroutineCount = 0;// 実行中のコルーチンのカウントをリセット
         ReloadData();// 登録されているステージ初期化メソッドの呼び出し
         _steps = 0;// 歩数を初期化
-        _stageTime = mapEditor._stageData.timeLimit;// 制限時間を初期化
+        _stageTime = MapEditor._stageData.timeLimit;// 制限時間を初期化
     }
     IEnumerator Move(Transform obj, Vector2 to, float endTime, Action callback)
     {
@@ -291,24 +281,24 @@ public class GameManager : Singleton<GameManager>
     bool IsMovable(Vector2Int from, Vector2Int to)
     {
         // 縦軸横軸の配列外参照をしていないか
-        if (to.y < 0 || to.y >= mapEditor._layer.GetLength(0))
+        if (to.y < 0 || to.y >= MapEditor._layer.GetLength(0))
             return false;
-        if (to.x < 0 || to.x >= mapEditor._layer.GetLength(1))
+        if (to.x < 0 || to.x >= MapEditor._layer.GetLength(1))
             return false;
-        if (mapEditor._layer[to.y, to.x].terrain.type == PrefabType.Wall)
+        if (MapEditor._layer[to.y, to.x].terrain.type == PrefabType.Wall)
             return false;
 
         Vector2Int direction = to - from;
-        var destinationObject = mapEditor._layer[to.y, to.x].currentField;
+        var destinationObject = MapEditor._layer[to.y, to.x].currentField;
         if (destinationObject && destinationObject.CompareTag("Movable"))
         {
             bool success = IsMovable(to, to + direction);//再帰呼び出し
             if (!success) return false;
         }
         // GameObjectの座標(position)を移動させてからインデックスの入れ替え
-        var gimmickObject = mapEditor._layer[to.y, to.x].currentGimmick;
-        var targetObject = mapEditor._layer[from.y, from.x].currentField;
-        var targetPosition = new Vector2(to.x, mapEditor._layer.GetLength(0) - to.y);
+        var gimmickObject = MapEditor._layer[to.y, to.x].currentGimmick;
+        var targetObject = MapEditor._layer[from.y, from.x].currentField;
+        var targetPosition = new Vector2(to.x, MapEditor._layer.GetLength(0) - to.y);
         var player = targetObject.GetComponent<Player>();
 
         if (_pushField == false)
@@ -320,7 +310,7 @@ public class GameManager : Singleton<GameManager>
         //移動させるオブジェクトがプレイヤーコンポーネントを持っていた場合の処理
         if (player)
         {
-            AudioManager.instance.PlaySound(1);
+            AudioManager.Instance.PlaySound(1);
             // プレイヤーの移動先を登録元へ知らせる
             if(MoveTo != null) MoveTo(targetPosition);
         }
@@ -331,27 +321,27 @@ public class GameManager : Singleton<GameManager>
             if (_singleCrateSound == false)
             {
                 //箱を元に呼び出された時、最初の1回だけ音を鳴らす。
-                AudioManager.instance.PlaySound(0);
+                AudioManager.Instance.PlaySound(0);
             }
             _singleCrateSound = true;
         }
         MoveFunction(targetObject.transform, targetPosition, _moveSpeed);
         //移動先が川で何もオブジェクトが無いのなら
-        if (mapEditor._layer[to.y, to.x].terrain.type == PrefabType.Water && gimmickObject == null && targetObject.TryGetComponent(out IObjectState targetState))
+        if (MapEditor._layer[to.y, to.x].terrain.type == PrefabType.Water && gimmickObject == null && targetObject.TryGetComponent(out IObjectState targetState))
         {
             targetState.ChangeState(ObjectState.UnderWater);//水に沈む
         }
         //オブジェクトが水中に居るのなら_currentGimmickのtoの要素へ移動し、fromの要素はnullで上書きする
         if (targetObject.TryGetComponent(out IObjectState targetState2) && targetState2.objectState == ObjectState.UnderWater)
         {
-            AudioManager.instance.PlaySound(10);
-            mapEditor._layer[to.y, to.x].currentGimmick = mapEditor._layer[from.y, from.x].currentField;
-            mapEditor._layer[from.y, from.x].currentField = null;
+            AudioManager.Instance.PlaySound(10);
+            MapEditor._layer[to.y, to.x].currentGimmick = MapEditor._layer[from.y, from.x].currentField;
+            MapEditor._layer[from.y, from.x].currentField = null;
         }
         else// 居なければ通常通りtoの要素へ移動し、fromの要素はnullで上書きする
         {
-            mapEditor._layer[to.y, to.x].currentField = mapEditor._layer[from.y, from.x].currentField;
-            mapEditor._layer[from.y, from.x].currentField = null;
+            MapEditor._layer[to.y, to.x].currentField = MapEditor._layer[from.y, from.x].currentField;
+            MapEditor._layer[from.y, from.x].currentField = null;
         }
         return true;
     }
@@ -362,7 +352,7 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     void CheckRecord<T>(T current, Dictionary<string, T> dic) where T : IComparable<T>
     {
-        string stageName = mapEditor._stageData.name;
+        string stageName = MapEditor._stageData.name;
         string saveLabel = "";
         TextType textType = 0;
 

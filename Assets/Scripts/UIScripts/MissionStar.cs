@@ -17,11 +17,11 @@ public class MissionStar : MonoBehaviour
     [SerializeField] Sprite _missionFailure = null;
     void OnEnable()
     {
-        GameManager.instance.GameClear += CheckMissions;
+        GameManager.Instance.GameClear += CheckMissions;
     }
     void OnDisable()
     {
-        GameManager.instance.GameClear -= CheckMissions;
+        GameManager.Instance.GameClear -= CheckMissions;
     }
     void Start()
     {
@@ -32,13 +32,13 @@ public class MissionStar : MonoBehaviour
     /// <summary>ミッションが成功しているかを判定して表示を変える</summary>
     void CheckMissions()
     {
-        if (GameManager.instance._isAchieved[0]())
+        if (GameManager.Instance._isAchieved[0]())
         {
             _missionStar1.sprite = _missionSuccessful;
-            if (GameManager.instance._isAchieved[1]())
+            if (GameManager.Instance._isAchieved[1]())
             {
                 _missionStar2.sprite = _missionSuccessful;
-                if (GameManager.instance._isAchieved[2]())
+                if (GameManager.Instance._isAchieved[2]())
                     _missionStar3.sprite = _missionSuccessful;
             }
         }

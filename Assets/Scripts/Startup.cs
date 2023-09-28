@@ -9,7 +9,7 @@ public class Startup
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     static void Initialize()
     {
-        Debug.Log("メッセージパック初期化");
+        //Debug.Log("メッセージパック初期化");
         if (!serializerRegistered)
         {
             StaticCompositeResolver.Instance.Register(

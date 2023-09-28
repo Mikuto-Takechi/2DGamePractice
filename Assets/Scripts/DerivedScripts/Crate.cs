@@ -18,21 +18,21 @@ public class Crate : MonoBehaviour, IObjectState
     }
     void OnEnable()
     {
-        GameManager.instance.PushData += PushUndo;
-        GameManager.instance.PopData += PopUndo;
-        GameManager.instance.ReloadData += Reload;
-        GameManager.instance.MoveEnd += ChangeAnimationState;
+        GameManager.Instance.PushData += PushUndo;
+        GameManager.Instance.PopData += PopUndo;
+        GameManager.Instance.ReloadData += Reload;
+        GameManager.Instance.MoveEnd += ChangeAnimationState;
     }
     void OnDisable()
     {
-        GameManager.instance.PushData -= PushUndo;
-        GameManager.instance.PopData -= PopUndo;
-        GameManager.instance.ReloadData -= Reload;
-        GameManager.instance.MoveEnd -= ChangeAnimationState;
+        GameManager.Instance.PushData -= PushUndo;
+        GameManager.Instance.PopData -= PopUndo;
+        GameManager.Instance.ReloadData -= Reload;
+        GameManager.Instance.MoveEnd -= ChangeAnimationState;
     }
     private void Update()
     {
-        var layer = GameManager.instance.mapEditor._layer;
+        var layer = GameManager.Instance.MapEditor._layer;
         int x = (int)transform.position.x;
         int y = layer.GetLength(0) - (int)transform.position.y;
         if (layer[y,x].field.type == PrefabType.Target)

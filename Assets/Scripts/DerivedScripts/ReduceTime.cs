@@ -19,17 +19,17 @@ public class ReduceTime : ItemBase
         {
             text.EaseStart();
         }
-        if (GameManager.instance._stageTime > 0)
+        if (GameManager.Instance._stageTime > 0)
         {
-            float count = GameManager.instance._stageTime;
+            float count = GameManager.Instance._stageTime;
             count += reduceCount;
             if (count <= 0)
             {
-                GameManager.instance._stageTime = 0f;
+                GameManager.Instance._stageTime = 0f;
             }
             if (count > 0)
             {
-                GameManager.instance._stageTime = count;
+                GameManager.Instance._stageTime = count;
             }
         }
     }

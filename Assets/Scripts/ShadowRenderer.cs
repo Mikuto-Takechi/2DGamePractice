@@ -18,13 +18,13 @@ public class ShadowRenderer : MonoBehaviour
     float timer = 0;
     void OnEnable()
     {
-        GameManager.instance.PopData += ShadowEnabled;
-        GameManager.instance.MoveEnd += ShadowDisable;
+        GameManager.Instance.PopData += ShadowEnabled;
+        GameManager.Instance.MoveEnd += ShadowDisable;
     }
     void OnDisable()
     {
-        GameManager.instance.PopData -= ShadowEnabled;
-        GameManager.instance.MoveEnd -= ShadowDisable;
+        GameManager.Instance.PopData -= ShadowEnabled;
+        GameManager.Instance.MoveEnd -= ShadowDisable;
     }
 
     private void Start()

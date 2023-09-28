@@ -7,8 +7,8 @@ public class DeleteAllPlayerPrefs : MonoBehaviour
     public void Delete()
     {
         //PlayerPrefs.DeleteAll();
-        GameManager.instance.DeleteSave();
-        AudioManager.instance.DeleteSave();
+        GameManager.Instance.DeleteSave();
+        AudioManager.Instance.DeleteSave();
         Debug.Log("PlayerPrefs‚Ìƒf[ƒ^‚ğ‚·‚×‚Äíœ‚µ‚½");
     }
 }

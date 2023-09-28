@@ -6,6 +6,6 @@ public class Coin : ItemBase
 {
     public override void ItemEffect()
     {
-        AudioManager.instance.PlaySound(11);
+        AudioManager.Instance.PlaySound(11);
     }
 }

@@ -17,8 +17,8 @@ public class SpeedUp : ItemBase
     }
     public override void ItemEffect()
     {
-        AudioManager.instance.PlaySound(12);
-        GameManager.instance._moveSpeed = _changeSpeed;
+        AudioManager.Instance.PlaySound(12);
+        GameManager.Instance._moveSpeed = _changeSpeed;
         _shadowRenderer._effectEnabled = true;
         _shadowRenderer._externalColor = new Color(0, 1, 1, 1);
         if( _removeEffect != null ) 
@@ -29,7 +29,7 @@ public class SpeedUp : ItemBase
         // Žw’è‚µ‚½ŽžŠÔ‚ªŒo‰ß‚µ‚½‚çŒø‰Ê‚ð‰ðœ‚·‚é
         _removeEffect = DOVirtual.DelayedCall(_effectTime ,() => 
         {
-            GameManager.instance._moveSpeed = GameManager.instance._defaultSpeed;
+            GameManager.Instance._moveSpeed = GameManager.Instance._defaultSpeed;
             _shadowRenderer._effectEnabled = false;
             _shadowRenderer._externalColor = default;
         }).SetLink(gameObject);
