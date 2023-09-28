@@ -146,33 +146,29 @@ namespace MyNamespace
         /// <returns>読み込みが成功しているかをbool型で戻す</returns>
         public static bool MessagePackLoad<T>(string label, out T data)
         {
-            string json = PlayerPrefs.GetString(label, "");
-            if (json != null && json != "")
+            string json = PlayerPrefs.GetString(label, string.Empty);
+            if (json != null && json != string.Empty)
             {
-                byte[] bytes = MessagePackSerializer.ConvertFromJson(json);
-                data = MessagePackSerializer.Deserialize<T>(bytes);
+                try
+                {
+                    byte[] bytes = MessagePackSerializer.ConvertFromJson(json);
+                    data = MessagePackSerializer.Deserialize<T>(bytes);
+                }
+                catch
+                {
+                    Debug.Log("セーブデータの逆シリアライズに失敗しました");
+                    data = default;
+                    return false;
+                }
                 return true;
             }
             else
             {
+                Debug.Log("セーブデータを取得できませんでした");
                 data = default;
                 return false;
             }
         }
-        //public static void MessagePackInitialize()
-        //{
-        //    Debug.Log("メッセージパック初期化");
-        //    MessagePack.Resolvers.StaticCompositeResolver.Instance.Register(
-        //    MessagePack.Resolvers.GeneratedResolver.Instance, // コード生成した型解決クラス
-        //    MessagePack.Unity.UnityResolver.Instance,
-        //    MessagePack.Unity.Extension.UnityBlitWithPrimitiveArrayResolver.Instance,
-        //    MessagePack.Resolvers.StandardResolver.Instance
-        //    );
-        //    var option = MessagePack.MessagePackSerializerOptions.Standard
-        //    .WithCompression(MessagePack.MessagePackCompression.Lz4BlockArray) // LZ4 圧縮利用
-        //    .WithResolver(MessagePack.Resolvers.StaticCompositeResolver.Instance);
-        //    MessagePack.MessagePackSerializer.DefaultOptions = option;
-        //}
     }
 }
 namespace Takechi
