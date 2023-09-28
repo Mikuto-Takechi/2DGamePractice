@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -36,6 +35,7 @@ public class SceneChanger : Singleton<SceneChanger>
     /// </summary>
     public void StartGame(string stageName)
     {
+        if( _tween != null) return;
         if (GameManager.Instance.MapEditor.BuildMapData(stageName))
             LoadScene("CSVTest");
     }
@@ -44,6 +44,7 @@ public class SceneChanger : Singleton<SceneChanger>
     /// </summary>
     public void NextGame()
     {
+        if (_tween != null) return;
         string nextStage = GameManager.Instance.MapEditor._stageData.next;
         if (nextStage != string.Empty)
         {
