@@ -19,6 +19,8 @@ public class GamePanel : MonoBehaviour
             panel.blocksRaycasts = false;
             if (panel == _panels[index])
             {
+                panel.transform.localScale = Vector3.zero;
+                panel.transform.DOScale(1f, 1f).SetEase(Ease.OutBounce).SetLink(gameObject);
                 panel.alpha = 1;
                 panel.interactable = true;
                 panel.blocksRaycasts = true;
@@ -29,23 +31,23 @@ public class GamePanel : MonoBehaviour
     }
     public void SwitchPause()
     {
-        if (GameManager.instance._gameState == GameState.Pause)
+        if (GameManager.Instance._gameState == GameState.Pause)
         {
-            GameManager.instance._gameState = GameState.Idle;
+            GameManager.Instance._gameState = GameState.Idle;
             ChangePanel(0);//メインUI
-            AudioManager.instance.PauseBGM(false);
+            AudioManager.Instance.PauseBGM(false);
         }
         else
         {
-            GameManager.instance._gameState = GameState.Pause;
+            GameManager.Instance._gameState = GameState.Pause;
             ChangePanel(2);//ポーズUI
             EaseText[] ease = _panels[2].transform.GetComponentsInChildren<EaseText>();
             foreach (var e in ease)
             {
                 if (e != null) e.EaseStart();
             }
-            AudioManager.instance.PauseBGM(true);
-            AudioManager.instance.PlaySound(2);
+            AudioManager.Instance.PauseBGM(true);
+            AudioManager.Instance.PlaySound(2);
         }
     }
     public void Clear()
@@ -57,40 +59,19 @@ public class GamePanel : MonoBehaviour
         }
         _panels[1].transform.GetComponentInChildren<Button>().Select();
     }
-    public void ChangeScene(int index)
-    {
-        if (index < 0) index = 0;
-        if (index > SceneManager.sceneCountInBuildSettings - 1) index = SceneManager.sceneCountInBuildSettings - 1;
-        SceneManager.LoadScene(index);
-    }
     /// <summary>
     /// ゲーム開始
     /// </summary>
     public void StartGame(string stageName)
     {
-        MapEditor mapEditor = FindObjectOfType<MapEditor>();
-        if (_fadeTween != null) return;
-        _fadeTween = _fadePanel.DOFade(1, 1).OnComplete(() => 
-        {
-            if (mapEditor.BuildMapData(stageName))
-                SceneManager.LoadScene("CSVTest");
-        });
+        SceneChanger.Instance.StartGame(stageName);
     }
     /// <summary>
     /// 次のステージへ移動させる
     /// </summary>
     public void NextGame()
     {
-        MapEditor mapEditor = FindObjectOfType<MapEditor>();
-        if(mapEditor._stageData.next != null)
-        {
-            if (mapEditor.BuildMapData(mapEditor._stageData.next))
-                SceneManager.LoadScene("CSVTest");
-        }
-        else
-        {
-            Debug.Log("次のマップの読み込みに失敗しました");
-        }
+        SceneChanger.Instance.NextGame();
     }
     public void QuitGame()
     {
@@ -102,9 +83,9 @@ public class GamePanel : MonoBehaviour
     }
     public void ResetGame()
     {
-        GameManager.instance.ResetGame();
+        GameManager.Instance.ResetGame();
         ChangePanel(0);
-        AudioManager.instance.PlayBGM(2);
-        GameManager.instance._gameState = GameState.Idle;
+        AudioManager.Instance.PlayBGM(2);
+        GameManager.Instance._gameState = GameState.Idle;
     }
 }

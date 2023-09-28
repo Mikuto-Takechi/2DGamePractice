@@ -167,7 +167,7 @@ public class MapEditor : MonoBehaviour
         if (_fieldStack.TryPop(out var undoField))
         {
             LayerArray.Set(_layer, undoField, LayerMode.CurrentField);
-            AudioManager.instance.PlaySound(6);
+            AudioManager.Instance.PlaySound(6);
             for (int y = 0; y < _layer.GetLength(0); y++)
             {
                 for (int x = 0; x < _layer.GetLength(1); x++)

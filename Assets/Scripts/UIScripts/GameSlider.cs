@@ -11,11 +11,11 @@ public class GameSlider : MonoBehaviour
     Text _sliderText;
     void OnEnable()
     {
-        AudioManager.instance.DeleteSetting += DeleteSave;
+        AudioManager.Instance.DeleteSetting += DeleteSave;
     }
     void OnDisable()
     {
-        AudioManager.instance.DeleteSetting -= DeleteSave;
+        AudioManager.Instance.DeleteSetting -= DeleteSave;
     }
     void Start()
     {
@@ -25,12 +25,12 @@ public class GameSlider : MonoBehaviour
         _slider.onValueChanged.AddListener(SliderSound);
         if (_sliderType == SliderType.BGM)
         {
-            _slider.value = AudioManager.instance._loop.volume;//スライダーにAudioSourceの値を代入
+            _slider.value = AudioManager.Instance._loop.volume;//スライダーにAudioSourceの値を代入
             if (_sliderText) _sliderText.text = $"BGM: {_slider.value.ToString("F1")}";
         }
         if (_sliderType == SliderType.SE)
         {
-            _slider.value = AudioManager.instance._se.volume;//スライダーにAudioSourceの値を代入
+            _slider.value = AudioManager.Instance._se.volume;//スライダーにAudioSourceの値を代入
             if (_sliderText) _sliderText.text = $"SE: {_slider.value.ToString("F1")}";
         }
     }
@@ -40,18 +40,18 @@ public class GameSlider : MonoBehaviour
         if (_slider == null) return;
         if (_sliderType == SliderType.BGM)
         {
-            AudioManager.instance._loop.volume = _slider.value;//AudioSourceにスライダーの値を代入
+            AudioManager.Instance._loop.volume = _slider.value;//AudioSourceにスライダーの値を代入
             if (_sliderText) _sliderText.text = $"BGM: {_slider.value.ToString("F1")}";
         }
         if (_sliderType == SliderType.SE)
         {
-            AudioManager.instance._se.volume = _slider.value;//AudioSourceにスライダーの値を代入
+            AudioManager.Instance._se.volume = _slider.value;//AudioSourceにスライダーの値を代入
             if (_sliderText) _sliderText.text = $"SE: {_slider.value.ToString("F1")}";
         }
     }
     void SliderSound(float num)
     {
-        AudioManager.instance.PlaySound(4);
+        AudioManager.Instance.PlaySound(4);
     }
     void DeleteSave()
     {

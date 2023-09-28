@@ -10,26 +10,26 @@ public class TimeAndStepStack : MonoBehaviour/*, IReload, IPushUndo, IPopUndo*/
     //Stack<float> _timeStack = new Stack<float>();
     void OnEnable()
     {
-        GameManager.instance.PushData += PushUndo;
-        GameManager.instance.PopData += PopUndo;
-        GameManager.instance.ReloadData += Reload;
+        GameManager.Instance.PushData += PushUndo;
+        GameManager.Instance.PopData += PopUndo;
+        GameManager.Instance.ReloadData += Reload;
     }
     void OnDisable()
     {
-        GameManager.instance.PushData -= PushUndo;
-        GameManager.instance.PopData -= PopUndo;
-        GameManager.instance.ReloadData -= Reload;
+        GameManager.Instance.PushData -= PushUndo;
+        GameManager.Instance.PopData -= PopUndo;
+        GameManager.Instance.ReloadData -= Reload;
     }
     public void Reload()
     {
-        GameManager.instance._steps = 0;
+        GameManager.Instance._steps = 0;
         //GameManager.instance._stageTime = 0;
         _stepStack.Clear();
         //_timeStack.Clear();
     }
     public void PushUndo()
     {
-        _stepStack.Push(GameManager.instance._steps);
+        _stepStack.Push(GameManager.Instance._steps);
         //_timeStack.Push(GameManager.instance._stageTime);
     }
 
@@ -37,7 +37,7 @@ public class TimeAndStepStack : MonoBehaviour/*, IReload, IPushUndo, IPopUndo*/
     {
         if (_stepStack.TryPop(out int step))
         {
-            GameManager.instance._steps = step;
+            GameManager.Instance._steps = step;
         }
         //if (_timeStack.TryPop(out float time))
         //{

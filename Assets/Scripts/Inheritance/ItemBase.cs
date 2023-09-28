@@ -11,17 +11,17 @@ public abstract class ItemBase : MonoBehaviour
     Stack<bool> _activeStack = new Stack<bool>();
     void OnEnable()
     {
-        GameManager.instance.MoveTo += PlayerMove;
-        GameManager.instance.PushData += PushUndo;
-        GameManager.instance.PopData += PopUndo;
-        GameManager.instance.ReloadData += Reload;
+        GameManager.Instance.MoveTo += PlayerMove;
+        GameManager.Instance.PushData += PushUndo;
+        GameManager.Instance.PopData += PopUndo;
+        GameManager.Instance.ReloadData += Reload;
     }
     void OnDisable()
     {
-        GameManager.instance.MoveTo -= PlayerMove;
-        GameManager.instance.PushData -= PushUndo;
-        GameManager.instance.PopData -= PopUndo;
-        GameManager.instance.ReloadData -= Reload;
+        GameManager.Instance.MoveTo -= PlayerMove;
+        GameManager.Instance.PushData -= PushUndo;
+        GameManager.Instance.PopData -= PopUndo;
+        GameManager.Instance.ReloadData -= Reload;
     }
     protected void Start()
     {

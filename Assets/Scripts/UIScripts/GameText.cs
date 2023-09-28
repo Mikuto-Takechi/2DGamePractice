@@ -15,11 +15,11 @@ public class GameText : MonoBehaviour
     int _indexNumber = 0;
     void OnEnable()
     {
-        GameManager.instance.NewRecord += NewRecord;
+        GameManager.Instance.NewRecord += NewRecord;
     }
     void OnDisable()
     {
-        GameManager.instance.NewRecord -= NewRecord;
+        GameManager.Instance.NewRecord -= NewRecord;
     }
     void Start()
     {
@@ -28,7 +28,7 @@ public class GameText : MonoBehaviour
             StartCoroutine(MoveText());
         if( _type == TextType.Time)
         {
-            _time.Value = (int)GameManager.instance._stageTime;
+            _time.Value = (int)GameManager.Instance._stageTime;
             _time.Where(time => time > 7).Subscribe(_ => _text.color = Color.white);
             _time.Where(time => time > 5 && time <= 7).Subscribe(_ => _text.DOColor(new Color(1, 1, 0), 0.9f));
             _time.Where(time => time <= 5)
@@ -45,36 +45,36 @@ public class GameText : MonoBehaviour
     {
         if(_type == TextType.Time)
         {
-            _time.Value = (int)GameManager.instance._stageTime;
-            _text.text = TimeDisplay(GameManager.instance._stageTime);
+            _time.Value = (int)GameManager.Instance._stageTime;
+            _text.text = TimeDisplay(GameManager.Instance._stageTime);
         }
         if (_type == TextType.Steps) 
-            _text.text = GameManager.instance._steps.ToString("0000");
+            _text.text = GameManager.Instance._steps.ToString("0000");
         if(_type == TextType.ClearSteps)
-            _text.text = "クリア歩数：" + GameManager.instance._steps.ToString();
+            _text.text = "クリア歩数：" + GameManager.Instance._steps.ToString();
         if (_type == TextType.ClearTime)
         {
-            var gm = GameManager.instance;
-            _text.text = "クリア時間：" + (gm.mapEditor._stageData.timeLimit - gm._stageTime).ToString("0.00");
+            var gm = GameManager.Instance;
+            _text.text = "クリア時間：" + (gm.MapEditor._stageData.timeLimit - gm._stageTime).ToString("0.00");
         }
         if (_type == TextType.timeAchievement)
         {
-            _text.text = $"[1]{GameManager.instance.mapEditor._stageData.timeAchievement}秒以内にクリア";
-            if (GameManager.instance._isAchieved[0]())
+            _text.text = $"[1]{GameManager.Instance.MapEditor._stageData.timeAchievement}秒以内にクリア";
+            if (GameManager.Instance._isAchieved[0]())
                 _text.color = Color.white;
             else _text.color = Color.red;
         }
         if (_type == TextType.stepAchievement1)
         {
-            _text.text = $"[2]{GameManager.instance.mapEditor._stageData.stepAchievement1}歩以内にクリア";
-            if (GameManager.instance._isAchieved[0]() && GameManager.instance._isAchieved[1]())
+            _text.text = $"[2]{GameManager.Instance.MapEditor._stageData.stepAchievement1}歩以内にクリア";
+            if (GameManager.Instance._isAchieved[0]() && GameManager.Instance._isAchieved[1]())
                 _text.color = Color.white;
             else _text.color = Color.red;
         }
         if (_type == TextType.stepAchievement2)
         {
-            _text.text = $"[3]{GameManager.instance.mapEditor._stageData.stepAchievement2}歩以内にクリア";
-            if (GameManager.instance._isAchieved[0]() && GameManager.instance._isAchieved[1]() && GameManager.instance._isAchieved[2]())
+            _text.text = $"[3]{GameManager.Instance.MapEditor._stageData.stepAchievement2}歩以内にクリア";
+            if (GameManager.Instance._isAchieved[0]() && GameManager.Instance._isAchieved[1]() && GameManager.Instance._isAchieved[2]())
                 _text.color = Color.white;
             else _text.color = Color.red;
         }
@@ -104,9 +104,8 @@ public class GameText : MonoBehaviour
         if (_newRecordAnchor == null) return;
         Text newRecord = Instantiate(_newRecord, _newRecordAnchor);
         newRecord.rectTransform.DOLocalMoveY(20f, 0.4f)
-                               .SetRelative(true)
-                               .SetEase(Ease.OutQuad)
-                               .SetLoops(-1, LoopType.Yoyo)
-                               .SetLink(gameObject);
+                               .SetRelative(true).SetEase(Ease.OutQuad)
+                               .SetLoops(-1, LoopType.Yoyo).SetLink(gameObject);
+        newRecord.DOColor(Color.white, 1f).SetEase(Ease.Flash, 8).SetLoops(-1, LoopType.Yoyo).SetLink(gameObject);
     }
 }
