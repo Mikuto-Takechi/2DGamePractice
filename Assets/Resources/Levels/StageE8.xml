@@ -7,7 +7,7 @@
 		{
 		"name": "StageE8",
 		"next": "StageE9",
-		"timeLimit": 180,
+		"timeLimit": 250,
 		"timeAchievement": 165,
 		"stepAchievement1": 580,
 		"stepAchievement2": 555
