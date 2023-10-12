@@ -2701,7 +2701,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _material: {fileID: 2100000, guid: 5d0e4305f27997b4293ef0c871bdc8fd, type: 2}
-  _activeEffect: 0
+  _activeEffect: 1
 --- !u!1 &543544718
 GameObject:
   m_ObjectHideFlags: 0
@@ -8576,7 +8576,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -61.55002, y: 0}
+  m_AnchoredPosition: {x: -61.55005, y: 0}
   m_SizeDelta: {x: 1206.9, y: 103.09}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1755441937
