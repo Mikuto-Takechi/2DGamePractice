@@ -12,10 +12,12 @@ public class MapEditor : MonoBehaviour
     [SerializeField,Tooltip("Keyに番号、ValueのItem1にプレファブ、Item2には名前を入れる")]
     SerializableKeyPair<int, SerializableTuple<GameObject, PrefabType>>[] _prefabs = default;
     /// <summary>実際にゲームの処理で使うマップを構成するプレファブを設定したDictionary</summary>
-    public Dictionary<int, (GameObject, PrefabType)> _prefabsDictionary { get; set; }
+    Dictionary<int, (GameObject, PrefabType)> _prefabsDictionary = null;
+    //Inspectorで設定するためのクラスからDictionaryに変換する
+    public Dictionary<int, (GameObject, PrefabType)> PrefabsDictionary => _prefabsDictionary ?? (_prefabsDictionary = _prefabs.ToDictionary(p => p.Key, p => (p.Value.Item1, p.Value.Item2)));
     public Layer[,] _layer { get; set; }
     public StageData _stageData { get; set; }
-    TextAsset[] _allMap;
+    TextAsset[] _allMap = null;
     public Stack<GameObject[,]> _fieldStack { get; set; } = new Stack<GameObject[,]>();
     public Stack<GameObject[,]> _gimmickStack { get; set; } = new Stack<GameObject[,]>();
     GameManager gameManager;
@@ -24,8 +26,6 @@ public class MapEditor : MonoBehaviour
         gameManager = GetComponent<GameManager>();
         //マップデータを全て読み込む
         _allMap = Resources.LoadAll<TextAsset>("Levels");
-        //Inspectorで設定するためのクラスからDictionaryに変換する
-        _prefabsDictionary ??= _prefabs.ToDictionary(p => p.Key, p => (p.Value.Item1, p.Value.Item2));
     }
     void OnEnable()
     {
@@ -42,16 +42,22 @@ public class MapEditor : MonoBehaviour
     public bool BuildMapData(string stageName)
     {
         //全てのマップを一つずつ処理をする
-        foreach (TextAsset map in _allMap)
+        foreach (TextAsset map in Resources.LoadAll<TextAsset>("Levels"))
         {
             XElement mapXml = XElement.Parse(map.text);
             string stageDataString = mapXml.Element("stageData")?.Value;
             if (stageDataString == null)
+            {
+                Resources.UnloadAsset(map);
                 continue;
+            }
             _stageData = JsonUtility.FromJson<StageData>(stageDataString);
             //一番最初のタグ<map>の要素nameに指定した値が無いなら次のループへ移動する
             if (_stageData.name != stageName)
+            {
+                Resources.UnloadAsset(map);
                 continue;
+            }
             //読み込み始めるマップの名前と次のステージの名前と制限時間を登録
             //マップの幅と縦の大きさを取り出す
             int width = int.Parse(mapXml.Attribute("width").Value);
@@ -78,24 +84,6 @@ public class MapEditor : MonoBehaviour
                             _layer[col, row].field.id = int.Parse(nums[row]);
                     }
                 }
-                //デバッグログ
-                //string debugText = "";
-                //if (layer.Attribute("name").Value == "Terrain")
-                //    debugText += "Terrain\n";
-                //if (layer.Attribute("name").Value == "Field")
-                //    debugText += "Field\n";
-                //for (int i = 0; i < height; i++)
-                //{
-                //    for (int j = 0; j < width; j++)
-                //    {
-                //        if (layer.Attribute("name").Value == "Terrain")
-                //            debugText += $"{_layer[i, j].terrain.id},";
-                //        if (layer.Attribute("name").Value == "Field")
-                //            debugText += $"{_layer[i, j].field.id},";
-                //    }
-                //    debugText += "\n";
-                //}
-                //Debug.Log(debugText);
             }
             return true;
         }
