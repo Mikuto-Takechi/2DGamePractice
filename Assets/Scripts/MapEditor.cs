@@ -100,7 +100,7 @@ public class MapEditor : MonoBehaviour
                 //そのままVector3(x, y, 0)で初期化すると上下が反転するのでmap.Length - y
                 Vector3 position = new Vector3(x, _layer.GetLength(0) - y, 0);
                 // キーと一致する要素が配列内にあるならValueを取り出して生成する
-                foreach (var keyValue in _prefabsDictionary)
+                foreach (var keyValue in PrefabsDictionary)
                 {
                     if(keyValue.Key == _layer[y, x].terrain.id)
                     {
