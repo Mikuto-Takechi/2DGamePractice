@@ -70,7 +70,6 @@ public class MapEditor : MonoBehaviour
                 {
                     for (int row = 0; row < width; row++)
                     {
-                        //int[] nums = Array.ConvertAll(lines[col].Split(','), int.Parse);
                         var nums = lines[col].Split(',');
                         if (layer.Attribute("name").Value == "Terrain")
                             _layer[col, row].terrain.id = int.Parse(nums[row]);
@@ -78,24 +77,6 @@ public class MapEditor : MonoBehaviour
                             _layer[col, row].field.id = int.Parse(nums[row]);
                     }
                 }
-                //デバッグログ
-                //string debugText = "";
-                //if (layer.Attribute("name").Value == "Terrain")
-                //    debugText += "Terrain\n";
-                //if (layer.Attribute("name").Value == "Field")
-                //    debugText += "Field\n";
-                //for (int i = 0; i < height; i++)
-                //{
-                //    for (int j = 0; j < width; j++)
-                //    {
-                //        if (layer.Attribute("name").Value == "Terrain")
-                //            debugText += $"{_layer[i, j].terrain.id},";
-                //        if (layer.Attribute("name").Value == "Field")
-                //            debugText += $"{_layer[i, j].field.id},";
-                //    }
-                //    debugText += "\n";
-                //}
-                //Debug.Log(debugText);
             }
             return true;
         }
