@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 using System;
 using static MyNamespace.MessagePackMethods;
 using System.Linq;
-using UnityEngine.UI;
 using DG.Tweening;
 using UniRx;
 using Takechi;
@@ -63,13 +62,7 @@ public class GameManager : Singleton<GameManager>
             _saveData.UnlockStages = unlockData;
         if (MessagePackLoad("Achievements", out Dictionary<string, Stars> achievementsData))
             _saveData.Missions = achievementsData;
-        // GameObjectが破棄されるまで繰り返す
-        Observable.Timer(TimeSpan.FromSeconds(10))
-            .DoOnCompleted(Save)
-            .RepeatUntilDestroy(gameObject)
-            .Subscribe()
-            .AddTo(this);
-        //引数無し戻り値intの型のリスト
+        //  引数無し戻り値intの型のリスト
         _inputProcesses = new List<Func<int>>
         {
             () => InputProcess(_gameInputs.Player.Up.IsPressed(), Vector2Int.down, 1),

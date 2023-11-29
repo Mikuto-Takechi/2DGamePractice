@@ -20,12 +20,6 @@ public class AudioManager : Singleton<AudioManager>
         if (bgmVol != 999) _loop.volume = bgmVol;
         if (seVol != 999) _se.volume = seVol;
         SceneManager.sceneLoaded += SceneLoaded;
-        // GameObject‚ª”jŠü‚³‚ê‚é‚Ü‚ÅŒJ‚è•Ô‚·
-        Observable.Timer(TimeSpan.FromSeconds(10))
-            .DoOnCompleted(Save)
-            .RepeatUntilDestroy(gameObject)
-            .Subscribe()
-            .AddTo(this);
     }
     public void PlaySound(int num)
     {
