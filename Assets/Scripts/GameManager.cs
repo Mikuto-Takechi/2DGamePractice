@@ -17,7 +17,6 @@ public class GameManager : Singleton<GameManager>
     public float _stageTime { get; set; } = 0;
     public GameState _gameState = GameState.Title;
     public SaveData _saveData { get; set; } = new SaveData();
-    GamePanel _panel;
     Queue<Vector2Int> _inputQueue = new Queue<Vector2Int>();
     /// <summary>入力バッファサイズ</summary>
     [SerializeField] int _maxQueueCount = 2;
@@ -34,20 +33,24 @@ public class GameManager : Singleton<GameManager>
     int _initInputProcess = 0;
     /// <summary>実績が解除されているかを判定してbool型で返すメソッドを入れるリスト</summary>
     public List<Func<bool>> _isAchieved { get; set; } = null;
-    /// <summary>データをスタックにプッシュする際に呼ばれるメソッド</summary>
+    /// <summary>データをスタックにプッシュする際に呼ばれるデリゲート</summary>
     public event Action PushData;
-    /// <summary>データをスタックからポップする際に呼ばれるメソッド</summary>
+    /// <summary>データをスタックからポップする際に呼ばれるデリゲート</summary>
     public event Action PopData;
-    /// <summary>スタックに溜まっているデータをリセットする際に呼ばれるメソッド</summary>
+    /// <summary>スタックに溜まっているデータをリセットする際に呼ばれるデリゲート</summary>
     public event Action ReloadData;
-    /// <summary>移動先を登録元に知らせるメソッド</summary>
+    /// <summary>移動先を登録元に知らせるデリゲート</summary>
     public event Action<Vector2> MoveTo;
-    /// <summary>移動終了を知らせるメソッド</summary>
+    /// <summary>移動終了を知らせるデリゲート</summary>
     public event Action MoveEnd;
-    /// <summary>記録更新を知らせるメソッド</summary>
+    /// <summary>記録更新を知らせるデリゲート</summary>
     public event Action<TextType> NewRecord;
-    /// <summary>ゲームクリアを知らせるメソッド</summary>
+    /// <summary>ゲームクリアを知らせるデリゲート</summary>
     public event Action GameClear;
+    /// <summary>時間切れを知らせるデリゲート</summary>
+    public event Action TimeOver;
+    /// <summary>一時停止を知らせるデリゲート</summary>
+    public event Action PauseAction;
     public override void AwakeFunction()
     {
         _defaultSpeed = _moveSpeed;
@@ -93,8 +96,6 @@ public class GameManager : Singleton<GameManager>
         _coroutineCount = 0;//実行中のコルーチンのカウントをリセット
         _moveSpeed = _defaultSpeed;
         _steps = 0;
-        _panel = FindObjectOfType<GamePanel>();
-        _panel?.ChangePanel(0);
         MapEditor._fieldStack.Clear();//フィールドのスタックを削除する
         MapEditor._gimmickStack.Clear();//ギミックのスタックを削除する
         if (nextScene.name.Contains("Title"))
@@ -132,22 +133,20 @@ public class GameManager : Singleton<GameManager>
                 MessagePackSave("Achievements", _saveData.Missions);
                 _saveData.UnlockStages.Add(MapEditor._stageData.next);
                 MessagePackSave("UnlockStages", _saveData.UnlockStages);
-                _panel.ChangePanel(1);
-                _panel.Clear();
                 AudioManager.Instance.StopBGM();
                 AudioManager.Instance.PlaySound(3);
             }
             return;
         }
         if (_gameState == GameState.TimeOver) return;
-        if (_gameInputs.Player.Pause.triggered)
+        if (_gameInputs.Player.Pause.triggered && _gameState != GameState.Pause)
         {
-            _panel?.SwitchPause();
+            PauseAction();
+            Pause();
         }
-        if(_stageTime < 0 && _gameState != GameState.Move)
+        if(_stageTime <= 0 && _gameState != GameState.Move)
         {
-            _panel?.ChangePanel(4);
-            _panel?.TweenPanel(4);
+            TimeOver();
             AudioManager.Instance.StopBGM();
             AudioManager.Instance.PlaySound(13);
             _gameState = GameState.TimeOver;
@@ -198,13 +197,28 @@ public class GameManager : Singleton<GameManager>
                         AudioManager.Instance.PlaySound(14);
                         Vector2 moveToIndexHalf = (Vector2)playerIndex + (Vector2)pos / 3;
                         var moveToPos = new Vector2(moveToIndexHalf.x, MapEditor._layer.GetLength(0) - moveToIndexHalf.y);
-                        player.transform.DOMove(moveToPos, 0.1f).SetLoops(2, LoopType.Yoyo).OnComplete(() => _gameState = GameState.Idle);
+                        player.transform.DOMove(moveToPos, 0.1f).SetLoops(2, LoopType.Yoyo)
+                            .OnComplete(() => _gameState = _gameState == GameState.Pause ? GameState.Pause : GameState.Idle);
                     }
                 }
             }
         }
-        //stageTimeに加算
-        _stageTime -= Time.deltaTime;
+        //stageTimeを減らす
+        if (_stageTime > 0)
+            _stageTime -= Time.deltaTime;
+        else if (_stageTime < 0)
+            _stageTime = 0;
+    }
+    public void Pause()
+    {
+        _gameState = GameState.Pause;
+        AudioManager.Instance.PauseBGM(true);
+        AudioManager.Instance.PlaySound(2);
+    }
+    public void UnPause()
+    {
+        _gameState = GameState.Idle;
+        AudioManager.Instance.PauseBGM(false);
     }
     public void ResetGame()
     {
@@ -214,6 +228,8 @@ public class GameManager : Singleton<GameManager>
         ReloadData();// 登録されているステージ初期化メソッドの呼び出し
         _steps = 0;// 歩数を初期化
         _stageTime = MapEditor._stageData.timeLimit;// 制限時間を初期化
+        AudioManager.Instance.PlayBGM(2);
+        _gameState = GameState.Idle;
     }
     IEnumerator Move(Transform obj, Vector2 to, float endTime, Action callback)
     {

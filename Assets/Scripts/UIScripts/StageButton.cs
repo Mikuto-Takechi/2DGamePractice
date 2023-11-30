@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
 /// <summary>
@@ -35,6 +36,7 @@ public class StageButton : MonoBehaviour
     {
         _button = GetComponent<Button>();
         if (_lockImage) _lockImage.SetActive(false);
+        _button.OnClickAsObservable().Subscribe(_ => SceneChanger.Instance.StartGame(_stageName));
     }
     private void Update()
     {

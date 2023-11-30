@@ -21,8 +21,8 @@ public class GamePanel : MonoBehaviour
                 panel.alpha = 1;
                 panel.interactable = true;
                 panel.blocksRaycasts = true;
-                Button button = _panels[index].GetComponentInChildren<Button>();
-                if (button != null) EventSystem.current.SetSelectedGameObject(button.gameObject);
+                Selectable selectable = _panels[index].GetComponentInChildren<Selectable>();
+                if (selectable != null) EventSystem.current.SetSelectedGameObject(selectable.gameObject);
             }
         }
     }
@@ -93,7 +93,5 @@ public class GamePanel : MonoBehaviour
     {
         GameManager.Instance.ResetGame();
         ChangePanel(0);
-        AudioManager.Instance.PlayBGM(2);
-        GameManager.Instance._gameState = GameState.Idle;
     }
 }
