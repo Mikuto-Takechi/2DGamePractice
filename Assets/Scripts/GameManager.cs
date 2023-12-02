@@ -369,7 +369,7 @@ public class GameManager : Singleton<GameManager>
         if (typeof(T) == typeof(int))
         {
             saveLabel = "StepRecords";
-            textType =  TextType.ClearSteps;
+            textType = TextType.ClearSteps;
         }
         if (typeof(T) == typeof(float))
         {

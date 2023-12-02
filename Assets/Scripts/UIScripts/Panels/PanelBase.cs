@@ -9,10 +9,10 @@ using UnityEngine.UI;
 public abstract class PanelBase : InputBase
 {
     [SerializeField] bool _setActiveOnStart = false;
-    public List<IDisposable> Subscriptions = new();
-    public CanvasGroup CanvasGroup;
-    public RectTransform RectT;
-    public Vector2 InitPos;
+    public List<IDisposable> Subscriptions { get; private set; } = new();
+    public CanvasGroup CanvasGroup { get; private set; }
+    public RectTransform RectT { get; private set; }
+    public Vector2 InitPos{ get; private set; }
     float _moveDistance;
     /// <summary>w“Ç‚ğ‚·‚é‚½‚ß‚Ìˆ—‚ğ‘‚­êŠB</summary>
     protected abstract void Subscribe();

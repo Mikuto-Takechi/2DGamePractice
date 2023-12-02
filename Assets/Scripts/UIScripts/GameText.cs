@@ -50,9 +50,9 @@ public class GameText : MonoBehaviour
         }
         if (_type == TextType.Steps) 
             _text.text = GameManager.Instance._steps.ToString("0000");
-        if(_type == TextType.ClearSteps)
+        if(_type == TextType.ClearSteps)    //  ClearPanelクラスに移植済み
             _text.text = "クリア歩数：" + GameManager.Instance._steps.ToString();
-        if (_type == TextType.ClearTime)
+        if (_type == TextType.ClearTime)    //  ClearPanelクラスに移植済み
         {
             var gm = GameManager.Instance;
             _text.text = "クリア時間：" + (gm.MapEditor._stageData.timeLimit - gm._stageTime).ToString("0.00");

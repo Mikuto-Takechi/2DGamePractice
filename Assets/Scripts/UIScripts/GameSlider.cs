@@ -9,16 +9,13 @@ public class GameSlider : MonoBehaviour
     [SerializeField] SliderType _sliderType = SliderType.None;
     Slider _slider;
     Text _sliderText;
-    void OnEnable()
-    {
-        AudioManager.Instance.DeleteSetting += DeleteSave;
-    }
     void OnDisable()
     {
         AudioManager.Instance.DeleteSetting -= DeleteSave;
     }
     void Start()
     {
+        AudioManager.Instance.DeleteSetting += DeleteSave;
         _slider = GetComponent<Slider>();
         _sliderText = transform.GetComponentInChildren<Text>();
         if (_slider == null) return;
