@@ -20,7 +20,7 @@ public abstract class PanelBase : InputBase
     {
         CanvasGroup = GetComponent<CanvasGroup>();
         RectT = GetComponent<RectTransform>();
-        _moveDistance = Screen.width / 2;
+        _moveDistance = Screen.width;
         InitPos = RectT.anchoredPosition;
         if(_setActiveOnStart) 
             SetActive();
@@ -51,7 +51,7 @@ public abstract class PanelBase : InputBase
     {
         transform.localScale = Vector3.zero;
         CanvasGroup.alpha = 1;
-        transform.DOScale(Vector3.one, 0.25f).OnComplete(() => 
+        transform.DOScale(Vector3.one, 0.25f).SetEase(Ease.OutBack).OnComplete(() => 
         {
             Subscribe();
             CanvasGroup.blocksRaycasts = true;
@@ -71,7 +71,7 @@ public abstract class PanelBase : InputBase
         moveToPosition.x -= reverse ? -_moveDistance : _moveDistance;
         SetInactive(true);
         EventSystem.current.SetSelectedGameObject(null);
-        RectT.DOAnchorPos(moveToPosition, 0.5f).OnComplete(() => 
+        RectT.DOAnchorPos(moveToPosition, 0.5f).SetEase(Ease.InOutExpo).OnComplete(() => 
         {
             CanvasGroup.alpha = 0;
             RectT.anchoredPosition = InitPos;
@@ -81,7 +81,7 @@ public abstract class PanelBase : InputBase
         offsetPosition.x += reverse ? -_moveDistance : _moveDistance;
         panel.RectT.anchoredPosition = offsetPosition;
         panel.CanvasGroup.alpha = 1;
-        panel.RectT.DOAnchorPos(panel.InitPos, 0.5f)
+        panel.RectT.DOAnchorPos(panel.InitPos, 0.5f).SetEase(Ease.InOutExpo)
             .OnComplete(() => 
             {
                 panel.SetActive();
